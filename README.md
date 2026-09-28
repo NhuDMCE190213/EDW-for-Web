@@ -1,5 +1,5 @@
 # EDW - Electronic Device E-Commerce App
-**Môn học:** PRM393 - Lập trình mobile
+**Môn học:** PRN232
 **Nhóm:** PRM393-G2  
 **Học kỳ:** Fall 2026  
 
