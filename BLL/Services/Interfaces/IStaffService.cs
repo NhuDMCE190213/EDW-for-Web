@@ -4,6 +4,7 @@ namespace BLL.Services.Interfaces
 {
     public interface IStaffService
     {
+        Task<StaffDto?> GetStaffByIdAsync(int id);
         Task<StaffDto?> GetByEmailAsync(string email);
         Task<StaffDto?> ValidateLoginAsync(string email, string password);
         Task<StaffDto> CreateAsync(StaffCreateDto createDto);

@@ -5,7 +5,13 @@ using DAL;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
-
+using FluentValidation;
+using BLL.DTOs.Promotion;
+using BLL.DTOs.Validators.PromotionValidator;
+using BLL.DTOs.Customer;
+using BLL.DTOs.Validators.CustomerValidator;
+using BLL.DTOs.Staff;
+using BLL.DTOs.Validators.StaffValidator;
 namespace BLL
 {
     public static class DependencyInjection
@@ -27,6 +33,14 @@ namespace BLL
             services.AddScoped<IOrderItemService, OrderItemService>();
 
             services.AddScoped<ICartItemService, CartItemService>();
+
+            // Register Validators
+            services.AddScoped<IValidator<PromotionCreateDto>, PromotionCreateDtoValidator>();
+            services.AddScoped<IValidator<PromotionUpdateDto>, PromotionUpdateDtoValidator>();
+            services.AddScoped<IValidator<CustomerCreateDto>, CustomerCreateDtoValidator>();
+            services.AddScoped<IValidator<CustomerUpdateDto>, CustomerUpdateDtoValidator>();
+            services.AddScoped<IValidator<StaffCreateDto>, StaffCreateDtoValidator>();
+            services.AddScoped<IValidator<StaffUpdateDto>, StaffUpdateDtoValidator>();
 
             services.AddAutoMapper(cfg =>
             {

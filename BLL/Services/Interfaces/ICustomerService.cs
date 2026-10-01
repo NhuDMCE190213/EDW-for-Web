@@ -5,6 +5,7 @@ namespace BLL.Services.Interfaces
 {
     public interface ICustomerService
     {
+        Task<CustomerDto?> GetCustomerByIdAsync(int id);
         Task<CustomerDto?> GetByEmailAsync(string email);
         Task<CustomerDto?> ValidateLoginAsync(string email, string password);
         Task<CustomerDto> CreateAsync(CustomerCreateDto createDto);

@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using BLL.DTOs.Customer;
 using BLL.DTOs.Pagination;
 using BLL.DTOs.Staff;
@@ -28,6 +28,24 @@ namespace BLL.Services
             _customerRepository = customerRepository;
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+        }
+
+        public async Task<CustomerDto?> GetCustomerByIdAsync(int id)
+        {
+            var customer = await _customerRepository.GetByIdAsync(id);
+            if (customer == null || customer.IsDeleted) return null;
+
+            return new CustomerDto
+            {
+                CustomerId = customer.CustomerId,
+                FullName = customer.FullName,
+                Email = customer.Email,
+                PhoneNumber = customer.PhoneNumber,
+                Role = customer.Role,
+                Points = customer.Points,
+                CreatedAt = customer.CreatedAt,
+                UpdatedAt = customer.UpdatedAt
+            };
         }
 
         public async Task<CustomerDto?> GetByEmailAsync(string email)
