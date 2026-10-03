@@ -60,7 +60,7 @@ public sealed class StaffProductVariantController : Controller
     }
 
     [HttpGet]
-    public async Task<IActionResult> Edit(Guid id, int productId, CancellationToken cancellationToken)
+    public async Task<IActionResult> Update(Guid id, int productId, CancellationToken cancellationToken)
     {
         var variant = await _api.GetAsync(id, cancellationToken);
         if (variant is null)

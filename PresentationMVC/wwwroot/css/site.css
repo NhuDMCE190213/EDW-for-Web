@@ -20,3 +20,59 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+.ds-heading-accent {
+  border-left: 4px solid #E24B4A;
+  padding-left: 12px;
+}
+
+.ds-card {
+  border: none;
+  border-radius: 12px;
+}
+
+.table-ds thead th {
+  color: #888888;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.table-ds tbody td {
+  color: #2f2f2f;
+  font-size: 13px;
+}
+
+.btn-ds-primary,
+.btn-ds-secondary {
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+.btn-ds-primary {
+  background-color: #E24B4A;
+  border: 1px solid #E24B4A;
+  color: #FFFFFF;
+  padding: 8px 16px;
+}
+
+.btn-ds-primary:hover,
+.btn-ds-primary:focus {
+  background-color: #A32D2D;
+  border-color: #A32D2D;
+  color: #FFFFFF;
+}
+
+.btn-ds-secondary {
+  background-color: #FFFFFF;
+  border: 1px solid #E24B4A;
+  color: #A32D2D;
+}
+
+.btn-ds-secondary:hover,
+.btn-ds-secondary:focus {
+  background-color: #FCEBEB;
+  border-color: #E24B4A;
+  color: #A32D2D;
+}
