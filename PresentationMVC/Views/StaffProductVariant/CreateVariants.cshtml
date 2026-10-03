@@ -1,0 +1,36 @@
+@model PresentationMVC.Models.ProductVariantMatrixModel
+@{ ViewData["Title"] = "Auto-Generate Product Variants"; }
+<div class="d-flex align-items-center mb-4 gap-3"><a asp-action="Index" asp-route-productId="@Model.ProductId" class="btn btn-light">&larr; Back</a><h2>Auto-Generate Variants Matrix</h2></div>
+<form asp-action="CreateVariants" method="post" id="matrixForm">
+    @Html.AntiForgeryToken()<input asp-for="ProductId" type="hidden" />
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+    <div class="card shadow-sm mb-3"><div class="card-body"><div class="row">
+        <div class="col-md-5"><h5>1. Enter Attributes</h5><p class="text-muted small">Separate values with commas.</p>
+            <input id="colors" class="form-control mb-2" placeholder="Colors (e.g. Black, White)" />
+            <input id="cpus" class="form-control mb-2" placeholder="CPU" /><input id="rams" class="form-control mb-2" placeholder="RAM" />
+            <input id="storages" class="form-control mb-2" placeholder="Storage" /><input id="screens" class="form-control mb-2" placeholder="Screen size" />
+            <input id="price" type="number" min="0" class="form-control mb-2" placeholder="Default price" /><input id="stock" type="number" min="0" class="form-control" placeholder="Default stock" />
+        </div>
+        <div class="col-md-7"><h5>2. Generated Variants Matrix</h5><div class="table-responsive"><table class="table table-bordered align-middle text-center"><thead><tr><th>Color</th><th>CPU</th><th>RAM</th><th>Storage</th><th>Screen</th><th>Price</th><th>Stock</th></tr></thead><tbody id="matrixBody"><tr><td colspan="7" class="text-muted">Enter attributes to generate variants.</td></tr></tbody></table></div></div>
+    </div></div></div>
+    <button class="btn btn-success" id="saveButton" disabled>Save All Variants</button>
+</form>
+@section Scripts {
+<partial name="_ValidationScriptsPartial" />
+<script>
+const ids = ["colors", "cpus", "rams", "storages", "screens"];
+ids.concat(["price", "stock"]).forEach(id => document.getElementById(id).addEventListener("input", generate));
+function values(id) { const value = document.getElementById(id).value.trim(); return value ? [...new Set(value.split(",").map(x => x.trim()).filter(Boolean))] : [""]; }
+function generate() {
+    const sets = ids.map(values), body = document.getElementById("matrixBody"), price = document.getElementById("price").value, stock = document.getElementById("stock").value;
+    let rows = sets.reduce((a, set) => a.flatMap(prefix => set.map(value => prefix.concat(value))), [[]]);
+    body.innerHTML = ""; document.getElementById("saveButton").disabled = rows.length === 0 || !price || !stock;
+    rows.forEach((row, index) => {
+        const names = ["Color", "Cpu", "Ram", "Storage", "ScreenSize"], tr = document.createElement("tr");
+        row.forEach((value, column) => { const td = document.createElement("td"); td.textContent = value || "-"; td.innerHTML += `<input type="hidden" name="Variants[${index}].${names[column]}" value="${value.replaceAll('"', "&quot;")}">`; tr.appendChild(td); });
+        tr.innerHTML += `<td><input class="form-control" type="number" min="0" name="Variants[${index}].Price" value="${price}" required></td><td><input class="form-control" type="number" min="0" name="Variants[${index}].StockQuantity" value="${stock}" required></td>`;
+        body.appendChild(tr);
+    });
+}
+</script>
+}

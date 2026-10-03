@@ -1,23 +1,18 @@
-using BLL.DTOs.ProductVariant.Staff;
+﻿using BLL.DTOs.ProductVariant.Staff;
 using BLL.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace EDW.Api.Controllers
+namespace API.Controllers
 {
-    /// <summary>
-    /// HTTP wrapper around IProductVariantService. Every method maps 1:1 to the
-    /// existing service method the Razor Pages used to call directly — nothing about
-    /// the business logic changed, only how the frontend reaches it.
-    /// </summary>
+    [Route("api/staff/product-variants")]
     [ApiController]
-    [Route("api/product-variants")]
-    [Authorize]
-    public class ProductVariantsController : ControllerBase
+    //[Authorize]
+    public class StaffProductVariantsController : ControllerBase
     {
         private readonly IProductVariantService _productVariantService;
 
-        public ProductVariantsController(IProductVariantService productVariantService)
+        public StaffProductVariantsController(IProductVariantService productVariantService)
         {
             _productVariantService = productVariantService;
         }
@@ -69,15 +64,11 @@ namespace EDW.Api.Controllers
         }
 
         [HttpPost("{id:guid}/stock-in")]
-        public async Task<IActionResult> StockIn(Guid id, [FromBody] StockInRequest request)
+        public async Task<IActionResult> StockIn(Guid id, [FromBody] int amount)
         {
-            var success = await _productVariantService.StockInAsync(id, request.IncreaseAmount);
+            var success = await _productVariantService.StockInAsync(id, amount);
             return success ? NoContent() : NotFound();
         }
-    }
 
-    public class StockInRequest
-    {
-        public int IncreaseAmount { get; set; }
     }
 }
