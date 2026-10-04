@@ -13,8 +13,10 @@ namespace Staff.Razor.Pages.Auth
 
         public async Task<IActionResult> OnPostAsync()
         {
+            // UC-02 Normal Flow 02.2: Terminate session by removing the auth cookie
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            return RedirectToPage("/Index");
+            // UC-02 Normal Flow 02.3 (POST-2): Redirect to the Login page
+            return RedirectToPage("/Auth/Login");
         }
     }
 }
