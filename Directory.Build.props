@@ -1,0 +1,8 @@
+<Project>
+  <!-- Copy shared appsettings.json to each project folder before building -->
+  <Target Name="CopySharedAppSettings" BeforeTargets="BeforeBuild">
+    <Copy SourceFiles="$(MSBuildThisFileDirectory)appsettings.json" 
+          DestinationFolder="$(MSBuildProjectDirectory)" 
+          SkipUnchangedFiles="true" />
+  </Target>
+</Project>

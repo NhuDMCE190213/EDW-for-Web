@@ -25,6 +25,18 @@ namespace DAL.Data
         {
             base.OnModelCreating(modelBuilder);
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
+            
+            // Explicitly set table names to match the existing migration snapshot
+            modelBuilder.Entity<Category>().ToTable("categories");
+            modelBuilder.Entity<Product>().ToTable("products");
+            modelBuilder.Entity<ProductVariant>().ToTable("product_variants");
+            modelBuilder.Entity<ProductReview>().ToTable("product_reviews");
+            modelBuilder.Entity<Customer>().ToTable("customers");
+            modelBuilder.Entity<CartItem>().ToTable("cart_items");
+            
+            // Orders and OrderItems also need explicit names because their configs use ToTable with constraints without names
+            modelBuilder.Entity<Order>().ToTable("orders");
+            modelBuilder.Entity<OrderItem>().ToTable("order_items");
         }
     }
 }

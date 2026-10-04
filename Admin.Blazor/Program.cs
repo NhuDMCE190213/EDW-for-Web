@@ -43,6 +43,20 @@ builder.Services.AddScoped<AuthenticationStateProvider>(sp => sp.GetRequiredServ
 
 builder.Services.AddCascadingAuthenticationState(); // Đăng ký dịch vụ CascadingAuthenticationState
 
+builder.Services.AddTransient<Admin.Blazor.Services.JwtAuthHandler>();
+
+// Override IPromotionService to use API instead of BLL directly
+builder.Services.AddHttpClient<BLL.Services.Interfaces.IPromotionService, Admin.Blazor.Services.PromotionApiClient>(client =>
+{
+    client.BaseAddress = new Uri("https://localhost:7278/");
+})
+.AddHttpMessageHandler<Admin.Blazor.Services.JwtAuthHandler>()
+.ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+{
+    // Bỏ qua lỗi SSL (UntrustedRoot) ở môi trường local development
+    ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true
+});
+
 var app = builder.Build();
 
 // --- ĐÃ SỬA: Chuyển Seed Data sang Async hoàn toàn ---
