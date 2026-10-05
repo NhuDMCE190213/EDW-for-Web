@@ -1,0 +1,22 @@
+@model PresentationMVC.Models.ProductVariantUpdateModel
+@{ ViewData["Title"] = "Update Product Variant"; }
+<div class="d-flex align-items-center mb-4 gap-3"><a asp-action="Index" asp-route-productId="@Model.ProductId" class="btn btn-light">&larr; Back</a><h2>Update Product Variant</h2></div>
+<div class="card shadow-sm"><div class="card-body">
+    <form asp-action="Edit" method="post">
+        @Html.AntiForgeryToken()
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+        <input asp-for="ProductVariantId" type="hidden" /><input asp-for="ProductId" type="hidden" />
+        <div class="row">
+            <div class="col-md-3 mb-3"><label asp-for="Color"></label><input asp-for="Color" class="form-control" /><span asp-validation-for="Color" class="text-danger"></span></div>
+            <div class="col-md-3 mb-3"><label asp-for="Storage"></label><input asp-for="Storage" class="form-control" /></div>
+            <div class="col-md-3 mb-3"><label asp-for="Ram"></label><input asp-for="Ram" class="form-control" /></div>
+            <div class="col-md-3 mb-3"><label asp-for="ScreenSize"></label><input asp-for="ScreenSize" class="form-control" /></div>
+            <div class="col-md-12 mb-3"><label asp-for="Cpu"></label><input asp-for="Cpu" class="form-control" /></div>
+            <div class="col-md-4 mb-3"><label asp-for="Price"></label><input asp-for="Price" type="number" min="0" class="form-control" /></div>
+            <div class="col-md-4 mb-3"><label asp-for="StockQuantity"></label><input asp-for="StockQuantity" type="number" min="0" class="form-control" /></div>
+            <div class="col-md-4 mb-3"><label asp-for="ImageUrl"></label><input asp-for="ImageUrl" class="form-control" /></div>
+        </div>
+        <button class="btn btn-danger">Save Changes</button>
+    </form>
+</div></div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

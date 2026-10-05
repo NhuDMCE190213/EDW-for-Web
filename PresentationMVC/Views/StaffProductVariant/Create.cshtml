@@ -1,0 +1,25 @@
+@model PresentationMVC.Models.ProductVariantCreateModel
+@{ ViewData["Title"] = "Add New Variant"; }
+<div class="d-flex align-items-center mb-4 gap-3"><a asp-action="Index" asp-route-productId="@Model.ProductId" class="btn btn-light">&larr; Back</a><h2>Add New Product Variant</h2></div>
+<div class="card shadow-sm"><div class="card-body">
+    <form asp-action="Create" method="post">
+        @Html.AntiForgeryToken()
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+        <input asp-for="ProductId" type="hidden" />
+        <h5>Identification</h5><div class="mb-3"><label>Product ID</label><input value="@Model.ProductId" class="form-control" disabled /></div>
+        <h5>Specifications</h5><div class="row">
+            <div class="col-md-3 mb-3"><label asp-for="Color"></label><input asp-for="Color" class="form-control" /><span asp-validation-for="Color" class="text-danger"></span></div>
+            <div class="col-md-3 mb-3"><label asp-for="Storage"></label><input asp-for="Storage" class="form-control" /></div>
+            <div class="col-md-3 mb-3"><label asp-for="Ram"></label><input asp-for="Ram" class="form-control" /></div>
+            <div class="col-md-3 mb-3"><label asp-for="ScreenSize"></label><input asp-for="ScreenSize" class="form-control" /></div>
+            <div class="col-md-12 mb-3"><label asp-for="Cpu"></label><input asp-for="Cpu" class="form-control" /></div>
+        </div>
+        <h5>Pricing &amp; Inventory</h5><div class="row">
+            <div class="col-md-4 mb-3"><label asp-for="Price"></label><input asp-for="Price" type="number" min="0" class="form-control" /><span asp-validation-for="Price" class="text-danger"></span></div>
+            <div class="col-md-4 mb-3"><label asp-for="StockQuantity"></label><input asp-for="StockQuantity" type="number" min="0" class="form-control" /><span asp-validation-for="StockQuantity" class="text-danger"></span></div>
+            <div class="col-md-4 mb-3"><label asp-for="ImageUrl"></label><input asp-for="ImageUrl" class="form-control" /></div>
+        </div>
+        <button class="btn btn-danger">Create Variant</button>
+    </form>
+</div></div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

@@ -1,0 +1,169 @@
+@model IReadOnlyList<PresentationMVC.Models.ProductVariantModel>
+@{
+    ViewData["Title"] = "Product Variant Management";
+    var productId = (int)(ViewBag.ProductId ?? 0);
+}
+
+<style>
+    /* ---- Design system tokens (scoped to this page) ---- */
+    .btn-ds-neutral {
+        background-color: var(--color-background-secondary, #F0F0F0);
+        border: none;
+        color: var(--color-text-secondary, #555555);
+        border-radius: 8px;
+        font-size: 13px;
+    }
+
+    .ds-action-btn {
+        border-radius: 8px;
+        width: 34px;
+        height: 34px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+    }
+
+    /* Status badges � pill shape, design-system status colors */
+    .badge-pill-ds {
+        border-radius: 999px;
+        padding: 5px 14px;
+        font-weight: 500;
+        font-size: 12px;
+    }
+
+    .badge-stock-ok {
+        background-color: #EAF3DE;
+        color: #27500A;
+    }
+
+    .badge-stock-low {
+        background-color: var(--color-background-warning, #FAEEDA);
+        color: var(--color-text-warning, #633806);
+    }
+
+    .badge-stock-out {
+        background-color: #FCEBEB;
+        color: #791F1F;
+    }
+
+    .badge-attribute {
+        background-color: var(--color-background-secondary, #F0F0F0);
+        color: var(--color-text-secondary, #555555);
+        border-radius: 999px;
+        font-weight: 400;
+        padding: 4px 12px;
+    }
+
+    .price-accent {
+        color: #A32D2D;
+        font-weight: 500;
+    }
+
+    .modal-content-ds {
+        border: none;
+        border-radius: 12px;
+    }
+
+    .variant-page .badge-stock {
+        display: inline-block;
+        min-width: 34px;
+        padding: 5px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 600;
+        line-height: 1;
+    }
+
+    .variant-page .badge-stock-ok {
+        background-color: #eaf3de;
+        color: #27500a;
+    }
+
+    .variant-page .badge-stock-out {
+        background-color: #fcebeb;
+        color: #791f1f;
+    }
+
+    .variant-page .btn-outline-info {
+        color: #0b5d66;
+        border-color: #0b5d66;
+    }
+
+    .variant-page .btn-outline-info:hover {
+        color: #ffffff;
+        background-color: #0b5d66;
+    }
+</style>
+
+<div class="variant-page">
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="m-0 fw-medium ds-heading-accent">Variant List</h2>
+    <div class="d-flex gap-2">
+        <a asp-action="Create" asp-route-productId="@productId" class="btn btn-ds-primary"><i class="bi bi-plus-circle me-1"></i>Add Variant</a>
+        <a asp-action="CreateVariants" asp-route-productId="@productId" class="btn btn-ds-secondary"><i class="bi bi-grid-3x3-gap me-1"></i>Add Matrix Variants</a>
+    </div>
+</div>
+
+@if (TempData["SuccessMessage"] is string success) { <div class="alert alert-success">@success</div> }
+@if (TempData["ErrorMessage"] is string error) { <div class="alert alert-danger">@error</div> }
+
+<div class="card ds-card shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-hover table-borderless table-ds align-middle mb-0">
+            <thead><tr><th>SKU</th><th>Basic Configuration</th><th class="text-end">Price (VND)</th><th class="text-center">Stock</th><th>Promotion</th><th class="text-center">Actions</th></tr></thead>
+            <tbody>
+            @if (Model.Count == 0)
+            {
+                <tr><td colspan="6" class="text-center text-muted py-4">No variant data yet.</td></tr>
+            }
+            @foreach (var variant in Model)
+            {
+                <tr>
+                    <td><span class="badge badge-attribute">@variant.Color</span> <span class="badge badge-attribute">@variant.Storage</span><br /><small class="variant-sku">@variant.Sku</small></td>
+                    <td><small>@if (!string.IsNullOrWhiteSpace(variant.Ram)) { <span class="d-block"><b>RAM:</b> @variant.Ram</span> } @if (!string.IsNullOrWhiteSpace(variant.Cpu)) { <span class="d-block"><b>CPU:</b> @variant.Cpu</span> } @if (!string.IsNullOrWhiteSpace(variant.ScreenSize)) { <span class="d-block"><b>Screen:</b> @variant.ScreenSize</span> }</small></td>
+                    <td class="text-end">@variant.Price.ToString("N0") VND</td>
+                    <td class="text-center">@if (variant.StockQuantity > 0) { <span class="badge-stock badge-stock-ok">@variant.StockQuantity</span> } else { <span class="badge-stock badge-stock-out">Out of stock</span> }</td>
+                    <td>@variant.Promotion?.Name</td>
+                    <td class="text-center text-nowrap">
+                        <button type="button" class="btn btn-ds-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#stockModal-@variant.ProductVariantId"><i class="bi bi-box-seam me-1"></i>Stock in</button>
+                        <a asp-action="Update" asp-route-id="@variant.ProductVariantId" asp-route-productId="@productId" class="btn btn-ds-secondary btn-sm"><i class="bi bi-pencil-square me-1"></i>Update</a>
+                        <form asp-action="Delete" method="post" class="d-inline" onsubmit="return confirm('Delete this variant?');">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@variant.ProductVariantId" /><input type="hidden" name="productId" value="@productId" />
+                            <button class="btn btn-ds-secondary btn-sm"><i class="bi bi-trash me-1"></i>Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    @foreach (var variant in Model)
+    {
+        <div class="modal fade" id="stockModal-@variant.ProductVariantId" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form asp-action="StockIn" method="post">
+                        @Html.AntiForgeryToken()
+                        <div class="modal-header">
+                            <h5 class="modal-title">Stock in @variant.Sku</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <input type="hidden" name="id" value="@variant.ProductVariantId" />
+                            <input type="hidden" name="productId" value="@productId" />
+                            <label class="form-label" for="amount-@variant.ProductVariantId">Increase amount</label>
+                            <input id="amount-@variant.ProductVariantId" class="form-control" type="number" name="increaseAmount" min="1" required />
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-primary">Save</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    }
+    </div>
