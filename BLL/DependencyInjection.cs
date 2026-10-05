@@ -28,6 +28,9 @@ namespace BLL
 
             services.AddScoped<ICartItemService, CartItemService>();
 
+            // JWT token generation (used by API project only; MVC/Razor use cookie auth)
+            services.AddScoped<IJwtService, JwtService>();
+
             services.AddAutoMapper(cfg =>
             {
                 cfg.AddMaps(Assembly.GetExecutingAssembly());
