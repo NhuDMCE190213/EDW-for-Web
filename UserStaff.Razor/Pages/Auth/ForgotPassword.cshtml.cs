@@ -20,7 +20,7 @@ namespace Staff.Razor.Pages.Auth
         {
         }
 
-        public async Task<IActionResult> OnPostAsync()
+        public IActionResult OnPost()
         {
             if (string.IsNullOrWhiteSpace(Email))
             {
@@ -32,7 +32,7 @@ namespace Staff.Razor.Pages.Auth
             // Note: this project uses a simplified dev flow: if email exists we redirect
             // to SetNewPassword with the email in query string. Production should use
             // a secure token sent by email instead of exposing email in query.
-            var staff = await _staffService.GetByEmailAsync(Email);
+            var staff = _staffService.GetByEmailAsync(Email).GetAwaiter().GetResult();
             if (staff == null)
             {
                 ModelState.AddModelError(string.Empty, "Email address not found.");
