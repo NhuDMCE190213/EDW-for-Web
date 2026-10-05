@@ -54,23 +54,12 @@ namespace Staff.Razor.Pages.Auth
             };
 
             // Create identity/principal and sign in (issue auth cookie)
-            var identity  = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
             var principal = new ClaimsPrincipal(identity);
 
-            // UC-01.2 Alternative Flow (01.2.1):
-            // If "Remember Me" is selected the session remains active for a longer period (30 days).
-            var authProperties = new AuthenticationProperties
-            {
-                IsPersistent = Input.RememberMe,
-                ExpiresUtc   = Input.RememberMe
-                    ? DateTimeOffset.UtcNow.AddDays(30)
-                    : DateTimeOffset.UtcNow.AddDays(1)
-            };
+            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
 
-            await HttpContext.SignInAsync(
-                CookieAuthenticationDefaults.AuthenticationScheme, principal, authProperties);
-
-            // UC-01.2 Normal Flow 01.2.5: Redirect to the appropriate page (return URL or homepage)
+            // Redirect back to return URL or homepage
             return LocalRedirect(ReturnUrl ?? "/Index");
         }
     }

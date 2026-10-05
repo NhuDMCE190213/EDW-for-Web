@@ -86,13 +86,14 @@ namespace Customer.Mvc.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Logout(string returnUrl = null!)
         {
-            // POST /Auth/Logout — UC-02 Normal Flow 02.2 + 02.3
-            // 02.2: Terminate the current session by removing the authentication cookie
+            // POST /Auth/Logout
+            // Signs the user out by removing the authentication cookie
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            // 02.3 (POST-2): Redirect to the Login page after session termination.
-            // A custom returnUrl is only honoured if it explicitly targets the login page to
-            // prevent open-redirect attacks.
-            return RedirectToAction("Login", "Auth");
+            if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+            {
+                return Redirect(returnUrl);
+            }
+            return RedirectToAction("Index", "Home");
         }
 
         [AllowAnonymous]
