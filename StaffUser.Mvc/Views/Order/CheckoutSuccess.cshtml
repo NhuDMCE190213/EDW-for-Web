@@ -1,80 +1,204 @@
 @using System.Globalization
 @model BLL.DTOs.Order.OrderCheckoutResultDto
 @{
-    ViewData["Title"] = "Order Created";
+    ViewData["Title"] = "Order Placed Successfully";
 }
 
+<style>
+    .success-hero {
+        background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+        border-radius: 20px;
+        color: #fff;
+        padding: 36px 40px;
+        margin-bottom: 28px;
+        position: relative;
+        overflow: hidden;
+    }
+    .success-hero::before {
+        content: '';
+        position: absolute;
+        width: 200px; height: 200px;
+        border-radius: 50%;
+        background: rgba(255,255,255,.08);
+        top: -50px; right: -30px;
+    }
+    .success-icon {
+        width: 64px; height: 64px;
+        background: rgba(255,255,255,.25);
+        border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 2rem;
+        margin-bottom: 16px;
+    }
+
+    .summary-stat {
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 16px 20px;
+        height: 100%;
+    }
+    .summary-stat .label { font-size: .75rem; text-transform: uppercase; color: #aaa; font-weight: 600; letter-spacing: .05em; }
+    .summary-stat .value { font-size: 1.1rem; font-weight: 700; color: #222; margin-top: 4px; }
+    .summary-stat .value.primary { color: var(--color-primary); font-size: 1.3rem; }
+
+    .items-table th { font-size: .72rem; text-transform: uppercase; letter-spacing: .04em; color: #aaa; font-weight: 700; }
+    .items-table td { font-size: .88rem; }
+
+    .action-bar { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+    .btn-view-orders {
+        background: var(--color-primary); color: #fff; border: none;
+        border-radius: 10px; padding: 12px 28px; font-weight: 700;
+        font-size: .95rem; transition: background .15s;
+        display: inline-flex; align-items: center; gap: 8px;
+    }
+    .btn-view-orders:hover { background: #c0392b; color: #fff; }
+    .btn-back-cart {
+        background: #fff; color: #555;
+        border: 1.5px solid #ddd; border-radius: 10px;
+        padding: 12px 24px; font-weight: 600; font-size: .9rem;
+        transition: border-color .15s;
+        display: inline-flex; align-items: center; gap: 8px;
+    }
+    .btn-back-cart:hover { border-color: #aaa; color: #333; }
+
+    .order-id-box {
+        background: #f0f9ff;
+        border: 1.5px solid #bde0fe;
+        border-radius: 10px;
+        padding: 10px 16px;
+        font-family: monospace;
+        font-size: .82rem;
+        color: #0369a1;
+        word-break: break-all;
+    }
+
+    .payment-badge {
+        background: #fff8e1;
+        color: #b45309;
+        border: 1.5px solid #fcd34d;
+        border-radius: 999px;
+        padding: 5px 14px;
+        font-size: .8rem;
+        font-weight: 600;
+    }
+</style>
+
 <div class="row justify-content-center">
-    <div class="col-lg-10">
-        <div class="card shadow-sm border-0 mb-4">
-            <div class="card-body p-4 p-md-5">
-                <div class="d-flex align-items-start justify-content-between flex-wrap gap-3 mb-4">
-                    <div>
-                        <h2 class="fw-bold mb-2">Order created successfully</h2>
-                        <p class="text-muted mb-0">Your cart items have been transferred into a pending order.</p>
-                    </div>
-                    <span class="badge bg-warning-subtle text-warning-emphasis border px-3 py-2">Payment: @Model.PaymentStatus</span>
-                </div>
+    <div class="col-lg-9">
 
-                <div class="row g-4 mb-4">
-                    <div class="col-md-3">
-                        <div class="p-3 bg-light rounded-3 h-100">
-                            <div class="text-muted small">Order ID</div>
-                            <div class="fw-semibold text-break">@Model.Order.OrderId</div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="p-3 bg-light rounded-3 h-100">
-                            <div class="text-muted small">Subtotal</div>
-                            <div class="fw-semibold">@Model.Subtotal.ToString("C", new CultureInfo("vi-VN"))</div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="p-3 bg-light rounded-3 h-100">
-                            <div class="text-muted small">Shipping</div>
-                            <div class="fw-semibold">@Model.Shipping.ToString("C", new CultureInfo("vi-VN"))</div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="p-3 bg-light rounded-3 h-100">
-                            <div class="text-muted small">Total</div>
-                            <div class="fw-bold text-danger fs-5">@Model.Total.ToString("C", new CultureInfo("vi-VN"))</div>
-                        </div>
+        @* ── Success Hero ─────────────────────────────────────────────────── *@
+        <div class="success-hero">
+            <div class="success-icon"><i class="bi bi-check-lg"></i></div>
+            <h3 class="fw-bold mb-1">Order Placed Successfully!</h3>
+            <p class="mb-3" style="opacity:.9;">
+                Your selected cart items have been converted into a pending order.
+            </p>
+            <span class="payment-badge">
+                <i class="bi bi-credit-card me-1"></i> Payment: @Model.PaymentStatus
+            </span>
+        </div>
+
+        @* ── Order ID ─────────────────────────────────────────────────────── *@
+        <div class="mb-4">
+            <div class="text-muted small mb-1 fw-semibold">Order ID</div>
+            <div class="order-id-box">
+                <i class="bi bi-hash me-1"></i> @Model.Order.OrderId
+            </div>
+        </div>
+
+        @* ── Summary Stats ────────────────────────────────────────────────── *@
+        <div class="row g-3 mb-4">
+            <div class="col-6 col-md-3">
+                <div class="summary-stat">
+                    <div class="label">Subtotal</div>
+                    <div class="value">@Model.Subtotal.ToString("C", new CultureInfo("vi-VN"))</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="summary-stat">
+                    <div class="label">Discount</div>
+                    <div class="value" style="color:#27ae60;">
+                        @if (Model.Discount > 0) { <text>-</text> }
+                        @Model.Discount.ToString("C", new CultureInfo("vi-VN"))
                     </div>
                 </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="summary-stat">
+                    <div class="label">Shipping</div>
+                    <div class="value">
+                        @if (Model.Shipping == 0) { <text><span class="text-success">Free</span></text> }
+                        else { @Model.Shipping.ToString("C", new CultureInfo("vi-VN")) }
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="summary-stat">
+                    <div class="label">Total Paid</div>
+                    <div class="value primary">@Model.Total.ToString("C", new CultureInfo("vi-VN"))</div>
+                </div>
+            </div>
+        </div>
 
-                <div class="table-responsive mb-4">
-                    <table class="table align-middle">
-                        <thead>
+        @* ── Items Table ──────────────────────────────────────────────────── *@
+        <div class="card border-0 shadow-sm mb-4" style="border-radius:14px; overflow:hidden;">
+            <div class="card-header bg-white border-bottom py-3 px-4">
+                <h6 class="fw-bold mb-0">
+                    <i class="bi bi-box-seam me-2 text-primary"></i>
+                    Order Items (@Model.Order.OrderItems.Count)
+                </h6>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table items-table align-middle mb-0">
+                        <thead class="table-light">
                             <tr>
-                                <th>Product</th>
+                                <th class="ps-4">Product</th>
+                                <th>Variant</th>
                                 <th class="text-end">Qty</th>
                                 <th class="text-end">Unit Price</th>
-                                <th class="text-end">Line Total</th>
+                                <th class="text-end pe-4">Line Total</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach (var item in Model.Order.OrderItems)
                             {
                                 <tr>
-                                    <td>
-                                        <div class="fw-semibold">@item.ProductName</div>
-                                        <div class="text-muted small">@item.ProductVariantDetails</div>
+                                    <td class="ps-4">
+                                        <div class="fw-semibold text-dark">@item.ProductName</div>
+                                        <div class="text-muted" style="font-size:.74rem;">@item.ProductVariantDetails</div>
                                     </td>
+                                    <td class="text-muted">@item.ProductVariantDetails</td>
                                     <td class="text-end">@item.Quantity</td>
                                     <td class="text-end">@item.PriceAtPurchase.ToString("C", new CultureInfo("vi-VN"))</td>
-                                    <td class="text-end">@((item.PriceAtPurchase * item.Quantity).ToString("C", new CultureInfo("vi-VN")))</td>
+                                    <td class="text-end pe-4 fw-semibold" style="color:var(--color-primary);">
+                                        @((item.PriceAtPurchase * item.Quantity).ToString("C", new CultureInfo("vi-VN")))
+                                    </td>
                                 </tr>
                             }
                         </tbody>
+                        <tfoot class="border-top">
+                            <tr>
+                                <td colspan="4" class="text-end fw-bold ps-4">Total</td>
+                                <td class="text-end pe-4 fw-bold" style="color:var(--color-primary); font-size:1.05rem;">
+                                    @Model.Total.ToString("C", new CultureInfo("vi-VN"))
+                                </td>
+                            </tr>
+                        </tfoot>
                     </table>
-                </div>
-
-                <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
-                    <a class="btn btn-outline-secondary" href="@Url.Action("Index", "Cart")">Back to cart</a>
-                    <a class="btn btn-danger text-white" href="@Url.Action("Index", "Orders")">View orders</a>
                 </div>
             </div>
         </div>
+
+        @* ── Action Bar ───────────────────────────────────────────────────── *@
+        <div class="action-bar">
+            <a href="@Url.Action("Index", "Cart")" class="btn-back-cart">
+                <i class="bi bi-cart3"></i> Back to Cart
+            </a>
+            <a href="@Url.Action("Index", "Orders")" class="btn-view-orders">
+                <i class="bi bi-bag-check-fill"></i> View My Orders
+            </a>
+        </div>
+
     </div>
 </div>
