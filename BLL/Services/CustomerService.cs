@@ -30,6 +30,21 @@ namespace BLL.Services
             _mapper = mapper;
         }
 
+        public async Task<CustomerProfileDto?> GetProfileAsync(int customerId)
+        {
+            var customer = await _customerRepository.GetByIdAsync(customerId);
+            if (customer == null || customer.IsDeleted) return null;
+
+            return new CustomerProfileDto
+            {
+                CustomerId = customer.CustomerId,
+                FullName = customer.FullName,
+                Email = customer.Email,
+                PhoneNumber = customer.PhoneNumber,
+                Points = customer.Points
+            };
+        }
+
         public async Task<CustomerDto?> GetByEmailAsync(string email)
         {
             // Return DTO or null if not found. Used by forgot-password flows.

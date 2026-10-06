@@ -128,6 +128,95 @@ namespace API.Controllers
         }
 
         // ══════════════════════════════════════════════════════════════════════════
+        // UC-04 – Forget Password
+        // ══════════════════════════════════════════════════════════════════════════
+
+        /// <summary>
+        /// Verifies if the email exists for the Forgot Password flow (UC-04.1 → 04.2).
+        /// </summary>
+        [AllowAnonymous]
+        [HttpPost("customer/verify-email")]
+        public async Task<IActionResult> CustomerVerifyEmail([FromBody] VerifyEmailDto dto)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            var customer = await _customerService.GetByEmailAsync(dto.Email);
+            if (customer == null)
+            {
+                // Exception 04.0.E1: Email not found
+                return NotFound(new { message = "Email not found." });
+            }
+
+            return Ok(new { message = "Email verified. Proceed to reset password." });
+        }
+
+        /// <summary>
+        /// Resets the customer's password (UC-04.4 → 04.5).
+        /// </summary>
+        [AllowAnonymous]
+        [HttpPost("customer/reset-password")]
+        public async Task<IActionResult> CustomerResetPassword([FromBody] CustomerSetPasswordDto dto)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            var customer = await _customerService.GetByEmailAsync(dto.Email);
+            if (customer == null)
+            {
+                return NotFound(new { message = "Email not found." });
+            }
+
+            var success = await _customerService.SetPasswordAsync(customer.CustomerId, dto.Password);
+            if (!success)
+            {
+                return StatusCode(500, new { message = "Failed to update password." });
+            }
+
+            return Ok(new { message = "Password updated successfully. You can now login." });
+        }
+
+        /// <summary>
+        /// Verifies if the email exists for the Forgot Password flow (Staff) (UC-04.1 → 04.2).
+        /// </summary>
+        [AllowAnonymous]
+        [HttpPost("staff/verify-email")]
+        public async Task<IActionResult> StaffVerifyEmail([FromBody] VerifyEmailDto dto)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            var staff = await _staffService.GetByEmailAsync(dto.Email);
+            if (staff == null)
+            {
+                return NotFound(new { message = "Email not found." });
+            }
+
+            return Ok(new { message = "Email verified. Proceed to reset password." });
+        }
+
+        /// <summary>
+        /// Resets the staff's password (UC-04.4 → 04.5).
+        /// </summary>
+        [AllowAnonymous]
+        [HttpPost("staff/reset-password")]
+        public async Task<IActionResult> StaffResetPassword([FromBody] CustomerSetPasswordDto dto)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            var staff = await _staffService.GetByEmailAsync(dto.Email);
+            if (staff == null)
+            {
+                return NotFound(new { message = "Email not found." });
+            }
+
+            var success = await _staffService.SetPasswordAsync(staff.StaffId, dto.Password);
+            if (!success)
+            {
+                return StatusCode(500, new { message = "Failed to update password." });
+            }
+
+            return Ok(new { message = "Password updated successfully. You can now login." });
+        }
+
+        // ══════════════════════════════════════════════════════════════════════════
         // UC-01.2 – Login for Staff
         // ══════════════════════════════════════════════════════════════════════════
 
