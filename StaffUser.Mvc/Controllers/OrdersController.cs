@@ -1,9 +1,9 @@
-using BLL.DTOs.CartItem;
-using BLL.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Customer.Mvc.Models;
 using System.Security.Claims;
+using StaffUser.Mvc.Services;
+using BLL.Services.Interfaces;
 
 namespace StaffUser.Mvc.Controllers
 {
@@ -11,16 +11,14 @@ namespace StaffUser.Mvc.Controllers
     public class OrdersController : Controller
     {
         private readonly ICustomerService _customerService;
-        private readonly IOrderService _orderService;
-        private readonly ICartItemService _cartItemService;
+        private readonly CustomerOrderApiClient _orderApiClient;
 
         private int CustomerId => int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
 
-        public OrdersController(ICustomerService customerService, IOrderService orderService, ICartItemService cartItemService)
+        public OrdersController(ICustomerService customerService, CustomerOrderApiClient orderApiClient)
         {
             _customerService = customerService;
-            _orderService = orderService;
-            _cartItemService = cartItemService;
+            _orderApiClient = orderApiClient;
         }
 
         public async Task<IActionResult> Index()
@@ -37,7 +35,7 @@ namespace StaffUser.Mvc.Controllers
                 return RedirectToAction("Login", "Auth");
             }
 
-            var orders = await _orderService.GetOrdersByCustomerIdAsync(customer.CustomerId);
+            var orders = await _orderApiClient.GetMyOrdersAsync(customer.CustomerId);
             var orderedOrders = orders
                 .OrderByDescending(order => order.CreatedAt)
                 .ToList();
@@ -63,23 +61,8 @@ namespace StaffUser.Mvc.Controllers
 
             try
             {
-                // Verify the order belongs to this customer
-                var order = await _orderService.GetOrderByIdAsync(orderId);
-                if (order == null)
-                    return Json(new { success = false, message = "Order not found." });
-
-                if (order.CustomerId != CustomerId)
-                    return Json(new { success = false, message = "You are not authorised to cancel this order." });
-
-                if (order.Status is "Completed" or "Cancelled")
-                    return Json(new { success = false, message = $"Cannot cancel an order with status '{order.Status}'." });
-
-                var result = await _orderService.CancelOrderAsync(orderId);
+                var result = await _orderApiClient.CancelOrderAsync(orderId);
                 return Json(new { success = result, message = result ? "Order cancelled successfully." : "Failed to cancel order." });
-            }
-            catch (InvalidOperationException ex)
-            {
-                return Json(new { success = false, message = ex.Message });
             }
             catch (Exception ex)
             {
@@ -97,44 +80,14 @@ namespace StaffUser.Mvc.Controllers
 
             try
             {
-                var order = await _orderService.GetOrderByIdAsync(orderId);
-                if (order == null)
-                    return Json(new { success = false, message = "Order not found." });
+                var result = await _orderApiClient.TransferToCartAsync(orderId, CustomerId);
+                
+                if (result == null || !result.Success)
+                    return Json(new { success = false, message = "Failed to transfer items to cart." });
 
-                if (order.CustomerId != CustomerId)
-                    return Json(new { success = false, message = "You are not authorised to perform this action." });
-
-                if (order.Status != "Cancelled" && order.Status != "Pending")
-                    return Json(new { success = false, message = "Only Cancelled or Pending orders can be transferred to cart." });
-
-                int transferred = 0;
-                var errors = new List<string>();
-
-                foreach (var item in order.OrderItems)
-                {
-                    try
-                    {
-                        var createDto = new CartItemCreateDTO
-                        {
-                            CustomerId = CustomerId,
-                            ProductVariantId = item.ProductVariantId,
-                            Quantity = item.Quantity
-                        };
-                        await _cartItemService.CreateCartItemAsync(createDto);
-                        transferred++;
-                    }
-                    catch (Exception ex)
-                    {
-                        errors.Add($"{item.ProductName}: {ex.Message}");
-                    }
-                }
-
-                if (transferred == 0)
-                    return Json(new { success = false, message = "No items could be transferred. " + string.Join("; ", errors) });
-
-                var message = transferred == order.OrderItems.Count
-                    ? $"All {transferred} item(s) transferred to cart."
-                    : $"{transferred}/{order.OrderItems.Count} item(s) transferred. Some items could not be added: {string.Join("; ", errors)}";
+                var message = result.Transferred == result.Total
+                    ? $"All {result.Transferred} item(s) transferred to cart."
+                    : $"{result.Transferred}/{result.Total} item(s) transferred. Some items could not be added: {string.Join("; ", result.Errors)}";
 
                 return Json(new { success = true, message });
             }

@@ -1,0 +1,38 @@
+@model PresentationMVC.Models.Order.Staff.OrderDashboardModel
+
+@{
+    ViewData["Title"] = "Order Dashboard";
+}
+
+<div class="container mt-4">
+    <h2>Order Dashboard</h2>
+    <div class="row mt-4">
+        <div class="col-md-4">
+            <div class="card text-white bg-primary mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Total Orders</h5>
+                    <p class="card-text display-4">@Model.TotalOrders</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white bg-success mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Total Revenue</h5>
+                    <p class="card-text display-4">@Model.TotalRevenue.ToString("C")</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white bg-warning mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Pending Orders</h5>
+                    <p class="card-text display-4">@Model.PendingOrders</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="mt-3">
+        <a asp-action="Index" class="btn btn-primary">View All Orders</a>
+    </div>
+</div>
