@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Staff.Razor", "UserStaff.Ra
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "API", "API\API.csproj", "{B29208FB-B6EF-4874-BB5B-630003BE357A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PresentationMVC", "PresentationMVC\PresentationMVC.csproj", "{0F8CCCF6-856E-4FD4-A5E8-149078551A24}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -47,6 +49,10 @@ Global
 		{B29208FB-B6EF-4874-BB5B-630003BE357A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B29208FB-B6EF-4874-BB5B-630003BE357A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B29208FB-B6EF-4874-BB5B-630003BE357A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0F8CCCF6-856E-4FD4-A5E8-149078551A24}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0F8CCCF6-856E-4FD4-A5E8-149078551A24}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0F8CCCF6-856E-4FD4-A5E8-149078551A24}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0F8CCCF6-856E-4FD4-A5E8-149078551A24}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
