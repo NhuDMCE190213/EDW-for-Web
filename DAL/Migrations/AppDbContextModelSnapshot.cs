@@ -17,7 +17,7 @@ namespace DAL.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.16")
+                .HasAnnotation("ProductVersion", "8.0.16")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -323,7 +323,7 @@ namespace DAL.Migrations
                         .HasDatabaseName("ix_products_category_id");
 
                     b.HasIndex("ProductName")
-                        .HasDatabaseName("IX_Product_ProductName");
+                        .HasDatabaseName("ix_products_product_name");
 
                     b.ToTable("products", (string)null);
                 });
@@ -459,7 +459,7 @@ namespace DAL.Migrations
                         .HasName("pk_product_variants");
 
                     b.HasIndex("Price")
-                        .HasDatabaseName("IX_ProductVariant_Price");
+                        .HasDatabaseName("ix_product_variants_price");
 
                     b.HasIndex("ProductId")
                         .HasDatabaseName("ix_product_variants_product_id");
@@ -469,7 +469,7 @@ namespace DAL.Migrations
 
                     b.HasIndex("Sku")
                         .IsUnique()
-                        .HasDatabaseName("IX_ProductVariant_Sku");
+                        .HasDatabaseName("ix_product_variants_sku");
 
                     b.ToTable("product_variants", (string)null);
                 });
@@ -525,8 +525,8 @@ namespace DAL.Migrations
                         .HasColumnType("nvarchar(255)")
                         .HasColumnName("name");
 
-                    b.Property<byte?>("Percentage")
-                        .HasColumnType("tinyint")
+                    b.Property<decimal?>("Percentage")
+                        .HasColumnType("decimal(18,2)")
                         .HasColumnName("percentage");
 
                     b.Property<int>("PromotionType")
@@ -552,19 +552,19 @@ namespace DAL.Migrations
                     b.HasKey("PromotionId")
                         .HasName("pk_promotions");
 
-                    b.HasIndex(new[] { "EndAt" }, "ix_promotions_end_at")
+                    b.HasIndex("EndAt")
                         .HasDatabaseName("ix_promotions_end_at");
 
-                    b.HasIndex(new[] { "IsDeleted" }, "ix_promotions_is_deleted")
+                    b.HasIndex("IsDeleted")
                         .HasDatabaseName("ix_promotions_is_deleted");
 
-                    b.HasIndex(new[] { "IsDisabled" }, "ix_promotions_is_disabled")
+                    b.HasIndex("IsDisabled")
                         .HasDatabaseName("ix_promotions_is_disabled");
 
-                    b.HasIndex(new[] { "PromotionType" }, "ix_promotions_promotion_type")
+                    b.HasIndex("PromotionType")
                         .HasDatabaseName("ix_promotions_promotion_type");
 
-                    b.HasIndex(new[] { "StartAt" }, "ix_promotions_start_at")
+                    b.HasIndex("StartAt")
                         .HasDatabaseName("ix_promotions_start_at");
 
                     b.ToTable("promotions", (string)null);

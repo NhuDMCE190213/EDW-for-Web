@@ -24,6 +24,7 @@ Action<HttpClient> configureApiClient = client =>
     client.BaseAddress = new Uri(baseUrl, UriKind.Absolute);
 };
 
+builder.Services.AddHttpClient<PromotionApiClient>(configureApiClient);
 builder.Services.AddHttpClient<AuthApiClient>(configureApiClient);
 builder.Services.AddHttpClient<CategoryApiClient>(configureApiClient);
 builder.Services.AddHttpClient<ProfileApiClient>(configureApiClient);
