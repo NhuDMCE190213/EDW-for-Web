@@ -1,0 +1,79 @@
+using Microsoft.AspNetCore.Mvc;
+
+namespace YourProject.Controllers
+{
+    [ApiController]
+    // Định nghĩa route chung cho API theo chuẩn: api/products
+    [Route("api/[controller]")] 
+    public class ProductsController : ControllerBase
+    {
+        // Giả lập Service xử lý logic (Dependency Injection)
+        private readonly IProductService _productService;
+
+        public ProductsController(IProductService productService)
+        {
+            _productService = productService;
+        }
+
+        // 1. GET: api/products
+        [HttpGet]
+        public async Task<IActionResult> GetAll()
+        {
+            var products = await _productService.GetAllAsync();
+            return Ok(products); // Trả về HTTP 200 OK kèm dữ liệu
+        }
+
+        // 2. GET: api/products/{id}
+        [HttpGet("{id:int}")]
+        public async Task<IActionResult> GetById(int id)
+        {
+            var product = await _productService.GetByIdAsync(id);
+            if (product == null)
+            {
+                return NotFound(new { Message = $"Không tìm thấy sản phẩm với ID = {id}" }); // HTTP 404
+            }
+            return Ok(product);
+        }
+
+        // 3. POST: api/products
+        [HttpPost]
+        public async Task<IActionResult> Create([FromBody] CreateProductDto dto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState); // HTTP 400 nếu dữ liệu đầu vào không hợp lệ
+            }
+
+            var createdProduct = await _productService.CreateAsync(dto);
+            
+            // Trả về HTTP 201 Created cùng link dẫn tới API lấy chi tiết item vừa tạo
+            return CreatedAtAction(nameof(GetById), new { id = createdProduct.Id }, createdProduct);
+        }
+
+        // 4. PUT: api/products/{id}
+        [HttpPut("{id:int}")]
+        public async Task<IActionResult> Update(int id, [FromBody] UpdateProductDto dto)
+        {
+            var isUpdated = await _productService.UpdateAsync(id, dto);
+            if (!isUpdated)
+            {
+                return NotFound();
+            }
+
+            return NoContent(); // HTTP 204 No Content (Thành công nhưng không cần trả dữ liệu về)
+        }
+
+        // 5. DELETE: api/products/{id}
+        [HttpDelete("{id:int}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var isDeleted = await _productService.DeleteAsync(id);
+            if (!isDeleted)
+            {
+                return NotFound();
+            }
+
+            return NoContent(); // HTTP 204
+        }
+    }
+}

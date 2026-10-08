@@ -1,4 +1,4 @@
-namespace PresentationMVC.Models.Product.Customer
+namespace PresentationMVC.Models
 {
     public class ProductCustomerModel
     {

@@ -1,10 +1,11 @@
-using PresentationMVC.Models.Product.Staff;
+using PresentationMVC.Models;
 
 namespace PresentationMVC.Services
 {
     public sealed class ProductApiClient
     {
-        private const string Resource = "api/staff/products";
+        private const string ResourceAdmin = "api/admin/products";
+        private const string ResourceStaff = "api/staff/products";
         private readonly HttpClient _httpClient;
         private readonly ILogger<ProductApiClient> _logger;
 
@@ -16,8 +17,32 @@ namespace PresentationMVC.Services
 
         public async Task<List<ProductStaffModel>> GetAllAsync(CancellationToken cancellationToken = default)
         {
-            using var response = await _httpClient.GetAsync(Resource, cancellationToken);
+            using var response = await _httpClient.GetAsync(ResourceStaff, cancellationToken);
             return await ReadAsync<List<ProductStaffModel>>(response, cancellationToken) ?? new();
+        }
+
+        public async Task<ProductStaffModel?> GetByIdAsync(int productId, CancellationToken cancellationToken = default)
+        {
+            using var response = await _httpClient.GetAsync($"{ResourceAdmin}/{productId}", cancellationToken);
+            return await ReadAsync<ProductStaffModel>(response, cancellationToken);
+        }
+
+        public async Task CreateAsync(ProductStaffCreateModel model, CancellationToken cancellationToken = default)
+        {
+            using var response = await _httpClient.PostAsJsonAsync(ResourceAdmin, model, cancellationToken);
+            await EnsureSuccessAsync(response, cancellationToken);
+        }
+
+        public async Task UpdateAsync(ProductStaffUpdateModel model, CancellationToken cancellationToken = default)
+        {
+            using var response = await _httpClient.PutAsJsonAsync($"{ResourceAdmin}/{model.ProductId}", model, cancellationToken);
+            await EnsureSuccessAsync(response, cancellationToken);
+        }
+
+        public async Task DeleteAsync(int productId, CancellationToken cancellationToken = default)
+        {
+            using var response = await _httpClient.DeleteAsync($"{ResourceAdmin}/{productId}", cancellationToken);
+            await EnsureSuccessAsync(response, cancellationToken);
         }
 
         private async Task<T?> ReadAsync<T>(HttpResponseMessage response, CancellationToken cancellationToken)

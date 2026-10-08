@@ -1,0 +1,112 @@
+@model PresentationMVC.Models.AdminProductIndexViewModel
+@{
+    ViewData["Title"] = "Manage Products";
+}
+
+<div class="admin-page">
+    <div class="admin-page-heading">
+        <div>
+            <h1>Manage Products</h1>
+            <p>Create, view, edit, and delete phones, laptops, and other electronic devices.</p>
+        </div>
+    </div>
+
+    @if (TempData["SuccessMessage"] is string success)
+    {
+        <div class="alert alert-success">@success</div>
+    }
+    @if (TempData["ErrorMessage"] is string error)
+    {
+        <div class="alert alert-danger">@error</div>
+    }
+
+    <div class="row g-4 mb-4">
+        <div class="col-md-4"><div class="admin-stat"><small>TOTAL PRODUCTS</small><strong>@Model.Products.Count</strong><span>📱</span></div></div>
+        <div class="col-md-4"><div class="admin-stat admin-stat-blue"><small>UNIQUE BRANDS</small><strong>@Model.Products.Select(p => p.Brand).Distinct(StringComparer.OrdinalIgnoreCase).Count()</strong><span>🏷️</span></div></div>
+        <div class="col-md-4"><div class="admin-stat admin-stat-green"><small>ACTIVE CATEGORIES</small><strong>@Model.Categories.Count</strong><span>📂</span></div></div>
+    </div>
+
+    <div class="admin-panel">
+        <div class="admin-panel-heading product-toolbar">
+            <h2>Product List <span>(@Model.Products.Count)</span></h2>
+            <form method="get" class="d-flex flex-wrap gap-2">
+                <select name="categoryFilter" class="form-select">
+                    <option value="0">All Categories</option>
+                    @foreach (var category in Model.Categories)
+                    {
+                        <option value="@category.Id" selected="@(category.Id == Model.CategoryFilter)">@category.Name</option>
+                    }
+                </select>
+                <input name="search" value="@Model.Search" class="form-control" placeholder="Search products..." />
+                <button class="btn btn-outline-secondary" type="submit"><i class="bi bi-search"></i></button>
+                <a class="btn btn-danger" asp-action="Index"><span>+</span> Add Product</a>
+            </form>
+        </div>
+        @if (Model.Products.Count == 0)
+        {
+            <div class="admin-empty">No products found.</div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table admin-table align-middle">
+                    <thead><tr><th>ID</th><th>Product Info</th><th>Brand</th><th>Category</th><th class="text-end">Actions</th></tr></thead>
+                    <tbody>
+                    @foreach (var product in Model.Products)
+                    {
+                        <tr>
+                            <td class="fw-bold text-secondary">#@product.ProductId</td>
+                            <td>
+                                <div class="d-flex align-items-center gap-3">
+                                    @if (!string.IsNullOrWhiteSpace(product.ImageUrl))
+                                    {
+                                        <img src="@product.ImageUrl" alt="@product.ProductName" class="product-thumb" />
+                                    }
+                                    else
+                                    {
+                                        <div class="product-thumb product-thumb-empty">No image</div>
+                                    }
+                                    <span class="fw-bold">@product.ProductName</span>
+                                </div>
+                            </td>
+                            <td><span class="badge bg-light text-dark border">@product.Brand</span></td>
+                            <td><span class="badge bg-danger-subtle text-danger">@(!string.IsNullOrWhiteSpace(product.CategoryName) ? product.CategoryName : "Uncategorized")</span></td>
+                            <td class="text-end text-nowrap">
+                                <a class="btn btn-sm btn-outline-info me-1" asp-controller="StaffProductVariant" asp-action="Index" asp-route-productId="@product.ProductId">Variants</a>
+                                <a class="btn btn-sm btn-outline-primary me-2" asp-route-editId="@product.ProductId">Edit</a>
+                                <form asp-action="Delete" method="post" class="d-inline" onsubmit="return confirm('Delete product @product.ProductName?');">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="productId" value="@product.ProductId" />
+                                    <button class="btn btn-sm btn-outline-danger" type="submit">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+
+    <div class="admin-panel mt-4">
+        <h2>@(Model.IsEditing ? "Update Product" : "Create New Product")</h2>
+        <form asp-action="@(Model.IsEditing ? "Edit" : "Create")" method="post">
+            @Html.AntiForgeryToken()
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input asp-for="Form.ProductId" type="hidden" />
+            <div class="row g-3">
+                <div class="col-md-6"><label asp-for="Form.ProductName" class="admin-label">Product Name <span>*</span></label><input asp-for="Form.ProductName" class="form-control" placeholder="e.g. iPhone 15 Pro Max" /><span asp-validation-for="Form.ProductName" class="text-danger"></span></div>
+                <div class="col-md-6"><label asp-for="Form.Brand" class="admin-label">Brand <span>*</span></label><input asp-for="Form.Brand" class="form-control" placeholder="e.g. Apple, Samsung" /><span asp-validation-for="Form.Brand" class="text-danger"></span></div>
+                <div class="col-md-6"><label asp-for="Form.CategoryId" class="admin-label">Category <span>*</span></label><select asp-for="Form.CategoryId" class="form-select"><option value="0">-- Select Category --</option>@foreach (var category in Model.Categories) { <option value="@category.Id">@category.Name</option> }</select><span asp-validation-for="Form.CategoryId" class="text-danger"></span></div>
+                <div class="col-md-6"><label asp-for="Form.ImageUrl" class="admin-label">Image URL</label><input asp-for="Form.ImageUrl" class="form-control" placeholder="https://..." /></div>
+            </div>
+            <div class="d-flex gap-2 justify-content-end mt-4">
+                @if (Model.IsEditing) { <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a> }
+                <button class="btn btn-danger" type="submit">@(Model.IsEditing ? "Update Product" : "Add Product")</button>
+            </div>
+        </form>
+    </div>
+</div>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
