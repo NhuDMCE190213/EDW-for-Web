@@ -1,48 +1,55 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Customer.Mvc.Models;
+using PresentationMVC.Models.Order.Customer;
+using PresentationMVC.Services;
 using System.Security.Claims;
-using StaffUser.Mvc.Services;
-using BLL.Services.Interfaces;
 
-namespace StaffUser.Mvc.Controllers
+namespace PresentationMVC.Controllers
 {
+    // Removing [Authorize] for now, or you can keep it if PresentationMVC implements Auth later.
+    // Assuming user gets CustomerId via claims. Since we may not have Auth configured in PresentationMVC yet,
+    // we'll leave [Authorize] but provide a fallback if the claims are missing.
     [Authorize]
     public class OrdersController : Controller
     {
-        private readonly ICustomerService _customerService;
         private readonly CustomerOrderApiClient _orderApiClient;
 
-        private int CustomerId => int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
-
-        public OrdersController(ICustomerService customerService, CustomerOrderApiClient orderApiClient)
+        private int CustomerId 
         {
-            _customerService = customerService;
+            get
+            {
+                var val = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (int.TryParse(val, out int id)) return id;
+                return 0; // Or handle unauthorized access
+            }
+        }
+
+        public OrdersController(CustomerOrderApiClient orderApiClient)
+        {
             _orderApiClient = orderApiClient;
         }
 
         public async Task<IActionResult> Index()
         {
-            var email = User.FindFirst(ClaimTypes.Email)?.Value;
-            if (string.IsNullOrWhiteSpace(email))
+            // For now, since PresentationMVC doesn't have login, let's allow it to fallback or redirect to Login
+            var customerId = CustomerId;
+            if (customerId <= 0)
             {
+                // In case it's not authenticated yet
                 return RedirectToAction("Login", "Auth");
             }
 
-            var customer = await _customerService.GetByEmailAsync(email);
-            if (customer == null)
-            {
-                return RedirectToAction("Login", "Auth");
-            }
+            var email = User.FindFirst(ClaimTypes.Email)?.Value ?? "Unknown Email";
+            var fullName = User.FindFirst(ClaimTypes.Name)?.Value ?? email;
 
-            var orders = await _orderApiClient.GetMyOrdersAsync(customer.CustomerId);
+            var orders = await _orderApiClient.GetMyOrdersAsync(customerId);
             var orderedOrders = orders
                 .OrderByDescending(order => order.CreatedAt)
                 .ToList();
 
             var model = new MyOrdersViewModel
             {
-                CustomerName = customer.FullName,
+                CustomerName = fullName,
                 TotalOrders = orderedOrders.Count,
                 TotalSpent = orderedOrders.Sum(order => order.TotalAmount),
                 Orders = orderedOrders

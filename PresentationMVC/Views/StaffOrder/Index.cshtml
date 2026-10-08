@@ -1,0 +1,64 @@
+@model IEnumerable<PresentationMVC.Models.Order.Staff.OrderStaffModel>
+
+@{
+    ViewData["Title"] = "View Orders";
+}
+
+<div class="container mt-4">
+    <h2>Manage Orders</h2>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Error"]</div>
+    }
+
+    <table class="table table-striped mt-4">
+        <thead>
+            <tr>
+                <th>Order ID</th>
+                <th>Customer</th>
+                <th>Total Amount</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var order in Model)
+            {
+                <tr>
+                    <td>@order.OrderId</td>
+                    <td>@order.CustomerName</td>
+                    <td>@order.TotalAmount.ToString("C")</td>
+                    <td>@order.CreatedAt.ToString("g")</td>
+                    <td>@order.Status</td>
+                    <td>
+                        <form asp-action="ChangeStatus" method="post" class="d-inline">
+                            <input type="hidden" name="orderId" value="@order.OrderId" />
+                            <select name="status" class="form-select form-select-sm d-inline-block w-auto" onchange="this.form.submit()">
+                                @{
+                                    var statuses = new[] { "Pending", "Processing", "Completed", "Cancelled" };
+                                    foreach (var s in statuses)
+                                    {
+                                        if (s == order.Status)
+                                        {
+                                            <option value="@s" selected>@s</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@s">@s</option>
+                                        }
+                                    }
+                                }
+                            </select>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

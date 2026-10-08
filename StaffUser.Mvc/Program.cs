@@ -1,4 +1,4 @@
-﻿using BLL;
+using BLL;
 using BLL.DTOs.Customer;
 using BLL.Services.Interfaces;
 using BLL.Settings;
@@ -38,6 +38,12 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 // Add business logic layer services
 builder.Services.AddBusinessLogicLayer(connectionString!);
 builder.Services.Configure<VnpaySettings>(builder.Configuration.GetSection("VNPAY"));
+
+builder.Services.AddHttpClient<StaffUser.Mvc.Services.CustomerOrderApiClient>(client =>
+{
+    var baseUrl = builder.Configuration["ApiSettings:BaseUrl"] ?? "https://localhost:7278";
+    client.BaseAddress = new Uri(baseUrl, UriKind.Absolute);
+});
 
 var app = builder.Build();
 
