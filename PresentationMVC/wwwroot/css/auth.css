@@ -1,0 +1,183 @@
+/* auth.css - Đồng bộ trực tiếp với EDW Design System (site.css) */
+:root {
+    --edw-primary: #E24B4A;
+    --edw-primary-dark: #A32D2D;
+    --edw-primary-light: #FCEBEB;
+    --edw-text-dark: #2F2F2F;
+    --edw-text-muted: #888888;
+    --edw-border: #E2E8F0;
+    --edw-bg: #F8F9FA;
+}
+
+body.auth-page {
+    background-color: var(--edw-bg);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    color: var(--edw-text-dark);
+    margin: 0;
+    padding: 1.5rem;
+}
+
+.auth-wrapper {
+    width: 100%;
+    max-width: 440px;
+}
+
+.auth-card {
+    background: #ffffff;
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+    padding: 2.25rem;
+}
+
+.auth-brand-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background-color: var(--edw-primary-light);
+    color: var(--edw-primary-dark);
+    font-size: 13px;
+    font-weight: 600;
+    padding: 6px 14px;
+    border-radius: 999px;
+    margin-bottom: 1.25rem;
+}
+
+.auth-heading {
+    border-left: 4px solid var(--edw-primary);
+    padding-left: 12px;
+    font-size: 1.45rem;
+    font-weight: 600;
+    color: var(--edw-text-dark);
+    margin-bottom: 0.35rem;
+}
+
+.auth-subtext {
+    color: var(--edw-text-muted);
+    font-size: 0.875rem;
+    margin-bottom: 1.75rem;
+}
+
+.form-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--edw-text-dark);
+    margin-bottom: 6px;
+}
+
+.auth-input-group {
+    position: relative;
+    margin-bottom: 1.25rem;
+}
+
+.auth-input-group .input-icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--edw-text-muted);
+    font-size: 1rem;
+    pointer-events: none;
+}
+
+.auth-input-group .form-control {
+    padding-left: 42px;
+    height: 44px;
+    border-radius: 8px;
+    border: 1px solid var(--edw-border);
+    font-size: 14px;
+    transition: all 0.2s ease-in-out;
+}
+
+.auth-input-group .form-control:focus {
+    border-color: var(--edw-primary);
+    box-shadow: 0 0 0 0.2rem rgba(226, 75, 74, 0.15);
+}
+
+.form-check-input:checked {
+    background-color: var(--edw-primary);
+    border-color: var(--edw-primary);
+}
+
+.form-check-input:focus {
+    box-shadow: 0 0 0 0.2rem rgba(226, 75, 74, 0.15);
+}
+
+.btn-ds-primary {
+    background-color: var(--edw-primary);
+    border: 1px solid var(--edw-primary);
+    color: #ffffff;
+    border-radius: 8px;
+    padding: 10px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    width: 100%;
+    transition: all 0.2s ease-in-out;
+}
+
+.btn-ds-primary:hover, 
+.btn-ds-primary:focus {
+    background-color: var(--edw-primary-dark);
+    border-color: var(--edw-primary-dark);
+    color: #ffffff;
+}
+
+.btn-ds-secondary {
+    background-color: #ffffff;
+    border: 1px solid var(--edw-primary);
+    color: var(--edw-primary-dark);
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.2s ease-in-out;
+}
+
+.btn-ds-secondary:hover {
+    background-color: var(--edw-primary-light);
+    color: var(--edw-primary-dark);
+}
+
+.auth-links {
+    text-align: center;
+    font-size: 13px;
+    margin-top: 1.5rem;
+    color: var(--edw-text-muted);
+}
+
+.auth-links a {
+    color: var(--edw-primary);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.auth-links a:hover {
+    color: var(--edw-primary-dark);
+    text-decoration: underline;
+}
+
+.validation-summary-errors {
+    background-color: var(--edw-primary-light);
+    color: var(--edw-primary-dark);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 13px;
+    margin-bottom: 1.25rem;
+    border: 1px solid rgba(226, 75, 74, 0.2);
+}
+
+.validation-summary-errors ul {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.field-validation-error {
+    color: #DC2626;
+    font-size: 12px;
+    margin-top: 4px;
+    display: block;
+}
