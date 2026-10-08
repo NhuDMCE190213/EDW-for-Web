@@ -18,7 +18,7 @@ namespace DAL.Configurations
             builder.Property(o => o.CustomerId)
                 .IsRequired();
 
-            builder.ToTable(t =>
+            builder.ToTable("orders", t =>
             {
                 t.HasCheckConstraint(
                     "CK_Order_TotalAmount_NonNegative",
@@ -47,14 +47,11 @@ namespace DAL.Configurations
                 .HasDefaultValue(false);
 
             // Configure indexes
-            builder.HasIndex(o => new { o.Status, o.CreatedAt })
-                .HasDatabaseName("ix_orders_status_created_at");
+            builder.HasIndex(o => new { o.Status, o.CreatedAt });
 
-            builder.HasIndex(o => o.CustomerId)
-                .HasDatabaseName("ix_orders_customer_id");
+            builder.HasIndex(o => o.CustomerId);
 
-            builder.HasIndex(o => o.CreatedAt)
-                .HasDatabaseName("ix_orders_created_at");
+            builder.HasIndex(o => o.CreatedAt);
 
             // Configure relationships
             builder.HasMany(o => o.OrderItems)

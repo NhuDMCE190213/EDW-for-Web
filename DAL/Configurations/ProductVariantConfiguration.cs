@@ -1,4 +1,4 @@
-﻿using DAL.Models;
+using DAL.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -27,8 +27,8 @@ namespace DAL.Configurations
             builder.HasQueryFilter(pv => !pv.IsDeleted);
 
             // Thêm index để tăng hiệu suất tìm kiếm theo SKU
-            builder.HasIndex(pv => pv.Sku).IsUnique().HasDatabaseName("IX_ProductVariant_Sku");
-            builder.HasIndex(pv => pv.Price).HasDatabaseName("IX_ProductVariant_Price");
+            builder.HasIndex(pv => pv.Sku).IsUnique();
+            builder.HasIndex(pv => pv.Price);
         }
     }
 }

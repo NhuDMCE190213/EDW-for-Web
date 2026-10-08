@@ -33,7 +33,7 @@ namespace DAL.Configurations
             builder.HasQueryFilter(p => !p.IsDeleted);
 
             // 5. Cấu hình chỉ mục (Index)s
-            builder.HasIndex(p => p.ProductName).HasDatabaseName("IX_Product_ProductName");
+            builder.HasIndex(p => p.ProductName);
         }
     }
 }

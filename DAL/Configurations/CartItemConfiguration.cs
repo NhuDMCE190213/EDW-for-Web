@@ -1,4 +1,4 @@
-﻿using DAL.Models;
+using DAL.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -8,6 +8,7 @@ namespace DAL.Configurations
     {
         public void Configure(EntityTypeBuilder<CartItem> builder)
         {
+            builder.ToTable("cart_items");
             // 2. Cấu hình Khóa chính và các ràng buộc cột
             builder.HasKey(p => p.CartItemId);
             builder.Property(p => p.CustomerId).IsRequired();

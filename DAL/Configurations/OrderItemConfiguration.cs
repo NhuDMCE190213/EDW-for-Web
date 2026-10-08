@@ -24,7 +24,7 @@ namespace DAL.Configurations
             builder.Property(oi => oi.Quantity)
                    .IsRequired();
 
-            builder.ToTable(t =>
+            builder.ToTable("order_items", t =>
             {
                 t.HasCheckConstraint(
                     "CK_OrderItem_Quantity_Positive",
@@ -46,11 +46,9 @@ namespace DAL.Configurations
                 .HasDefaultValue(false);
 
             // Configure indexes
-            builder.HasIndex(oi => oi.OrderId)
-                .HasDatabaseName("ix_order_items_order_id");
+            builder.HasIndex(oi => oi.OrderId);
 
-            builder.HasIndex(oi => oi.ProductVariantId)
-                .HasDatabaseName("ix_order_items_product_variant_id");
+            builder.HasIndex(oi => oi.ProductVariantId);
 
             // Configure relationships
             builder.HasOne(oi => oi.Order)

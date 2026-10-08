@@ -8,6 +8,7 @@ namespace DAL.Configurations
     {
         public void Configure(EntityTypeBuilder<ProductReview> builder)
         {
+            builder.ToTable("product_reviews");
             builder.HasKey(pr => pr.Id);
             builder.Property(pr => pr.Rating).IsRequired();
             builder.Property(pr => pr.Comment).HasMaxLength(1000);
