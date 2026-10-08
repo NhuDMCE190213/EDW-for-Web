@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using PresentationMVC.Models;
 using PresentationMVC.Services;
 
 namespace PresentationMVC.Controllers;
 
+[Authorize(Roles = "Staff,Admin")]
 public sealed class StaffProductVariantController : Controller
 {
     private readonly ProductVariantApiClient _api;

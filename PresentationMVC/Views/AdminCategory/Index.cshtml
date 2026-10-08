@@ -1,0 +1,93 @@
+@model PresentationMVC.Models.AdminCategoryIndexViewModel
+@{
+    ViewData["Title"] = "Manage Categories";
+}
+
+<div class="admin-page">
+    <div class="admin-page-heading">
+        <div>
+            <h1>Manage Categories</h1>
+            <p>View, create, edit, and delete electronic device categories.</p>
+        </div>
+    </div>
+
+    @if (TempData["SuccessMessage"] is string success)
+    {
+        <div class="alert alert-success">@success</div>
+    }
+    @if (TempData["ErrorMessage"] is string error)
+    {
+        <div class="alert alert-danger">@error</div>
+    }
+
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="admin-panel">
+                <div class="admin-panel-heading">
+                    <h2>Category List <span>(@Model.Categories.Count)</span></h2>
+                    <form method="get" class="admin-search">
+                        <input name="search" value="@Model.Search" placeholder="Search categories..." />
+                        <button class="btn btn-outline-secondary" type="submit"><i class="bi bi-search"></i></button>
+                    </form>
+                </div>
+                @if (Model.Categories.Count == 0)
+                {
+                    <div class="admin-empty">No categories found.</div>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        <table class="table admin-table align-middle">
+                            <thead><tr><th>ID</th><th>Category Name</th><th>Created Date</th><th class="text-end">Actions</th></tr></thead>
+                            <tbody>
+                            @foreach (var category in Model.Categories)
+                            {
+                                <tr>
+                                    <td class="fw-bold text-secondary">#@category.Id</td>
+                                    <td class="fw-semibold">@category.Name</td>
+                                    <td class="text-muted">@category.CreatedAt.ToLocalTime().ToString("MM/dd/yyyy HH:mm")</td>
+                                    <td class="text-end">
+                                        <a class="btn btn-sm btn-outline-primary me-2" asp-route-editId="@category.Id">Edit</a>
+                                        <form asp-action="Delete" method="post" class="d-inline" onsubmit="return confirm('Delete category @category.Name?');">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="categoryId" value="@category.Id" />
+                                            <button class="btn btn-sm btn-outline-danger" type="submit">Delete</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="admin-panel">
+                <h2>@(Model.IsEditing ? "Update Category" : "Create New Category")</h2>
+                <form asp-action="@(Model.IsEditing ? "Edit" : "Create")" method="post">
+                    @Html.AntiForgeryToken()
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <input asp-for="Form.Id" type="hidden" />
+                    <label asp-for="Form.Name" class="admin-label">Category Name <span>*</span></label>
+                    <input asp-for="Form.Name" class="form-control" placeholder="e.g. Phone" />
+                    <span asp-validation-for="Form.Name" class="text-danger"></span>
+                    <div class="d-flex gap-2 justify-content-end mt-4">
+                        @if (Model.IsEditing)
+                        {
+                            <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+                            <button class="btn btn-danger" type="submit">Update</button>
+                        }
+                        else
+                        {
+                            <button class="btn btn-danger w-100" type="submit">Add Category</button>
+                        }
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
