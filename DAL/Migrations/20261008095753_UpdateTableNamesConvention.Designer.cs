@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DAL.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20261008094449_UpdateTableNamesConvention")]
+    [Migration("20261008095753_UpdateTableNamesConvention")]
     partial class UpdateTableNamesConvention
     {
         /// <inheritdoc />
@@ -636,7 +636,7 @@ namespace DAL.Migrations
                         .HasForeignKey("ProductVariantId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("fk_cart_items_product_variant_product_variant_id");
+                        .HasConstraintName("fk_cart_items_product_variants_product_variant_id");
 
                     b.Navigation("ProductVariant");
                 });
@@ -667,7 +667,7 @@ namespace DAL.Migrations
                         .HasForeignKey("ProductVariantId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
-                        .HasConstraintName("fk_order_items_product_variant_product_variant_id");
+                        .HasConstraintName("fk_order_items_product_variants_product_variant_id");
 
                     b.Navigation("Order");
 
@@ -719,7 +719,7 @@ namespace DAL.Migrations
                     b.HasOne("DAL.Models.Promotion", "Promotion")
                         .WithMany()
                         .HasForeignKey("PromotionId")
-                        .HasConstraintName("fk_product_variants_promotion_promotion_id");
+                        .HasConstraintName("fk_product_variants_promotions_promotion_id");
 
                     b.Navigation("Product");
 

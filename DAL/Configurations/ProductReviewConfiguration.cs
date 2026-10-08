@@ -16,11 +16,13 @@ namespace DAL.Configurations
             builder.HasOne(pr => pr.Customer)
                    .WithMany()
                    .HasForeignKey(pr => pr.CustomerId)
+                   .HasConstraintName("fk_product_reviews_customers_customer_id")
                    .OnDelete(DeleteBehavior.Cascade);
 
             builder.HasOne(pr => pr.Product)
                    .WithMany()
                    .HasForeignKey(pr => pr.ProductId)
+                   .HasConstraintName("fk_product_reviews_products_product_id")
                    .OnDelete(DeleteBehavior.Cascade);
 
             builder.HasQueryFilter(pr => !pr.IsDeleted);

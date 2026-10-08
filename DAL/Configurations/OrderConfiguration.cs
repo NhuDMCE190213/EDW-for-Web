@@ -65,6 +65,7 @@ namespace DAL.Configurations
             builder.HasOne(o => o.Customer)
                 .WithMany()
                 .HasForeignKey(o => o.CustomerId)
+                .HasConstraintName("fk_orders_customers_customer_id")
                 .OnDelete(DeleteBehavior.Restrict);
 
             // Configure soft delete

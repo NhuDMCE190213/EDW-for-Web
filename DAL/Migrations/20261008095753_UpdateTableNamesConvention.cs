@@ -206,7 +206,7 @@ namespace DAL.Migrations
                         principalColumn: "product_id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "fk_product_variants_promotion_promotion_id",
+                        name: "fk_product_variants_promotions_promotion_id",
                         column: x => x.promotion_id,
                         principalTable: "promotions",
                         principalColumn: "promotion_id");
@@ -226,7 +226,7 @@ namespace DAL.Migrations
                 {
                     table.PrimaryKey("pk_cart_items", x => x.cart_item_id);
                     table.ForeignKey(
-                        name: "fk_cart_items_product_variant_product_variant_id",
+                        name: "fk_cart_items_product_variants_product_variant_id",
                         column: x => x.product_variant_id,
                         principalTable: "product_variants",
                         principalColumn: "product_variant_id",
@@ -258,7 +258,7 @@ namespace DAL.Migrations
                         principalColumn: "order_id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "fk_order_items_product_variant_product_variant_id",
+                        name: "fk_order_items_product_variants_product_variant_id",
                         column: x => x.product_variant_id,
                         principalTable: "product_variants",
                         principalColumn: "product_variant_id",

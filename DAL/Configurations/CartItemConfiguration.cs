@@ -18,6 +18,7 @@ namespace DAL.Configurations
             builder.HasOne(p => p.ProductVariant)
                 .WithMany()
                 .HasForeignKey(p => p.ProductVariantId)
+                .HasConstraintName("fk_cart_items_product_variants_product_variant_id")
                 .OnDelete(DeleteBehavior.Cascade);
         }
     }
