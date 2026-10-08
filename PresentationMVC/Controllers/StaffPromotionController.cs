@@ -125,6 +125,17 @@ namespace PresentationMVC.Controllers
         }
 
         [HttpGet]
+        public async Task<IActionResult> Detail(Guid id, string returnUrl)
+        {
+            var p = await _promotionApiClient.GetPromotionByIdAsync(id);
+
+            if (p == null) return NotFound();
+
+            ViewBag.ReturnUrl = returnUrl ?? Url.Action("Index");
+            return View(p);
+        }
+
+        [HttpGet]
         public async Task<IActionResult> Edit(Guid id)
         {
             // if (!User.IsInRole("Admin"))
@@ -133,9 +144,7 @@ namespace PresentationMVC.Controllers
             //     return RedirectToAction("Index", "Home");
             // }
 
-            var req = new PromotionListRequest { Pagination = new PaginationRequest { Page = 1, PageSize = 1000 }, IncludeDeleted = true, IncludeDisable = true };
-            var list = await _promotionApiClient.GetPromotionsListAsync(req);
-            var p = list.Pagination.Items.FirstOrDefault(x => x.PromotionId == id);
+            var p = await _promotionApiClient.GetPromotionByIdAsync(id);
 
             if (p == null) return NotFound();
 

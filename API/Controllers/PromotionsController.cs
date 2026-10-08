@@ -25,6 +25,14 @@ namespace API.Controllers
             return Ok(result);
         }
 
+        [HttpGet("{id}")]
+        public async Task<ActionResult<BLL.DTOs.Promotion.PromotionDto>> GetPromotionById(Guid id)
+        {
+            var result = await _promotionService.GetPromotionByIdAsync(id);
+            if (result == null) return NotFound();
+            return Ok(result);
+        }
+
         [HttpGet("active")]
         public async Task<ActionResult<List<BLL.DTOs.Promotion.PromotionDto>>> GetActiveAndUpcomingPromotions()
         {
@@ -45,6 +53,7 @@ namespace API.Controllers
         {
             await _promotionService.UpdatePromotionAsync(id, promotionUpdateDto);
             await _hubContext.Clients.All.SendAsync("OnPromotionChanged");
+            await _hubContext.Clients.All.SendAsync("PromotionUpdated", id);
             return Ok(new { message = "Promotion updated successfully" });
         }
 
@@ -53,6 +62,7 @@ namespace API.Controllers
         {
             await _promotionService.DeletePromotionAsync(id);
             await _hubContext.Clients.All.SendAsync("OnPromotionChanged");
+            await _hubContext.Clients.All.SendAsync("PromotionDeleted", id);
             return Ok(new { message = "Promotion deleted/disabled successfully" });
         }
     }

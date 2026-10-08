@@ -21,6 +21,13 @@ namespace PresentationMVC.Services
             return await ReadAsync<PromotionListResponeDto>(response, cancellationToken) ?? new();
         }
 
+        public async Task<PromotionDto?> GetPromotionByIdAsync(Guid id, CancellationToken cancellationToken = default)
+        {
+            using var response = await _httpClient.GetAsync($"{Resource}/{id}", cancellationToken);
+            if (response.StatusCode == System.Net.HttpStatusCode.NotFound) return null;
+            return await ReadAsync<PromotionDto>(response, cancellationToken);
+        }
+
         public async Task<List<PromotionDto>> GetActiveAndUpcomingPromotionsAsync(CancellationToken cancellationToken = default)
         {
             using var response = await _httpClient.GetAsync($"{Resource}/active", cancellationToken);

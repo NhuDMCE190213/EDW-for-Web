@@ -9,6 +9,7 @@
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>Edit Promotion - Enterprise Management</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.12/signalr.min.js"></script>
 <script>
     tailwind.config = {
       theme: {
@@ -39,7 +40,17 @@
   </style>
 </head>
 <body class="bg-slate-100 min-h-screen text-slate-800 flex items-center justify-center p-4 sm:p-6 lg:p-8 font-sans antialiased">
-<main class="w-full max-w-4xl bg-white rounded-2xl shadow-xl border border-slate-200/80 overflow-hidden" data-purpose="edit-promotion-modal">
+<main class="w-full max-w-4xl bg-white rounded-2xl shadow-xl border border-slate-200/80 overflow-hidden relative" data-purpose="edit-promotion-modal">
+<div id="lock-overlay" class="absolute inset-0 bg-white/80 backdrop-blur-sm z-50 flex flex-col items-center justify-center hidden">
+    <div class="p-4 bg-white rounded-xl shadow-lg border border-slate-200 text-center max-w-sm">
+        <div class="w-12 h-12 rounded-full bg-red-100 text-red-600 flex items-center justify-center mx-auto mb-3">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+        </div>
+        <h3 class="text-lg font-bold text-slate-800 mb-1">Editing in Progress</h3>
+        <p class="text-sm text-slate-500 mb-4">Another user is currently editing this promotion. You cannot edit it right now.</p>
+        <a href="/StaffPromotion/Index" class="inline-flex px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-sm rounded-lg transition-colors">Go Back</a>
+    </div>
+</div>
 <header class="px-6 py-5 sm:px-8 border-b border-slate-100 flex items-center justify-between bg-gradient-to-r from-white via-white to-blue-50/30">
 <div class="flex items-start gap-3.5">
 <div class="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 shadow-sm flex-shrink-0 mt-0.5">
@@ -527,6 +538,23 @@
             successBanner.classList.remove('hidden');
         }
       });
+
+      // --- SIGNALR PESSIMISTIC LOCKING ---
+      const promotionId = '@ViewBag.Id';
+      const lockOverlay = document.getElementById('lock-overlay');
+      const connection = new signalR.HubConnectionBuilder()
+          .withUrl("https://localhost:7278/promotionHub") 
+          .withAutomaticReconnect()
+          .build();
+
+      connection.start().then(() => {
+          connection.invoke("TryLockPromotion", promotionId).then(success => {
+              if (!success) {
+                  lockOverlay.classList.remove('hidden');
+                  form.querySelectorAll('input, select, button').forEach(el => el.disabled = true);
+              }
+          });
+      }).catch(err => console.error(err.toString()));
     });
   </script>
 </body>

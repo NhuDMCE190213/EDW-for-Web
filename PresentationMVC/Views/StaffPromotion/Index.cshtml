@@ -303,6 +303,9 @@
                 });
 
                 const params = new URLSearchParams(formData);
+                
+                // --- Keep URL updated with filters for returnUrl logic ---
+                window.history.replaceState(null, '', '?' + params.toString());
 
                 fetch(`@Url.Action("Table", "StaffPromotion")?${params.toString()}`)
                     .then(response => response.text())
@@ -316,7 +319,7 @@
 
             // --- SIGNALR REALTIME LOGIC ---
             const connection = new signalR.HubConnectionBuilder()
-                .withUrl("https://localhost:7278/promotionHub") // Using API base URL (fallback to 5238 if needed, but SignalR usually needs exact URL if no CORS, wait, UserStaff configures BaseUrl but for client-side JS we hardcode or inject. We'll use 7278 for now)
+                .withUrl("https://localhost:7278/promotionHub") 
                 .withAutomaticReconnect()
                 .build();
 
@@ -325,7 +328,38 @@
                 fetchTableData(); 
             });
 
-            connection.start().catch(err => console.error(err.toString()));
+            connection.on("PromotionLocked", function (promotionId) {
+                // Someone else is editing
+                const btn = document.querySelector(`.btn-edit-promotion[data-id='${promotionId}']`);
+                if (btn) {
+                    btn.classList.add('disabled');
+                    btn.style.pointerEvents = 'none';
+                    btn.title = "This promotion is currently being edited by someone else.";
+                }
+            });
+
+            connection.on("PromotionUnlocked", function (promotionId) {
+                // Someone else finished editing
+                const btn = document.querySelector(`.btn-edit-promotion[data-id='${promotionId}']`);
+                if (btn) {
+                    btn.classList.remove('disabled');
+                    btn.style.pointerEvents = 'auto';
+                    btn.title = "Edit";
+                }
+            });
+
+            connection.start().then(() => {
+                connection.invoke("GetLockedPromotions").then(ids => {
+                    ids.forEach(id => {
+                        const btn = document.querySelector(`.btn-edit-promotion[data-id='${id}']`);
+                        if (btn) {
+                            btn.classList.add('disabled');
+                            btn.style.pointerEvents = 'none';
+                            btn.title = "This promotion is currently being edited by someone else.";
+                        }
+                    });
+                });
+            }).catch(err => console.error(err.toString()));
         });
     </script>
 }

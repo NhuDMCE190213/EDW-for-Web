@@ -81,6 +81,18 @@ namespace BLL.Services
             return result!;
         }
 
+        public async Task<PromotionDto?> GetPromotionByIdAsync(Guid id)
+        {
+            var promotion = await _unitOfWork.Repository<Promotion>().Query()
+                .IgnoreQueryFilters()
+                .AsNoTracking()
+                .FirstOrDefaultAsync(p => p.PromotionId == id);
+            
+            if (promotion == null) return null;
+
+            return _mapper.Map<PromotionDto>(promotion);
+        }
+
         public async Task<PromotionListResponeDto> GetPromotionsListAsync(PromotionListRequest request)
         {
             var promotionsQuery = _unitOfWork.Repository<Promotion>().Query().IgnoreQueryFilters().AsNoTracking();
