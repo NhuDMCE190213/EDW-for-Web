@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DAL.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20261008014057_Refactor type percent from byte to dedecimal")]
-    partial class Refactortypepercentfrombytetodedecimal
+    [Migration("20261008094449_UpdateTableNamesConvention")]
+    partial class UpdateTableNamesConvention
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -47,12 +47,12 @@ namespace DAL.Migrations
                         .HasColumnName("quantity");
 
                     b.HasKey("CartItemId")
-                        .HasName("pk_cart_item");
+                        .HasName("pk_cart_items");
 
                     b.HasIndex("ProductVariantId")
-                        .HasDatabaseName("ix_cart_item_product_variant_id");
+                        .HasDatabaseName("ix_cart_items_product_variant_id");
 
-                    b.ToTable("cart_item", (string)null);
+                    b.ToTable("cart_items", (string)null);
                 });
 
             modelBuilder.Entity("DAL.Models.Category", b =>
@@ -145,13 +145,13 @@ namespace DAL.Migrations
                         .HasColumnName("updated_at");
 
                     b.HasKey("CustomerId")
-                        .HasName("pk_customer");
+                        .HasName("pk_customers");
 
                     b.HasIndex("Email")
                         .IsUnique()
-                        .HasDatabaseName("ix_customer_email");
+                        .HasDatabaseName("ix_customers_email");
 
-                    b.ToTable("customer", (string)null);
+                    b.ToTable("customers", (string)null);
                 });
 
             modelBuilder.Entity("DAL.Models.Order", b =>
@@ -201,7 +201,7 @@ namespace DAL.Migrations
                         .HasDefaultValueSql("GETDATE()");
 
                     b.HasKey("OrderId")
-                        .HasName("pk_order");
+                        .HasName("pk_orders");
 
                     b.HasIndex("CreatedAt")
                         .HasDatabaseName("ix_orders_created_at");
@@ -212,7 +212,7 @@ namespace DAL.Migrations
                     b.HasIndex("Status", "CreatedAt")
                         .HasDatabaseName("ix_orders_status_created_at");
 
-                    b.ToTable("order", null, t =>
+                    b.ToTable("orders", null, t =>
                         {
                             t.HasCheckConstraint("CK_Order_TotalAmount_NonNegative", "[total_amount] >= 0");
                         });
@@ -262,7 +262,7 @@ namespace DAL.Migrations
                         .HasDefaultValueSql("GETDATE()");
 
                     b.HasKey("OrderItemId")
-                        .HasName("pk_order_item");
+                        .HasName("pk_order_items");
 
                     b.HasIndex("OrderId")
                         .HasDatabaseName("ix_order_items_order_id");
@@ -270,7 +270,7 @@ namespace DAL.Migrations
                     b.HasIndex("ProductVariantId")
                         .HasDatabaseName("ix_order_items_product_variant_id");
 
-                    b.ToTable("order_item", null, t =>
+                    b.ToTable("order_items", null, t =>
                         {
                             t.HasCheckConstraint("CK_OrderItem_Quantity_Positive", "[quantity] > 0");
                         });
@@ -326,7 +326,7 @@ namespace DAL.Migrations
                         .HasDatabaseName("ix_products_category_id");
 
                     b.HasIndex("ProductName")
-                        .HasDatabaseName("IX_Product_ProductName");
+                        .HasDatabaseName("ix_products_product_name");
 
                     b.ToTable("products", (string)null);
                 });
@@ -375,15 +375,15 @@ namespace DAL.Migrations
                         .HasColumnName("updated_at");
 
                     b.HasKey("Id")
-                        .HasName("pk_product_review");
+                        .HasName("pk_product_reviews");
 
                     b.HasIndex("CustomerId")
-                        .HasDatabaseName("ix_product_review_customer_id");
+                        .HasDatabaseName("ix_product_reviews_customer_id");
 
                     b.HasIndex("ProductId")
-                        .HasDatabaseName("ix_product_review_product_id");
+                        .HasDatabaseName("ix_product_reviews_product_id");
 
-                    b.ToTable("product_review", (string)null);
+                    b.ToTable("product_reviews", (string)null);
                 });
 
             modelBuilder.Entity("DAL.Models.ProductVariant", b =>
@@ -462,7 +462,7 @@ namespace DAL.Migrations
                         .HasName("pk_product_variants");
 
                     b.HasIndex("Price")
-                        .HasDatabaseName("IX_ProductVariant_Price");
+                        .HasDatabaseName("ix_product_variants_price");
 
                     b.HasIndex("ProductId")
                         .HasDatabaseName("ix_product_variants_product_id");
@@ -472,7 +472,7 @@ namespace DAL.Migrations
 
                     b.HasIndex("Sku")
                         .IsUnique()
-                        .HasDatabaseName("IX_ProductVariant_Sku");
+                        .HasDatabaseName("ix_product_variants_sku");
 
                     b.ToTable("product_variants", (string)null);
                 });
@@ -528,8 +528,8 @@ namespace DAL.Migrations
                         .HasColumnType("nvarchar(255)")
                         .HasColumnName("name");
 
-                    b.Property<byte?>("Percentage")
-                        .HasColumnType("tinyint")
+                    b.Property<decimal?>("Percentage")
+                        .HasColumnType("decimal(18,2)")
                         .HasColumnName("percentage");
 
                     b.Property<int>("PromotionType")
@@ -555,19 +555,19 @@ namespace DAL.Migrations
                     b.HasKey("PromotionId")
                         .HasName("pk_promotions");
 
-                    b.HasIndex(new[] { "EndAt" }, "ix_promotions_end_at")
+                    b.HasIndex("EndAt")
                         .HasDatabaseName("ix_promotions_end_at");
 
-                    b.HasIndex(new[] { "IsDeleted" }, "ix_promotions_is_deleted")
+                    b.HasIndex("IsDeleted")
                         .HasDatabaseName("ix_promotions_is_deleted");
 
-                    b.HasIndex(new[] { "IsDisabled" }, "ix_promotions_is_disabled")
+                    b.HasIndex("IsDisabled")
                         .HasDatabaseName("ix_promotions_is_disabled");
 
-                    b.HasIndex(new[] { "PromotionType" }, "ix_promotions_promotion_type")
+                    b.HasIndex("PromotionType")
                         .HasDatabaseName("ix_promotions_promotion_type");
 
-                    b.HasIndex(new[] { "StartAt" }, "ix_promotions_start_at")
+                    b.HasIndex("StartAt")
                         .HasDatabaseName("ix_promotions_start_at");
 
                     b.ToTable("promotions", (string)null);
@@ -636,7 +636,7 @@ namespace DAL.Migrations
                         .HasForeignKey("ProductVariantId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("fk_cart_item_product_variant_product_variant_id");
+                        .HasConstraintName("fk_cart_items_product_variant_product_variant_id");
 
                     b.Navigation("ProductVariant");
                 });
@@ -648,7 +648,7 @@ namespace DAL.Migrations
                         .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
-                        .HasConstraintName("fk_order_customer_customer_id");
+                        .HasConstraintName("fk_orders_customers_customer_id");
 
                     b.Navigation("Customer");
                 });
@@ -660,14 +660,14 @@ namespace DAL.Migrations
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("fk_order_item_order_order_id");
+                        .HasConstraintName("fk_order_items_orders_order_id");
 
                     b.HasOne("DAL.Models.ProductVariant", "ProductVariant")
                         .WithMany()
                         .HasForeignKey("ProductVariantId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
-                        .HasConstraintName("fk_order_item_product_variant_product_variant_id");
+                        .HasConstraintName("fk_order_items_product_variant_product_variant_id");
 
                     b.Navigation("Order");
 
@@ -693,14 +693,14 @@ namespace DAL.Migrations
                         .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("fk_product_review_customer_customer_id");
+                        .HasConstraintName("fk_product_reviews_customers_customer_id");
 
                     b.HasOne("DAL.Models.Product", "Product")
                         .WithMany()
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("fk_product_review_product_product_id");
+                        .HasConstraintName("fk_product_reviews_products_product_id");
 
                     b.Navigation("Customer");
 
