@@ -127,6 +127,40 @@ namespace PresentationMVC.Services
         public int UserId { get; set; }
         public string FullName { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
+
+        [JsonConverter(typeof(RoleStringJsonConverter))]
         public string Role { get; set; } = string.Empty;
+    }
+
+    public class RoleStringJsonConverter : JsonConverter<string>
+    {
+        public override string Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        {
+            if (reader.TokenType == JsonTokenType.Number)
+            {
+                if (reader.TryGetInt32(out int intVal))
+                {
+                    return intVal switch
+                    {
+                        0 => "Admin",
+                        1 => "Staff",
+                        2 => "Customer",
+                        _ => intVal.ToString()
+                    };
+                }
+            }
+
+            if (reader.TokenType == JsonTokenType.String)
+            {
+                return reader.GetString() ?? string.Empty;
+            }
+
+            return string.Empty;
+        }
+
+        public override void Write(Utf8JsonWriter writer, string value, JsonSerializerOptions options)
+        {
+            writer.WriteStringValue(value);
+        }
     }
 }
