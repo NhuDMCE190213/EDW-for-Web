@@ -49,7 +49,7 @@ namespace PresentationMVC.Controllers
             }
 
             await SignInUserAsync(response, model.RememberMe);
-            return RedirectToLocal(returnUrl);
+            return RedirectAfterStaffLogin(response.Role.ToString(), returnUrl);
         }
 
         // ═══════════════════════════════════════════════════════════════════════
@@ -85,7 +85,7 @@ namespace PresentationMVC.Controllers
             }
 
             await SignInUserAsync(response, model.RememberMe);
-            return RedirectToLocal(returnUrl);
+            return RedirectAfterStaffLogin(response.Role.ToString(), returnUrl);
         }
 
         // ═══════════════════════════════════════════════════════════════════════
@@ -247,6 +247,18 @@ namespace PresentationMVC.Controllers
             {
                 return RedirectToAction(nameof(HomeController.Index), "Home");
             }
+        }
+
+        private IActionResult RedirectAfterStaffLogin(string role, string? returnUrl)
+        {
+            if (Url.IsLocalUrl(returnUrl))
+            {
+                return Redirect(returnUrl);
+            }
+
+            return string.Equals(role, "Admin", StringComparison.OrdinalIgnoreCase)
+                ? RedirectToAction(nameof(HomeController.Index), "Home")!
+                : RedirectToAction(nameof(StaffProductController.Index), "StaffProduct")!;
         }
     }
 }

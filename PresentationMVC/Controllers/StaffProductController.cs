@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
-using PresentationMVC.Models.Product.Staff;
+using Microsoft.AspNetCore.Authorization;
+using PresentationMVC.Models;
 using PresentationMVC.Services;
 
 namespace PresentationMVC.Controllers
 {
+    [Authorize(Roles = "Staff,Admin")]
     public class StaffProductController : Controller
     {
 

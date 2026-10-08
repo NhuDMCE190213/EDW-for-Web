@@ -1,8 +1,83 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+@model PresentationMVC.Models.AdminDashboardViewModel
+@{
+    ViewData["Title"] = "Dashboard";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="admin-page">
+    <div class="admin-page-heading">
+        <div>
+            <h1>Dashboard</h1>
+            <p>Store performance overview.</p>
+        </div>
+        <span class="admin-page-badge"><i class="bi bi-shield-check"></i> Admin workspace</span>
+    </div>
+
+    @if (TempData["ErrorMessage"] is string error)
+    {
+        <div class="alert alert-danger">@error</div>
+    }
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="admin-stat"><div><small>PRODUCTS</small><strong>@Model.Products.Count</strong></div><span>📱</span></div>
+        </div>
+        <div class="col-md-4">
+            <div class="admin-stat admin-stat-blue"><div><small>CATEGORIES</small><strong>@Model.Categories.Count</strong></div><span>📂</span></div>
+        </div>
+        <div class="col-md-4">
+            <div class="admin-stat admin-stat-green"><div><small>UNIQUE BRANDS</small><strong>@Model.Products.Select(p => p.Brand).Distinct(StringComparer.OrdinalIgnoreCase).Count()</strong></div><span>🏷️</span></div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="admin-panel">
+                <div class="admin-panel-heading">
+                    <h2>Recent Products <span>(@Model.Products.Count)</span></h2>
+                    <a asp-controller="AdminProduct" asp-action="Index" class="btn btn-sm btn-danger">Manage products</a>
+                </div>
+                <div class="table-responsive">
+                    <table class="table admin-table align-middle">
+                        <thead><tr><th>ID</th><th>Product</th><th>Brand</th><th>Category</th><th class="text-end">Variants</th></tr></thead>
+                        <tbody>
+                        @foreach (var product in Model.Products.Take(6))
+                        {
+                            <tr>
+                                <td class="fw-bold text-secondary">#@product.ProductId</td>
+                                <td class="fw-semibold">@product.ProductName</td>
+                                <td>@product.Brand</td>
+                                <td><span class="badge bg-danger-subtle text-danger">@product.CategoryName</span></td>
+                                <td class="text-end"><a asp-controller="StaffProductVariant" asp-action="Index" asp-route-productId="@product.ProductId" class="btn btn-sm btn-outline-primary">View variants</a></td>
+                            </tr>
+                        }
+                        @if (Model.Products.Count == 0)
+                        {
+                            <tr><td colspan="5" class="admin-empty">No products found.</td></tr>
+                        }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="admin-panel">
+                <h2>Quick Actions</h2>
+                <div class="d-grid gap-2">
+                    <a asp-controller="AdminProduct" asp-action="Index" class="btn btn-danger text-start"><i class="bi bi-box-seam me-2"></i>Manage products</a>
+                    <a asp-controller="AdminCategory" asp-action="Index" class="btn btn-outline-danger text-start"><i class="bi bi-tags me-2"></i>Manage categories</a>
+                    @* Reviews, promotions, staff, customers and orders are intentionally hidden
+                       until their API-backed MVC screens are ready. *@
+                </div>
+            </div>
+            <div class="admin-panel mt-4">
+                <h2>Categories</h2>
+                @foreach (var category in Model.Categories.Take(6))
+                {
+                    <div class="d-flex justify-content-between border-bottom py-2">
+                        <span>@category.Name</span><span class="text-muted">#@category.Id</span>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
 </div>

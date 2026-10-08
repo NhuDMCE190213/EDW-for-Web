@@ -1,4 +1,4 @@
-using PresentationMVC.Services;
+﻿using PresentationMVC.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,7 +14,7 @@ builder.Services.AddAuthentication(Microsoft.AspNetCore.Authentication.Cookies.C
         options.Cookie.Name = "EDW_AuthToken";
     });
 
-builder.Services.AddHttpClient<AuthApiClient>(client =>
+Action<HttpClient> configureApiClient = client =>
 {
     var baseUrl = builder.Configuration["ApiSettings:BaseUrl"];
     if (string.IsNullOrWhiteSpace(baseUrl))
@@ -22,38 +22,13 @@ builder.Services.AddHttpClient<AuthApiClient>(client =>
         throw new InvalidOperationException("ApiSettings:BaseUrl must be configured.");
     }
     client.BaseAddress = new Uri(baseUrl, UriKind.Absolute);
-});
+};
 
-builder.Services.AddHttpClient<ProfileApiClient>(client =>
-{
-    var baseUrl = builder.Configuration["ApiSettings:BaseUrl"];
-    if (string.IsNullOrWhiteSpace(baseUrl))
-    {
-        throw new InvalidOperationException("ApiSettings:BaseUrl must be configured.");
-    }
-    client.BaseAddress = new Uri(baseUrl, UriKind.Absolute);
-});
-
-
-builder.Services.AddHttpClient<ProductVariantApiClient>(client =>
-{
-    var baseUrl = builder.Configuration["ApiSettings:BaseUrl"];
-    if (string.IsNullOrWhiteSpace(baseUrl))
-    {
-        throw new InvalidOperationException("ApiSettings:BaseUrl must be configured.");
-    }
-
-    client.BaseAddress = new Uri(baseUrl, UriKind.Absolute);
-});
-builder.Services.AddHttpClient<ProductApiClient>(client =>
-{
-    var baseUrl = builder.Configuration["ApiSettings:BaseUrl"];
-    if (string.IsNullOrWhiteSpace(baseUrl))
-    {
-        throw new InvalidOperationException("ApiSettings:BaseUrl must be configured.");
-    }
-    client.BaseAddress = new Uri(baseUrl, UriKind.Absolute);
-});
+builder.Services.AddHttpClient<AuthApiClient>(configureApiClient);
+builder.Services.AddHttpClient<CategoryApiClient>(configureApiClient);
+builder.Services.AddHttpClient<ProfileApiClient>(configureApiClient);
+builder.Services.AddHttpClient<ProductVariantApiClient>(configureApiClient);
+builder.Services.AddHttpClient<ProductApiClient>(configureApiClient);
 
 var app = builder.Build();
 
