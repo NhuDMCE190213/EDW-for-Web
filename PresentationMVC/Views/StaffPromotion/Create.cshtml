@@ -1,4 +1,4 @@
-@model BLL.DTOs.Promotion.PromotionCreateDto
+@model PresentationMVC.Models.Promotion.PromotionCreateModel
 @{
     Layout = null;
 }
@@ -92,8 +92,8 @@
 </label>
 <div class="relative">
 <select class="w-full appearance-none px-3.5 py-2.5 text-sm rounded-lg border border-slate-300 bg-white text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#d70018]/20 focus:border-[#d70018] transition-colors cursor-pointer" id="PromotionType" name="PromotionType">
-<option value="FixedAmount" selected="@(Model?.PromotionType == DAL.Enums.PromotionTypeEnum.FixedAmount ? "selected" : null)">Fixed Amount ($)</option>
-<option value="Percentage" selected="@(Model?.PromotionType == DAL.Enums.PromotionTypeEnum.Percentage ? "selected" : null)">Percentage (%)</option>
+<option value="FixedAmount" selected="@(Model?.PromotionType == PresentationMVC.Models.Promotion.PromotionType.FixedAmount ? "selected" : null)">Fixed Amount ($)</option>
+<option value="Percentage" selected="@(Model?.PromotionType == PresentationMVC.Models.Promotion.PromotionType.Percentage ? "selected" : null)">Percentage (%)</option>
 </select>
 <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-400">
 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>

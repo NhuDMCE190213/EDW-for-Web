@@ -1,6 +1,3 @@
-using BLL.DTOs.Pagination;
-using BLL.DTOs.Promotion;
-using BLL.DTOs.Promotion.PromotionList;
 using Microsoft.AspNetCore.Mvc;
 using PresentationMVC.Models.Promotion;
 using PresentationMVC.Services;
@@ -89,7 +86,7 @@ namespace PresentationMVC.Controllers
             //     return RedirectToAction("Index", "Home");
             // }
 
-            var dto = new PromotionCreateDto
+            var dto = new PromotionCreateModel
             {
                 StartAt = DateTime.UtcNow,
                 EndAt = DateTime.UtcNow.AddDays(7)
@@ -98,7 +95,7 @@ namespace PresentationMVC.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(PromotionCreateDto dto)
+        public async Task<IActionResult> Create(PromotionCreateModel dto)
         {
             // if (!User.IsInRole("Admin"))
             // {
@@ -148,7 +145,7 @@ namespace PresentationMVC.Controllers
 
             if (p == null) return NotFound();
 
-            var dto = new PromotionUpdateDto
+            var dto = new PromotionUpdateModel
             {
                 Name = p.Name!,
                 PromotionType = p.PromotionType,
@@ -168,7 +165,7 @@ namespace PresentationMVC.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Edit(Guid id, PromotionUpdateDto dto)
+        public async Task<IActionResult> Edit(Guid id, PromotionUpdateModel dto)
         {
             // if (!User.IsInRole("Admin"))
             // {

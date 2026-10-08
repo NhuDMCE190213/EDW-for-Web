@@ -1,15 +1,13 @@
-using BLL.DTOs.Promotion.PromotionList;
-
 namespace PresentationMVC.Models.Promotion
 {
     public class StaffPromotionIndexViewModel
     {
-        public PromotionListResponeDto PromotionData { get; set; } = default!;
+        public PromotionListResponse PromotionData { get; set; } = new();
 
         public string? SearchName { get; set; }
         public DateTime? StartAt { get; set; }
         public DateTime? EndAt { get; set; }
-        public DAL.Enums.PromotionTypeEnum? DiscountType { get; set; }
+        public PromotionType? DiscountType { get; set; }
         public decimal? MinDiscount { get; set; }
         public decimal? MaxDiscount { get; set; }
         public decimal MaxCost { get; set; } = 1000M;

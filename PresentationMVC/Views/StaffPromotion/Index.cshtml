@@ -66,11 +66,11 @@
                                 <label class="form-label small fw-bold">Type</label>
                                 <div class="d-flex gap-3 align-items-center">
                                     <div class="form-check mb-0">
-                                        <input class="form-check-input discount-type" type="radio" name="DiscountType" value="0" id="typePercent" @(Model.DiscountType == DAL.Enums.PromotionTypeEnum.Percentage ? "checked" : "")>
+                                        <input class="form-check-input discount-type" type="radio" name="DiscountType" value="0" id="typePercent" @(Model.DiscountType == PresentationMVC.Models.Promotion.PromotionType.Percentage ? "checked" : "")>
                                         <label class="form-check-label" for="typePercent">% Percent</label>
                                     </div>
                                     <div class="form-check mb-0 d-flex align-items-center gap-1">
-                                        <input class="form-check-input discount-type" type="radio" name="DiscountType" value="1" id="typeFixed" @(Model.DiscountType == DAL.Enums.PromotionTypeEnum.FixedAmount ? "checked" : "")>
+                                        <input class="form-check-input discount-type" type="radio" name="DiscountType" value="1" id="typeFixed" @(Model.DiscountType == PresentationMVC.Models.Promotion.PromotionType.FixedAmount ? "checked" : "")>
                                         <label class="form-check-label" for="typeFixed">$ Cost</label>
                                         <button type="button" id="btnClearDiscountType" class="btn btn-sm btn-outline-danger p-0 ms-1 d-flex justify-content-center align-items-center" style="width: 18px; height: 18px; font-size: 0.7rem; border-radius: 50%;" title="Clear Type"><i class="bi bi-x"></i></button>
                                     </div>

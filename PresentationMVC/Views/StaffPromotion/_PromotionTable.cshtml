@@ -83,7 +83,7 @@
                                 <td>
                                     @{
                                         string formattedDiscount = "";
-                                        if (item.PromotionType == DAL.Enums.PromotionTypeEnum.Percentage)
+                                        if (item.PromotionType == PresentationMVC.Models.Promotion.PromotionType.Percentage)
                                         {
                                             formattedDiscount = "-" + (item.Percentage ?? 0).ToString("0.##", new System.Globalization.CultureInfo("en-US")) + "%";
                                         }

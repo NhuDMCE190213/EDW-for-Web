@@ -1,4 +1,4 @@
-@model BLL.DTOs.Promotion.PromotionDto
+@model PresentationMVC.Models.Promotion.PromotionDto
 @{
     Layout = null;
 }
@@ -86,7 +86,7 @@
                 <div>
                     <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Discount Value</h3>
                     <p class="text-slate-800 font-bold text-lg text-emerald-600">
-                        @if (Model.PromotionType == DAL.Enums.PromotionTypeEnum.Percentage)
+                        @if (Model.PromotionType == PresentationMVC.Models.Promotion.PromotionType.Percentage)
                         {
                             <text>@Model.Percentage?.ToString("0.##")%</text>
                         }

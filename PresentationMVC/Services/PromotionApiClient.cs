@@ -1,5 +1,4 @@
-using BLL.DTOs.Promotion;
-using BLL.DTOs.Promotion.PromotionList;
+using PresentationMVC.Models.Promotion;
 
 namespace PresentationMVC.Services
 {
@@ -15,10 +14,10 @@ namespace PresentationMVC.Services
             _logger = logger;
         }
 
-        public async Task<PromotionListResponeDto> GetPromotionsListAsync(PromotionListRequest request, CancellationToken cancellationToken = default)
+        public async Task<PromotionListResponse> GetPromotionsListAsync(PromotionListRequest request, CancellationToken cancellationToken = default)
         {
             using var response = await _httpClient.PostAsJsonAsync($"{Resource}/list", request, cancellationToken);
-            return await ReadAsync<PromotionListResponeDto>(response, cancellationToken) ?? new();
+            return await ReadAsync<PromotionListResponse>(response, cancellationToken) ?? new();
         }
 
         public async Task<PromotionDto?> GetPromotionByIdAsync(Guid id, CancellationToken cancellationToken = default)
@@ -34,13 +33,13 @@ namespace PresentationMVC.Services
             return await ReadAsync<List<PromotionDto>>(response, cancellationToken) ?? new();
         }
 
-        public async Task CreatePromotionAsync(PromotionCreateDto dto, CancellationToken cancellationToken = default)
+        public async Task CreatePromotionAsync(PromotionCreateModel dto, CancellationToken cancellationToken = default)
         {
             using var response = await _httpClient.PostAsJsonAsync(Resource, dto, cancellationToken);
             await EnsureSuccessAsync(response, cancellationToken);
         }
 
-        public async Task UpdatePromotionAsync(Guid id, PromotionUpdateDto dto, CancellationToken cancellationToken = default)
+        public async Task UpdatePromotionAsync(Guid id, PromotionUpdateModel dto, CancellationToken cancellationToken = default)
         {
             using var response = await _httpClient.PutAsJsonAsync($"{Resource}/{id}", dto, cancellationToken);
             await EnsureSuccessAsync(response, cancellationToken);
