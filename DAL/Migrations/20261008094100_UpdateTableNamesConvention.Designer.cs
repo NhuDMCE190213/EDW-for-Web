@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DAL.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20261008092406_UpdateTableNamesConvention")]
+    [Migration("20261008094100_UpdateTableNamesConvention")]
     partial class UpdateTableNamesConvention
     {
         /// <inheritdoc />
