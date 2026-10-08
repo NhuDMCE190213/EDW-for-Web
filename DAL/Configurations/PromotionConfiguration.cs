@@ -1,4 +1,4 @@
-﻿using DAL.Models;
+using DAL.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -65,7 +65,7 @@ namespace DAL.Configurations
 
             builder.Property(p => p.Percentage)
                    .HasColumnName("percentage")
-                   .HasColumnType("tinyint")
+                   .HasColumnType("decimal(18,2)")
                    .IsRequired(false);
 
             // Stock-related

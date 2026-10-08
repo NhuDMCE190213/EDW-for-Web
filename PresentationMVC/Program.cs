@@ -23,6 +23,15 @@ builder.Services.AddHttpClient<ProductApiClient>(client =>
     }
     client.BaseAddress = new Uri(baseUrl, UriKind.Absolute);
 });
+builder.Services.AddHttpClient<PromotionApiClient>(client =>
+{
+    var baseUrl = builder.Configuration["ApiSettings:BaseUrl"];
+    if (string.IsNullOrWhiteSpace(baseUrl))
+    {
+        throw new InvalidOperationException("ApiSettings:BaseUrl must be configured.");
+    }
+    client.BaseAddress = new Uri(baseUrl, UriKind.Absolute);
+});
 
 var app = builder.Build();
 

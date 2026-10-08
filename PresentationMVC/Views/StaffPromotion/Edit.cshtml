@@ -1,0 +1,533 @@
+@model BLL.DTOs.Promotion.PromotionUpdateDto
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Edit Promotion - Enterprise Management</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+<style data-purpose="transitions">
+    .transition-collapse {
+      transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease, margin 0.25s ease;
+    }
+    .collapsed {
+      max-height: 0 !important;
+      opacity: 0 !important;
+      margin-top: 0 !important;
+      margin-bottom: 0 !important;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    .expanded {
+      max-height: 280px;
+      opacity: 1;
+    }
+  </style>
+</head>
+<body class="bg-slate-100 min-h-screen text-slate-800 flex items-center justify-center p-4 sm:p-6 lg:p-8 font-sans antialiased">
+<main class="w-full max-w-4xl bg-white rounded-2xl shadow-xl border border-slate-200/80 overflow-hidden" data-purpose="edit-promotion-modal">
+<header class="px-6 py-5 sm:px-8 border-b border-slate-100 flex items-center justify-between bg-gradient-to-r from-white via-white to-blue-50/30">
+<div class="flex items-start gap-3.5">
+<div class="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 shadow-sm flex-shrink-0 mt-0.5">
+<svg class="w-5 h-5 stroke-[2.2]" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125" />
+</svg>
+</div>
+<div>
+<div class="flex items-center gap-2">
+<h1 class="text-xl sm:text-2xl font-bold text-blue-800 tracking-tight">Edit Promotion</h1>
+</div>
+</div>
+</div>
+<div class="hidden sm:flex items-center gap-1.5 bg-slate-100/80 p-1 rounded-lg border border-slate-200 text-xs text-slate-600">
+<span class="px-2 py-1 font-medium text-slate-500">Quick Mode:</span>
+<button class="px-2.5 py-1 rounded bg-white text-slate-800 font-semibold shadow-sm transition-all hover:text-blue-600" id="btn-quick-fixed" type="button">Fixed</button>
+<button class="px-2.5 py-1 rounded text-slate-600 font-medium hover:text-blue-600 transition-all" id="btn-quick-percent" type="button">Percentage</button>
+</div>
+</header>
+
+<form asp-action="Edit" asp-controller="StaffPromotion" asp-route-id="@ViewBag.Id" method="post" class="p-6 sm:p-8 space-y-6" id="promotionForm" novalidate="">
+<div class="grid grid-cols-1 md:grid-cols-12 gap-5 items-start">
+<div class="md:col-span-7 space-y-1.5" data-purpose="field-promotion-name">
+<label class="block text-sm font-semibold text-slate-700" for="Name">
+            Promotion Name <span class="text-red-600">*</span>
+</label>
+<div class="relative">
+<input class="w-full px-3.5 py-2.5 text-sm rounded-lg border border-slate-300 bg-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition-colors" id="Name" name="Name" placeholder="e.g., Siêu Sale Cuối Tuần 50%" type="text" value="@Model?.Name"/>
+</div>
+<p class="hidden text-xs text-red-600 font-medium flex items-center gap-1 mt-1" id="err-promotionName">
+<svg class="w-3.5 h-3.5 inline shrink-0" fill="currentColor" viewbox="0 0 20 20"><path clip-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" fill-rule="evenodd"></path></svg>
+            Tên chương trình khuyến mãi không được để trống
+          </p>
+</div>
+<div class="md:col-span-5 space-y-1.5" data-purpose="field-promotion-type">
+<label class="block text-sm font-semibold text-slate-700" for="PromotionType">
+            Type <span class="text-red-600">*</span>
+</label>
+<div class="relative">
+<select class="w-full appearance-none px-3.5 py-2.5 text-sm rounded-lg border border-slate-300 bg-white text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition-colors cursor-pointer" id="PromotionType" name="PromotionType">
+<option value="FixedAmount" selected="@(Model?.PromotionType == DAL.Enums.PromotionTypeEnum.FixedAmount ? "selected" : null)">Fixed Amount ($)</option>
+<option value="Percentage" selected="@(Model?.PromotionType == DAL.Enums.PromotionTypeEnum.Percentage ? "selected" : null)">Percentage (%)</option>
+</select>
+<div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-400">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+</div>
+</div>
+</div>
+
+<section aria-label="Pricing Configurations" class="pt-1">
+<div class="hidden transition-all duration-200" id="section-percentage">
+<div class="max-w-md space-y-1.5">
+<label class="block text-sm font-semibold text-slate-700" for="Percentage">
+              Percentage (0-100) <span class="text-red-600">*</span>
+</label>
+<div class="relative rounded-lg shadow-sm">
+<input class="w-full px-3.5 py-2.5 pr-12 text-sm rounded-lg border border-slate-300 bg-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition-colors" id="Percentage" name="Percentage" placeholder="e.g., 15.5 or 50" type="text" inputmode="decimal" value="@Model?.Percentage"/>
+<div class="absolute inset-y-0 right-0 pr-3.5 flex items-center pointer-events-none text-slate-400 font-bold text-sm">
+                %
+              </div>
+</div>
+<p class="hidden text-xs text-red-600 font-medium flex items-center gap-1 mt-1" id="err-percentageValue">
+<svg class="w-3.5 h-3.5 inline shrink-0" fill="currentColor" viewbox="0 0 20 20"><path clip-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" fill-rule="evenodd"></path></svg>
+              Tỷ lệ phần trăm hợp lệ từ 0 đến 100 (tối đa 2 chữ số thập phân)
+            </p>
+</div>
+</div>
+<div class="space-y-2" id="section-fixed">
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+<div class="space-y-1.5">
+<label class="block text-sm font-semibold text-slate-700" for="SalePrice">
+                Sale Price <span class="text-red-600">*</span>
+</label>
+<div class="relative">
+<input class="w-full px-3.5 py-2.5 pr-10 text-sm rounded-lg border border-slate-300 bg-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition-colors" id="SalePrice" name="SalePrice" placeholder="e.g., 350000 or 23.32" type="text" inputmode="decimal" value="@Model?.SalePrice"/>
+<span class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-xs font-semibold text-slate-400 select-none">
+                  $
+                </span>
+</div>
+</div>
+<div class="space-y-1.5">
+<label class="block text-sm font-semibold text-slate-700" for="ThresholdPrice">
+                Threshold Price <span class="text-red-600">*</span>
+</label>
+<div class="relative">
+<input class="w-full px-3.5 py-2.5 pr-10 text-sm rounded-lg border border-slate-300 bg-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition-colors" id="ThresholdPrice" name="ThresholdPrice" placeholder="e.g., 500000 or 123.45" type="text" inputmode="decimal" value="@Model?.ThresholdPrice"/>
+<span class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-xs font-semibold text-slate-400 select-none">
+                  $
+                </span>
+</div>
+</div>
+</div>
+<p class="hidden text-xs text-red-600 font-medium flex items-center gap-1.5 pt-1" id="err-fixedPrices">
+<svg class="w-3.5 h-3.5 inline shrink-0" fill="currentColor" viewbox="0 0 20 20"><path clip-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" fill-rule="evenodd"></path></svg>
+            Threshold Price phải lớn hơn Sale Price và cả hai phải lớn hơn 0
+          </p>
+</div>
+</section>
+
+<div class="border-t border-slate-100 my-2"></div>
+
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-6 items-center">
+<div class="flex items-center gap-3 select-none">
+<label class="relative inline-flex items-center cursor-pointer">
+<input class="sr-only peer" id="IsLimitedTime" name="IsLimitedTime" type="checkbox" value="true" @(Model != null && Model.IsLimitedTime ? "checked" : "")/>
+<div class="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-600/30 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+</label>
+<span class="text-sm font-semibold text-slate-800 flex items-center gap-1.5 cursor-pointer" onclick="document.getElementById('IsLimitedTime').click()">
+            Limited Time
+</span>
+</div>
+<div class="flex items-center gap-3 select-none">
+<label class="relative inline-flex items-center cursor-pointer">
+<input class="sr-only peer" id="IsReservedStock" name="IsReservedStock" type="checkbox" value="true" @(Model != null && Model.IsReservedStock ? "checked" : "")/>
+<div class="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-600/30 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+</label>
+<span class="text-sm font-semibold text-slate-800 flex items-center gap-1.5 cursor-pointer" onclick="document.getElementById('IsReservedStock').click()">
+            Reserved Stock
+</span>
+</div>
+<div class="flex items-center gap-3 select-none">
+<label class="relative inline-flex items-center cursor-pointer">
+<input class="sr-only peer" id="IsDisable" name="IsDisable" type="checkbox" value="true" @(Model != null && Model.IsDisable ? "checked" : "")/>
+<div class="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-red-600/30 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"></div>
+</label>
+<span class="text-sm font-semibold text-red-600 flex items-center gap-1.5 cursor-pointer" onclick="document.getElementById('IsDisable').click()">
+            Disable Promotion
+</span>
+</div>
+</div>
+
+<div class="transition-collapse collapsed" id="container-limited-time">
+<div class="p-4 sm:p-5 bg-slate-50/80 rounded-xl border border-slate-200/80 space-y-3 mt-4">
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+<div class="space-y-1">
+<label class="block text-xs font-bold text-slate-700" for="StartAt">
+                Start Date <span class="text-red-600">*</span>
+</label>
+<div class="relative">
+<input class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600" id="StartAt" name="StartAt" type="datetime-local" value="@(Model?.StartAt?.ToString("yyyy-MM-ddTHH:mm"))"/>
+</div>
+</div>
+<div class="space-y-1">
+<label class="block text-xs font-bold text-slate-700" for="EndAt">
+                End Date <span class="text-red-600">*</span>
+</label>
+<div class="relative">
+<input class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600" id="EndAt" name="EndAt" type="datetime-local" value="@(Model?.EndAt?.ToString("yyyy-MM-ddTHH:mm"))"/>
+</div>
+</div>
+</div>
+<p class="hidden text-xs text-red-600 font-medium flex items-center gap-1 pt-1" id="err-dates">
+<svg class="w-3.5 h-3.5 inline shrink-0" fill="currentColor" viewbox="0 0 20 20"><path clip-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" fill-rule="evenodd"></path></svg>
+<span id="err-dates-text">Start Date và End Date không được bỏ trống, và End Date phải sau Start Date.</span>
+</p>
+</div>
+</div>
+
+<div class="transition-collapse collapsed" id="container-reserved-stock">
+<div class="p-4 sm:p-5 bg-slate-50/80 rounded-xl border border-slate-200/80 max-w-md space-y-1.5 mt-4">
+<label class="block text-sm font-semibold text-slate-700" for="MaxReservedStock">
+            Max Reserved Stock <span class="text-red-600">*</span>
+</label>
+<div class="relative">
+<input class="w-full px-3.5 py-2.5 text-sm rounded-lg border border-slate-300 bg-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600" id="MaxReservedStock" min="0" name="MaxReservedStock" placeholder="e.g., 100" step="1" type="number" value="@Model?.MaxReservedStock"/>
+</div>
+<p class="hidden text-xs text-red-600 font-medium flex items-center gap-1 mt-1" id="err-maxReservedStock">
+<svg class="w-3.5 h-3.5 inline shrink-0" fill="currentColor" viewbox="0 0 20 20"><path clip-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" fill-rule="evenodd"></path></svg>
+            Số lượng tồn kho phải là số nguyên lớn hơn hoặc bằng 0
+          </p>
+</div>
+</div>
+
+<div class="hidden rounded-xl bg-emerald-50 border border-emerald-200 p-4 text-emerald-800 transition-all mt-4" id="success-banner">
+<div class="flex items-center gap-3">
+<svg class="w-5 h-5 text-emerald-600 shrink-0" fill="currentColor" viewbox="0 0 20 20">
+<path clip-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" fill-rule="evenodd"></path>
+</svg>
+<div>
+<p class="font-bold text-sm text-emerald-900">Khuyến mãi hợp lệ, đang lưu...</p>
+<p class="text-xs text-emerald-700" id="success-summary">Dữ liệu hợp lệ theo tiêu chuẩn khuyến mãi.</p>
+</div>
+</div>
+</div>
+
+@if (!ViewData.ModelState.IsValid)
+{
+    <div class="rounded-xl bg-red-50 border border-red-200 p-4 text-red-800 transition-all mt-4">
+        <div asp-validation-summary="All" class="text-sm"></div>
+    </div>
+}
+
+<footer class="pt-4 mt-6 border-t border-slate-100 flex items-center justify-end gap-3" data-purpose="form-actions">
+<a asp-action="Index" class="px-5 py-2.5 rounded-lg border border-slate-300 text-sm font-semibold text-slate-700 hover:bg-slate-100 hover:text-slate-900 transition-colors shadow-sm active:scale-[0.98]" id="btnCancel">
+          Cancel
+        </a>
+<button class="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white text-sm font-semibold shadow-md shadow-blue-500/20 transition-all active:scale-[0.98]" id="btnSavePromotion" type="submit">
+<svg class="w-4 h-4 stroke-[2.2]" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125" />
+</svg>
+          Update Promotion
+        </button>
+</footer>
+</form>
+</main>
+<script data-purpose="form-logic">
+    document.addEventListener('DOMContentLoaded', () => {
+      const form = document.getElementById('promotionForm');
+      const promotionNameInput = document.getElementById('Name');
+      const promotionTypeSelect = document.getElementById('PromotionType');
+      
+      const sectionPercentage = document.getElementById('section-percentage');
+      const sectionFixed = document.getElementById('section-fixed');
+      const percentageInput = document.getElementById('Percentage');
+      percentageInput.addEventListener('blur', function() {
+          if (this.value) {
+              let val = this.value.replace(',', '.');
+              let num = parseFloat(val);
+              if (!isNaN(num)) {
+                  this.value = num.toFixed(2);
+              }
+          }
+      });
+      const salePriceInput = document.getElementById('SalePrice');
+      const thresholdPriceInput = document.getElementById('ThresholdPrice');
+      
+      [salePriceInput, thresholdPriceInput].forEach(input => {
+          input.addEventListener('blur', function() {
+              if (this.value) {
+                  let val = this.value.replace(',', '.');
+                  let num = parseFloat(val);
+                  if (!isNaN(num)) {
+                      this.value = num.toFixed(2);
+                  }
+              }
+          });
+      });
+
+      const toggleLimitedTime = document.getElementById('IsLimitedTime');
+      const containerLimitedTime = document.getElementById('container-limited-time');
+      const startDateInput = document.getElementById('StartAt');
+      const endDateInput = document.getElementById('EndAt');
+
+      const toggleReservedStock = document.getElementById('IsReservedStock');
+      const containerReservedStock = document.getElementById('container-reserved-stock');
+      const maxReservedStockInput = document.getElementById('MaxReservedStock');
+
+      const errPromotionName = document.getElementById('err-promotionName');
+      const errPercentageValue = document.getElementById('err-percentageValue');
+      const errFixedPrices = document.getElementById('err-fixedPrices');
+      const errDates = document.getElementById('err-dates');
+      const errDatesText = document.getElementById('err-dates-text');
+      const errMaxReservedStock = document.getElementById('err-maxReservedStock');
+      const successBanner = document.getElementById('success-banner');
+
+      const btnQuickFixed = document.getElementById('btn-quick-fixed');
+      const btnQuickPercent = document.getElementById('btn-quick-percent');
+
+      function setFieldStatus(inputElement, isError) {
+        if (!inputElement) return;
+        if (isError) {
+          inputElement.classList.add('border-red-600', 'focus:ring-red-600/30', 'focus:border-red-600');
+          inputElement.classList.remove('border-slate-300', 'focus:ring-blue-600/20', 'focus:border-blue-600');
+        } else {
+          inputElement.classList.remove('border-red-600', 'focus:ring-red-600/30', 'focus:border-red-600');
+          inputElement.classList.add('border-slate-300', 'focus:ring-blue-600/20', 'focus:border-blue-600');
+        }
+      }
+
+      function updateTypeView(type) {
+        if (type === 'Percentage') {
+          sectionPercentage.classList.remove('hidden');
+          sectionFixed.classList.add('hidden');
+          btnQuickPercent.classList.add('bg-white', 'text-slate-800', 'shadow-sm');
+          btnQuickPercent.classList.remove('text-slate-600');
+          btnQuickFixed.classList.remove('bg-white', 'text-slate-800', 'shadow-sm');
+          btnQuickFixed.classList.add('text-slate-600');
+        } else {
+          sectionPercentage.classList.add('hidden');
+          sectionFixed.classList.remove('hidden');
+          btnQuickFixed.classList.add('bg-white', 'text-slate-800', 'shadow-sm');
+          btnQuickFixed.classList.remove('text-slate-600');
+          btnQuickPercent.classList.remove('bg-white', 'text-slate-800', 'shadow-sm');
+          btnQuickPercent.classList.add('text-slate-600');
+        }
+        errPercentageValue.classList.add('hidden');
+        errFixedPrices.classList.add('hidden');
+        setFieldStatus(percentageInput, false);
+        setFieldStatus(salePriceInput, false);
+        setFieldStatus(thresholdPriceInput, false);
+      }
+
+      promotionTypeSelect.addEventListener('change', (e) => {
+        updateTypeView(e.target.value);
+      });
+
+      btnQuickFixed.addEventListener('click', () => {
+        promotionTypeSelect.value = 'FixedAmount';
+        updateTypeView('FixedAmount');
+      });
+
+      btnQuickPercent.addEventListener('click', () => {
+        promotionTypeSelect.value = 'Percentage';
+        updateTypeView('Percentage');
+      });
+
+      toggleLimitedTime.addEventListener('change', () => {
+        if (toggleLimitedTime.checked) {
+          containerLimitedTime.classList.remove('collapsed');
+          containerLimitedTime.classList.add('expanded');
+          if (!startDateInput.value) {
+            const now = new Date();
+            startDateInput.value = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+          }
+          if (!endDateInput.value) {
+            const nextWeek = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+            endDateInput.value = new Date(nextWeek.getTime() - nextWeek.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+          }
+        } else {
+          containerLimitedTime.classList.remove('expanded');
+          containerLimitedTime.classList.add('collapsed');
+          errDates.classList.add('hidden');
+          setFieldStatus(startDateInput, false);
+          setFieldStatus(endDateInput, false);
+        }
+      });
+
+      toggleReservedStock.addEventListener('change', () => {
+        if (toggleReservedStock.checked) {
+          containerReservedStock.classList.remove('collapsed');
+          containerReservedStock.classList.add('expanded');
+        } else {
+          containerReservedStock.classList.remove('expanded');
+          containerReservedStock.classList.add('collapsed');
+          errMaxReservedStock.classList.add('hidden');
+          setFieldStatus(maxReservedStockInput, false);
+        }
+      });
+
+      promotionNameInput.addEventListener('input', () => {
+        if (promotionNameInput.value.trim().length > 0) {
+          errPromotionName.classList.add('hidden');
+          setFieldStatus(promotionNameInput, false);
+        }
+      });
+
+      updateTypeView(promotionTypeSelect.value);
+      if(toggleLimitedTime.checked) {
+        containerLimitedTime.classList.remove('collapsed');
+        containerLimitedTime.classList.add('expanded');
+      }
+      if(toggleReservedStock.checked) {
+        containerReservedStock.classList.remove('collapsed');
+        containerReservedStock.classList.add('expanded');
+      }
+
+      form.addEventListener('submit', (e) => {
+        let isValid = true;
+        successBanner.classList.add('hidden');
+
+        const nameVal = promotionNameInput.value.trim();
+        if (!nameVal) {
+          errPromotionName.classList.remove('hidden');
+          setFieldStatus(promotionNameInput, true);
+          isValid = false;
+        } else {
+          errPromotionName.classList.add('hidden');
+          setFieldStatus(promotionNameInput, false);
+        }
+
+        const selectedType = promotionTypeSelect.value;
+        if (selectedType === 'Percentage') {
+          const rawPercent = percentageInput.value.replace(',', '.').trim();
+          const pVal = parseFloat(rawPercent);
+          const decimalRegex = /^\d+(\.\d{1,2})?$/;
+          const isDecimalValid = decimalRegex.test(rawPercent);
+
+          if (rawPercent === '' || isNaN(pVal) || pVal < 0 || pVal > 100 || !isDecimalValid) {
+            errPercentageValue.classList.remove('hidden');
+            setFieldStatus(percentageInput, true);
+            isValid = false;
+          } else {
+            errPercentageValue.classList.add('hidden');
+            setFieldStatus(percentageInput, false);
+          }
+        } else if (selectedType === 'FixedAmount') {
+          const rawSale = salePriceInput.value.replace(',', '.').trim();
+          const rawThresh = thresholdPriceInput.value.replace(',', '.').trim();
+          const saleVal = parseFloat(rawSale);
+          const threshVal = parseFloat(rawThresh);
+
+          const decimalRegex = /^\d+(\.\d{1,2})?$/;
+          const hasValidSale = !isNaN(saleVal) && saleVal > 0 && decimalRegex.test(rawSale);
+          const hasValidThresh = !isNaN(threshVal) && threshVal > 0 && decimalRegex.test(rawThresh);
+          const isThreshGreater = threshVal > saleVal;
+
+          if (!hasValidSale || !hasValidThresh || !isThreshGreater) {
+            errFixedPrices.classList.remove('hidden');
+            setFieldStatus(salePriceInput, !hasValidSale || !isThreshGreater);
+            setFieldStatus(thresholdPriceInput, !hasValidThresh || !isThreshGreater);
+            isValid = false;
+          } else {
+            errFixedPrices.classList.add('hidden');
+            setFieldStatus(salePriceInput, false);
+            setFieldStatus(thresholdPriceInput, false);
+          }
+        }
+
+        if (toggleLimitedTime.checked) {
+          const sVal = startDateInput.value;
+          const eVal = endDateInput.value;
+
+          if (!sVal || !eVal) {
+            errDatesText.textContent = 'Vui lòng chọn cả Start Date và End Date.';
+            errDates.classList.remove('hidden');
+            setFieldStatus(startDateInput, !sVal);
+            setFieldStatus(endDateInput, !eVal);
+            isValid = false;
+          } else {
+            const startTimestamp = new Date(sVal).getTime();
+            const endTimestamp = new Date(eVal).getTime();
+
+            if (endTimestamp <= startTimestamp) {
+              errDatesText.textContent = 'End Date phải sau Start Date.';
+              errDates.classList.remove('hidden');
+              setFieldStatus(endDateInput, true);
+              isValid = false;
+            } else {
+              errDates.classList.add('hidden');
+              setFieldStatus(startDateInput, false);
+              setFieldStatus(endDateInput, false);
+            }
+          }
+        }
+
+        if (toggleReservedStock.checked) {
+          const stockVal = maxReservedStockInput.value.trim();
+          const stockNum = parseInt(stockVal, 10);
+          
+          if (stockVal === '' || isNaN(stockNum) || stockNum < 0 || String(stockNum) !== stockVal) {
+            errMaxReservedStock.classList.remove('hidden');
+            setFieldStatus(maxReservedStockInput, true);
+            isValid = false;
+          } else {
+            errMaxReservedStock.classList.add('hidden');
+            setFieldStatus(maxReservedStockInput, false);
+          }
+        }
+
+        if (!isValid) {
+            e.preventDefault(); 
+        } else {
+            if (!toggleLimitedTime.checked) {
+               const hiddenInput = document.createElement("input");
+               hiddenInput.setAttribute("type", "hidden");
+               hiddenInput.setAttribute("name", "IsLimitedTime");
+               hiddenInput.setAttribute("value", "false");
+               form.appendChild(hiddenInput);
+            }
+            if (!toggleReservedStock.checked) {
+               const hiddenInput = document.createElement("input");
+               hiddenInput.setAttribute("type", "hidden");
+               hiddenInput.setAttribute("name", "IsReservedStock");
+               hiddenInput.setAttribute("value", "false");
+               form.appendChild(hiddenInput);
+            }
+            if (!document.getElementById('IsDisable').checked) {
+               const hiddenInput = document.createElement("input");
+               hiddenInput.setAttribute("type", "hidden");
+               hiddenInput.setAttribute("name", "IsDisable");
+               hiddenInput.setAttribute("value", "false");
+               form.appendChild(hiddenInput);
+            }
+
+            const btnSave = document.getElementById('btnSavePromotion');
+            btnSave.disabled = true;
+            btnSave.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Updating...';
+            
+            const summaryText = selectedType === 'Percentage'
+                ? `Chương trình "${nameVal}" loại Giảm ${percentageInput.value}% đang được xử lý.`
+                : `Chương trình "${nameVal}" với giá bán $${Number(salePriceInput.value).toLocaleString('en-US')} đang được xử lý.`;
+            
+            document.getElementById('success-summary').textContent = summaryText;
+            successBanner.classList.remove('hidden');
+        }
+      });
+    });
+  </script>
+</body>
+</html>
