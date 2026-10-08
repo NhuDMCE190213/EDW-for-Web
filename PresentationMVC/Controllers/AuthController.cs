@@ -218,7 +218,7 @@ namespace PresentationMVC.Controllers
                 new Claim(ClaimTypes.NameIdentifier, response.UserId.ToString()),
                 new Claim(ClaimTypes.Name, response.FullName),
                 new Claim(ClaimTypes.Email, response.Email),
-                new Claim(ClaimTypes.Role, response.Role),
+                new Claim(ClaimTypes.Role, response.Role.ToString()),
                 new Claim("JWTToken", response.Token)
             };
 

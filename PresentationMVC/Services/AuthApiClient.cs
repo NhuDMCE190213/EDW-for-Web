@@ -127,6 +127,13 @@ namespace PresentationMVC.Services
         public int UserId { get; set; }
         public string FullName { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
-        public string Role { get; set; } = string.Empty;
+        public LoginRole Role { get; set; }
+    }
+
+    public enum LoginRole
+    {
+        Admin,
+        Staff,
+        Customer
     }
 }
