@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
 using PresentationMVC.Services;
 using PresentationMVC.Models.Order.Staff;
+using Microsoft.AspNetCore.Authorization;
 
 namespace PresentationMVC.Controllers
 {
+    [Authorize(Roles = "Staff,Admin")]
     public class StaffOrderController : Controller
     {
         private readonly OrderApiClient _orderApiClient;
@@ -13,9 +15,14 @@ namespace PresentationMVC.Controllers
             _orderApiClient = orderApiClient;
         }
 
-        public async Task<IActionResult> Dashboard()
+        public async Task<IActionResult> Dashboard(CancellationToken cancellationToken)
         {
-            var model = await _orderApiClient.GetDashboardAsync();
+            if (User.IsInRole("Staff"))
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
+            var model = await _orderApiClient.GetDashboardAsync(cancellationToken);
             return View(model);
         }
 

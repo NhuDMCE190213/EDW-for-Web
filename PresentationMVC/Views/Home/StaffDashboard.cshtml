@@ -1,16 +1,15 @@
 @model PresentationMVC.Models.Order.Staff.OrderDashboardModel
-
 @{
-    ViewData["Title"] = "Order Dashboard";
+    ViewData["Title"] = "Staff Dashboard";
 }
 
 <div class="admin-page order-dashboard-page">
     <div class="admin-page-heading">
         <div>
-            <h1>Order Dashboard</h1>
+            <h1>Staff Dashboard</h1>
             <p>Monitor order activity and store revenue.</p>
         </div>
-        <a asp-action="Index" class="btn btn-ds-primary"><i class="bi bi-list-ul me-1"></i> View all orders</a>
+        <span class="admin-page-badge"><i class="bi bi-person-badge me-1"></i> Staff workspace</span>
     </div>
 
     <div class="row g-3 mb-4">
@@ -45,7 +44,7 @@
         <div class="col-lg-4">
             <div class="admin-panel order-action-panel">
                 <h2>Quick actions</h2>
-                <a asp-action="Index" class="btn btn-ds-primary w-100 mb-2"><i class="bi bi-pencil-square me-2"></i>Process orders</a>
+                <a asp-controller="StaffOrder" asp-action="Index" class="btn btn-ds-primary w-100 mb-2"><i class="bi bi-pencil-square me-2"></i>Process orders</a>
                 <a asp-controller="StaffProduct" asp-action="Index" class="btn btn-outline-secondary w-100"><i class="bi bi-box-seam me-2"></i>View products</a>
             </div>
         </div>

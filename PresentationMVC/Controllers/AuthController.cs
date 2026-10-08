@@ -107,7 +107,7 @@ namespace PresentationMVC.Controllers
         {
             if (User.Identity != null && User.Identity.IsAuthenticated)
             {
-                return RedirectToAction(nameof(HomeController.Index), "Home");
+                return RedirectToLocal(null);
             }
             return View();
         }
@@ -243,10 +243,16 @@ namespace PresentationMVC.Controllers
             {
                 return Redirect(returnUrl);
             }
-            else
+
+            var role = User.FindFirstValue(ClaimTypes.Role);
+            if (string.Equals(role, "Customer", StringComparison.OrdinalIgnoreCase))
             {
-                return RedirectToAction(nameof(HomeController.Index), "Home");
+                return RedirectToAction(nameof(HomeController.Customer), "Home")!;
             }
+
+            return string.Equals(role, "Admin", StringComparison.OrdinalIgnoreCase)
+                ? RedirectToAction(nameof(HomeController.Index), "Home")!
+                : RedirectToAction(nameof(StaffProductController.Index), "StaffProduct")!;
         }
 
         private IActionResult RedirectAfterStaffLogin(string role, string? returnUrl)
@@ -256,9 +262,17 @@ namespace PresentationMVC.Controllers
                 return Redirect(returnUrl);
             }
 
-            return string.Equals(role, "Admin", StringComparison.OrdinalIgnoreCase)
-                ? RedirectToAction(nameof(HomeController.Index), "Home")!
-                : RedirectToAction(nameof(StaffProductController.Index), "StaffProduct")!;
+            if (string.Equals(role, "Admin", StringComparison.OrdinalIgnoreCase))
+            {
+                return RedirectToAction(nameof(HomeController.Index), "Home")!;
+            }
+
+            if (string.Equals(role, "Customer", StringComparison.OrdinalIgnoreCase))
+            {
+                return RedirectToAction(nameof(HomeController.Customer), "Home")!;
+            }
+
+            return RedirectToAction(nameof(StaffProductController.Index), "StaffProduct")!;
         }
     }
 }

@@ -8,12 +8,13 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/PresentationMVC.styles.css" asp-append-version="true" />
+    @await RenderSectionAsync("Styles", required: false)
 </head>
 <body>
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container-fluid">
-                <a class="navbar-brand brand-admin" href="@(User.IsInRole("Admin") ? Url.Action("Index", "Home") : User.IsInRole("Staff") ? Url.Action("Index", "StaffProduct") : Url.Action("CustomerLogin", "Auth"))">
+                <a class="navbar-brand brand-admin" href="@(User.IsInRole("Admin") || User.IsInRole("Staff") ? Url.Action("Index", "Home") : Url.Action("CustomerLogin", "Auth"))">
                     <span class="brand-star">★</span> ECommerse
                     @if (User.IsInRole("Admin"))
                     {
@@ -44,16 +45,25 @@
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-controller="StaffPromotion" asp-action="Index"><i class="bi bi-megaphone me-1"></i>Promotions</a>
                             </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="StaffOrder" asp-action="Dashboard"><i class="bi bi-receipt me-1"></i>Orders</a>
+                            </li>
                             @* Variant management is available from each product row.
                                A global variant page is intentionally hidden until its API screen is ready. *@
                         }
                         else if (User.IsInRole("Staff"))
                         {
                             <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Home" asp-action="Index"><i class="bi bi-speedometer2 me-1"></i>Dashboard</a>
+                            </li>
+                            <li class="nav-item">
                                 <a class="nav-link text-dark" asp-controller="StaffProduct" asp-action="Index"><i class="bi bi-box-seam me-1"></i>Products</a>
                             </li>
-                            @* Orders, reviews and other staff screens will be enabled
-                               when their API-backed MVC controllers are implemented. *@
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="StaffOrder" asp-action="Index"><i class="bi bi-receipt me-1"></i>Orders</a>
+                            </li>
+                            @* Reviews and other staff screens remain hidden until their
+                               API-backed MVC controllers are implemented. *@
                         }
                         @* Customer-facing Home, reviews, promotions, staff, customers and orders
                            remain hidden while their API-backed MVC screens are in development. *@

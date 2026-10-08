@@ -226,6 +226,25 @@ body {
 
 .admin-stat-blue { border-left-color: #1b6ec2; }
 .admin-stat-green { border-left-color: #0ca678; }
+.admin-stat-purple { border-left-color: #7950f2; }
+.order-management-page .admin-stat span,
+.order-dashboard-page .admin-stat span { color: #adb5bd; }
+.order-table .order-reference { color: #6c757d; font-family: monospace; font-size: .8rem; }
+.order-table .item-count { background: #f8f9fa; border-radius: 999px; color: #495057; font-size: .78rem; padding: 5px 9px; }
+.order-status { align-items: center; border-radius: 999px; display: inline-flex; font-size: .75rem; font-weight: 700; gap: 6px; padding: 6px 10px; }
+.order-status i { font-size: .45rem; }
+.order-status-pending { background: #fff3cd; color: #997404; }
+.order-status-processing { background: #e7f5ff; color: #1971c2; }
+.order-status-completed { background: #eaf7ef; color: #2b8a3e; }
+.order-status-cancelled { background: #fff0f0; color: #c92a2a; }
+.order-status-default { background: #f1f3f5; color: #495057; }
+.order-status-select { border-color: #dee2e6; min-width: 125px; }
+.order-dashboard-stat .stat-caption { color: #868e96; display: block; font-size: .72rem; margin-top: 3px; }
+.order-overview-panel, .order-action-panel { min-height: 210px; }
+.order-progress-row { margin: 22px 0; }
+.order-progress-row > div:first-child { display: flex; font-size: .88rem; justify-content: space-between; margin-bottom: 8px; }
+.order-progress-row strong { color: #495057; }
+.order-progress-row .progress { background: #f1f3f5; height: 9px; }
 .product-thumb {
   border: 1px solid #dee2e6;
   border-radius: 6px;

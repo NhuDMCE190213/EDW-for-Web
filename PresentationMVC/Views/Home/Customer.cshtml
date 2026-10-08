@@ -1,0 +1,40 @@
+@model PresentationMVC.Models.CustomerStoreViewModel
+@{
+    ViewData["Title"] = "Electronic Store";
+}
+
+<section class="customer-hero">
+    <span class="badge bg-warning text-dark mb-2">ELECTRONICS STORE</span>
+    <h1 class="display-6 fw-bold">Technology for every day.</h1>
+    <p class="mb-0">Discover phones, laptops and accessories selected for your needs.</p>
+</section>
+
+<div class="d-flex justify-content-between align-items-end mb-3">
+    <div>
+        <h2 class="h4 mb-1">@(string.IsNullOrWhiteSpace(Model.Search) ? "Featured products" : $"Search results for \"{Model.Search}\"")</h2>
+        <p class="text-muted mb-0">@Model.Products.Count product(s) available</p>
+    </div>
+    @if (!string.IsNullOrWhiteSpace(Model.Search) || !string.IsNullOrWhiteSpace(Model.Category))
+    {
+        <a asp-action="Customer" class="btn btn-outline-secondary btn-sm">Clear filters</a>
+    }
+</div>
+
+<div class="row g-4">
+    @foreach (var product in Model.Products)
+    {
+        <div class="col-sm-6 col-lg-4 col-xl-3">
+            <article class="customer-product-card">
+                <div class="product-icon"><i class="bi bi-cpu"></i></div>
+                <span class="badge bg-danger-subtle text-danger mb-2">@product.CategoryName</span>
+                <h3 class="h5">@product.ProductName</h3>
+                <p class="text-muted small mb-1">@product.Brand</p>
+                <small class="text-secondary">Product #@product.ProductId</small>
+            </article>
+        </div>
+    }
+    @if (Model.Products.Count == 0)
+    {
+        <div class="col-12"><div class="alert alert-light border text-center py-5">No products match your search.</div></div>
+    }
+</div>

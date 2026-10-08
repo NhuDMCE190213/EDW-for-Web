@@ -1,45 +1,73 @@
 @model IEnumerable<PresentationMVC.Models.Order.Staff.OrderStaffModel>
 
 @{
-    ViewData["Title"] = "View Orders";
+    ViewData["Title"] = "Order Management";
+    var orders = Model.ToList();
+    string StatusClass(string status) => status.ToLowerInvariant() switch
+    {
+        "pending" => "order-status-pending",
+        "processing" => "order-status-processing",
+        "completed" => "order-status-completed",
+        "cancelled" => "order-status-cancelled",
+        _ => "order-status-default"
+    };
 }
 
-<div class="container mt-4">
-    <h2>Manage Orders</h2>
+<div class="admin-page order-management-page">
+    <div class="admin-page-heading">
+        <div>
+            <h1>Order Management</h1>
+            <p>Review customer orders and update their fulfillment status.</p>
+        </div>
+        <a asp-action="Dashboard" class="admin-page-badge text-decoration-none">
+            <i class="bi bi-bar-chart-line me-1"></i> Order dashboard
+        </a>
+    </div>
 
     @if (TempData["Success"] != null)
     {
-        <div class="alert alert-success">@TempData["Success"]</div>
+        <div class="alert alert-success border-0 shadow-sm">@TempData["Success"]</div>
     }
     @if (TempData["Error"] != null)
     {
-        <div class="alert alert-danger">@TempData["Error"]</div>
+        <div class="alert alert-danger border-0 shadow-sm">@TempData["Error"]</div>
     }
 
-    <table class="table table-striped mt-4">
-        <thead>
-            <tr>
-                <th>Order ID</th>
-                <th>Customer</th>
-                <th>Total Amount</th>
-                <th>Date</th>
-                <th>Status</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var order in Model)
+    <div class="row g-3 mb-4">
+        <div class="col-sm-6 col-xl-3"><div class="admin-stat"><div><small>ALL ORDERS</small><strong>@orders.Count</strong></div><span><i class="bi bi-receipt"></i></span></div></div>
+        <div class="col-sm-6 col-xl-3"><div class="admin-stat admin-stat-blue"><div><small>PROCESSING</small><strong>@orders.Count(o => o.Status is "Pending" or "Processing")</strong></div><span><i class="bi bi-hourglass-split"></i></span></div></div>
+        <div class="col-sm-6 col-xl-3"><div class="admin-stat admin-stat-green"><div><small>COMPLETED</small><strong>@orders.Count(o => o.Status == "Completed")</strong></div><span><i class="bi bi-check-circle"></i></span></div></div>
+        <div class="col-sm-6 col-xl-3"><div class="admin-stat admin-stat-purple"><div><small>TOTAL VALUE</small><strong>@orders.Sum(o => o.TotalAmount).ToString("N0") ₫</strong></div><span><i class="bi bi-cash-stack"></i></span></div></div>
+    </div>
+
+    <div class="admin-panel">
+        <div class="admin-panel-heading">
+            <h2>Customer Orders <span>(@orders.Count)</span></h2>
+            <span class="text-muted small"><i class="bi bi-arrow-down-up me-1"></i>Newest first</span>
+        </div>
+        @if (orders.Count == 0)
+        {
+            <div class="admin-empty"><i class="bi bi-inbox fs-2 d-block mb-2"></i>No orders found.</div>
+        }
+        else
+        {
+        <div class="table-responsive">
+            <table class="table admin-table order-table align-middle mb-0">
+                <thead><tr><th>Order</th><th>Customer</th><th>Items</th><th>Total</th><th>Created</th><th>Status</th><th class="text-end">Update</th></tr></thead>
+                <tbody>
+            @foreach (var order in orders.OrderByDescending(o => o.CreatedAt))
             {
                 <tr>
-                    <td>@order.OrderId</td>
-                    <td>@order.CustomerName</td>
-                    <td>@order.TotalAmount.ToString("C")</td>
-                    <td>@order.CreatedAt.ToString("g")</td>
-                    <td>@order.Status</td>
-                    <td>
+                    <td><span class="order-reference">#@order.OrderId.ToString()[..8].ToUpperInvariant()</span></td>
+                    <td><div class="fw-semibold">@order.CustomerName</div><small class="text-muted">Customer #@order.CustomerId</small></td>
+                    <td><span class="item-count">@order.OrderItems.Sum(i => i.Quantity) item(s)</span></td>
+                    <td class="fw-bold">@order.TotalAmount.ToString("N0") ₫</td>
+                    <td><span class="small">@order.CreatedAt.ToLocalTime().ToString("dd MMM yyyy")</span><small class="d-block text-muted">@order.CreatedAt.ToLocalTime().ToString("HH:mm")</small></td>
+                    <td><span class="order-status @StatusClass(order.Status)"><i class="bi bi-circle-fill"></i>@order.Status</span></td>
+                    <td class="text-end">
                         <form asp-action="ChangeStatus" method="post" class="d-inline">
                             <input type="hidden" name="orderId" value="@order.OrderId" />
-                            <select name="status" class="form-select form-select-sm d-inline-block w-auto" onchange="this.form.submit()">
+                            <select name="status" class="form-select form-select-sm order-status-select" onchange="this.form.submit()" aria-label="Update order status">
                                 @{
                                     var statuses = new[] { "Pending", "Processing", "Completed", "Cancelled" };
                                     foreach (var s in statuses)
@@ -59,6 +87,9 @@
                     </td>
                 </tr>
             }
-        </tbody>
-    </table>
+                </tbody>
+            </table>
+        </div>
+        }
+    </div>
 </div>

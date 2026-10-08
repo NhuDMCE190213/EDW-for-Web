@@ -1,7 +1,7 @@
 @model PresentationMVC.Models.Order.Customer.MyOrdersViewModel
 @{
     ViewData["Title"] = "My Orders";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    Layout = "~/Views/Shared/_CustomerLayout.cshtml";
 
     string GetStatusClass(string status) => status.ToLower() switch
     {
@@ -33,7 +33,7 @@
 <style>
 /* ── Hero ─────────────────────────────────────────────── */
 .orders-hero {
-    background: linear-gradient(135deg, var(--color-primary) 0%, #a93226 100%);
+    background: linear-gradient(135deg, var(--customer-primary) 0%, var(--customer-primary-dark) 100%);
     border-radius: 20px;
     color: #fff;
     padding: 32px 36px;
@@ -69,8 +69,8 @@
     cursor:pointer; background:#fff; transition: all .15s;
     color: #555;
 }
-.filter-tab:hover          { border-color: var(--color-primary); color: var(--color-primary); }
-.filter-tab.active         { background: var(--color-primary); border-color: var(--color-primary); color:#fff; }
+.filter-tab:hover          { border-color: var(--customer-primary); color: var(--customer-primary-dark); }
+.filter-tab.active         { background: var(--customer-primary); border-color: var(--customer-primary); color:#fff; }
 
 /* ── Order card ───────────────────────────────────────── */
 .order-card {
@@ -91,7 +91,7 @@
 
 .order-id   { font-family:monospace; font-size:.77rem; background:#f4f4f5; border-radius:6px; padding:2px 8px; color:#777; }
 .order-date { font-size:.78rem; color:#aaa; }
-.order-amt  { font-size:1.05rem; font-weight:700; color: var(--color-primary); margin-left:auto; margin-right:6px; }
+.order-amt  { font-size:1.05rem; font-weight:700; color: var(--customer-primary-dark); margin-left:auto; margin-right:6px; }
 .chevron    { color:#ccc; transition:transform .25s; flex-shrink:0; }
 .order-card.open .chevron { transform: rotate(180deg); }
 
@@ -120,7 +120,7 @@
 
 .items-tbl th { font-size:.72rem; text-transform:uppercase; letter-spacing:.04em; color:#aaa; font-weight:700; }
 .items-tbl td { font-size:.87rem; }
-.tfoot-total  { font-size:1rem; font-weight:700; color: var(--color-primary); }
+.tfoot-total  { font-size:1rem; font-weight:700; color: var(--customer-primary-dark); }
 
 /* ── Action buttons ────────────────────────────────────── */
 .act-btn {
@@ -137,7 +137,7 @@
 .btn-transfer { background:#f0f9ff; color:#0078d4; border-color:#74b9ff; }
 .btn-transfer:hover { background:#dcf0ff; }
 
-.btn-shop     { background: var(--color-primary); color:#fff; border-color: var(--color-primary); }
+.btn-shop     { background: var(--customer-primary); color:#fff; border-color: var(--customer-primary); }
 .btn-shop:hover { background: #c0392b; border-color:#c0392b; }
 
 /* ── Empty state ───────────────────────────────────────── */
