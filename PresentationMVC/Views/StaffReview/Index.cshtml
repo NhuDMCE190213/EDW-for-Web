@@ -1,0 +1,320 @@
+@model PresentationMVC.Models.Review.StaffReviewIndexViewModel
+@{
+    ViewData["Title"] = "Review Management";
+    var isAdmin = User.IsInRole("Admin");
+}
+
+<div class="admin-page review-management-page">
+    <div class="admin-page-heading d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 fw-bold mb-1"><i class="bi bi-chat-square-quote me-2 text-primary"></i>Review Management</h1>
+            <p class="text-muted mb-0">Monitor customer feedback, flag suspicious/spam reviews, and moderate product visibility.</p>
+        </div>
+        <div>
+            @if (isAdmin)
+            {
+                <span class="badge bg-danger px-3 py-2 fs-6"><i class="bi bi-shield-lock-fill me-1"></i>Admin Moderation Access</span>
+            }
+            else
+            {
+                <span class="badge bg-secondary px-3 py-2 fs-6"><i class="bi bi-person-badge me-1"></i>Staff Monitor Access</span>
+            }
+        </div>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm mb-4" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i>@TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm mb-4" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>@TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <!-- Stat Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-sm-6 col-xl-3">
+            <div class="card border-0 shadow-sm p-3 rounded-3 bg-white">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <small class="text-muted text-uppercase fw-semibold">TOTAL REVIEWS</small>
+                        <h3 class="fw-bold mb-0 mt-1">@Model.TotalReviews</h3>
+                    </div>
+                    <div class="p-3 bg-primary-subtle text-primary rounded-circle">
+                        <i class="bi bi-chat-left-text fs-4"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-xl-3">
+            <div class="card border-0 shadow-sm p-3 rounded-3 bg-white">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <small class="text-muted text-uppercase fw-semibold">FLAGGED (SPAM)</small>
+                        <h3 class="fw-bold mb-0 mt-1 text-warning">@Model.TotalFlagged</h3>
+                    </div>
+                    <div class="p-3 bg-warning-subtle text-warning rounded-circle">
+                        <i class="bi bi-flag-fill fs-4"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-xl-3">
+            <div class="card border-0 shadow-sm p-3 rounded-3 bg-white">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <small class="text-muted text-uppercase fw-semibold">HIDDEN REVIEWS</small>
+                        <h3 class="fw-bold mb-0 mt-1 text-danger">@Model.TotalHidden</h3>
+                    </div>
+                    <div class="p-3 bg-danger-subtle text-danger rounded-circle">
+                        <i class="bi bi-eye-slash-fill fs-4"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-xl-3">
+            <div class="card border-0 shadow-sm p-3 rounded-3 bg-white">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <small class="text-muted text-uppercase fw-semibold">AVERAGE RATING</small>
+                        <h3 class="fw-bold mb-0 mt-1 text-success">@Model.AverageRating <span class="fs-6 text-warning">★</span></h3>
+                    </div>
+                    <div class="p-3 bg-success-subtle text-success rounded-circle">
+                        <i class="bi bi-star-fill fs-4"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter Form -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body p-3">
+            <form method="get" asp-action="Index" class="row g-2 align-items-center">
+                <div class="col-md-4">
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0"><i class="bi bi-search text-muted"></i></span>
+                        <input type="text" name="SearchTerm" class="form-control border-start-0" placeholder="Search product, customer, or content..." value="@Model.Filter.SearchTerm" />
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <select name="Rating" class="form-select">
+                        <option value="">All Ratings</option>
+                        <option value="5" selected="@(Model.Filter.Rating == 5)">5 Stars ★★★★★</option>
+                        <option value="4" selected="@(Model.Filter.Rating == 4)">4 Stars ★★★★☆</option>
+                        <option value="3" selected="@(Model.Filter.Rating == 3)">3 Stars ★★★☆☆</option>
+                        <option value="2" selected="@(Model.Filter.Rating == 2)">2 Stars ★★☆☆☆</option>
+                        <option value="1" selected="@(Model.Filter.Rating == 1)">1 Star ★☆☆☆☆</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select name="Status" class="form-select">
+                        <option value="">All Statuses</option>
+                        <option value="Published" selected="@(Model.Filter.Status == "Published")">Published</option>
+                        <option value="Flagged" selected="@(Model.Filter.Status == "Flagged")">Flagged</option>
+                        <option value="Hidden" selected="@(Model.Filter.Status == "Hidden")">Hidden</option>
+                        <option value="Pending" selected="@(Model.Filter.Status == "Pending")">Pending</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-check form-switch pt-2">
+                        <input class="form-check-input" type="checkbox" name="OnlyFlagged" value="true" id="onlyFlaggedCheck" @(Model.Filter.OnlyFlagged == true ? "checked" : "") />
+                        <label class="form-check-label fw-semibold text-warning" for="onlyFlaggedCheck">
+                            <i class="bi bi-flag-fill me-1"></i>Only Flagged
+                        </label>
+                    </div>
+                </div>
+                <div class="col-md-2 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary w-100"><i class="bi bi-funnel me-1"></i>Filter</button>
+                    <a asp-action="Index" class="btn btn-outline-secondary" title="Reset filter"><i class="bi bi-arrow-counterclockwise"></i></a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Review List Table -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0 fw-bold">Customer Reviews <span class="badge bg-light text-dark border ms-1">@Model.Reviews.Count</span></h5>
+            <span class="text-muted small"><i class="bi bi-info-circle me-1"></i>Showing newest feedback first</span>
+        </div>
+
+        @if (Model.Reviews.Count == 0)
+        {
+            <div class="card-body text-center py-5">
+                <i class="bi bi-chat-square-dots text-muted display-4 d-block mb-3"></i>
+                <h5 class="text-muted fw-normal">No reviews available.</h5>
+                <p class="text-secondary small">Customer product reviews will appear here once submitted.</p>
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width: 18%;">Product</th>
+                            <th style="width: 15%;">Customer</th>
+                            <th style="width: 12%;">Rating</th>
+                            <th style="width: 30%;">Review Content</th>
+                            <th style="width: 10%;">Date</th>
+                            <th style="width: 15%;" class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var review in Model.Reviews)
+                        {
+                            <tr class="@(review.IsHidden ? "table-danger-subtle bg-opacity-25" : review.IsFlagged ? "table-warning-subtle" : "")">
+                                <td>
+                                    <div class="fw-bold text-dark">@review.ProductName</div>
+                                    <small class="text-muted">ID: #@review.ProductId</small>
+                                </td>
+                                <td>
+                                    <div class="fw-medium text-dark">@review.CustomerName</div>
+                                    <small class="text-muted">@review.CustomerEmail</small>
+                                </td>
+                                <td>
+                                    <div class="text-warning">
+                                        @for (int i = 1; i <= 5; i++)
+                                        {
+                                            if (i <= review.Rating)
+                                            {
+                                                <i class="bi bi-star-fill"></i>
+                                            }
+                                            else
+                                            {
+                                                <i class="bi bi-star text-secondary opacity-50"></i>
+                                            }
+                                        }
+                                    </div>
+                                    <small class="text-muted fw-semibold">(@review.Rating/5)</small>
+                                </td>
+                                <td>
+                                    <div class="review-content text-break mb-1">
+                                        @review.Content
+                                    </div>
+                                    <div class="d-flex flex-wrap gap-1 mt-1">
+                                        @if (review.IsFlagged)
+                                        {
+                                            <span class="badge bg-warning text-dark border" title="@review.FlagReason">
+                                                <i class="bi bi-flag-fill me-1"></i>Flagged: @(string.IsNullOrWhiteSpace(review.FlagReason) ? "Spam/Suspicious" : review.FlagReason)
+                                            </span>
+                                        }
+                                        @if (review.IsHidden)
+                                        {
+                                            <span class="badge bg-danger">
+                                                <i class="bi bi-eye-slash-fill me-1"></i>Hidden on Store
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-success-subtle text-success border border-success-subtle">
+                                                <i class="bi bi-eye-fill me-1"></i>Visible
+                                            </span>
+                                        }
+                                    </div>
+                                </td>
+                                <td>
+                                    <small class="text-muted d-block">@review.CreatedAt.ToString("dd/MM/yyyy")</small>
+                                    <small class="text-secondary">@review.CreatedAt.ToString("HH:mm")</small>
+                                </td>
+                                <td class="text-end">
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        <!-- UC-06.2: Flag Review (Admin & Staff) -->
+                                        @if (!review.IsFlagged)
+                                        {
+                                            <button type="button" class="btn btn-outline-warning" data-bs-toggle="modal" data-bs-target="#flagModal-@review.ReviewId" title="Flag as suspicious or spam">
+                                                <i class="bi bi-flag me-1"></i>Flag
+                                            </button>
+                                        }
+                                        else
+                                        {
+                                            <button type="button" class="btn btn-warning disabled" title="Already flagged">
+                                                <i class="bi bi-flag-fill me-1"></i>Flagged
+                                            </button>
+                                        }
+
+                                        <!-- UC-06.3: Moderate Product Reviews (Admin Only - FR-01) -->
+                                        @if (isAdmin)
+                                        {
+                                            @if (review.IsHidden)
+                                            {
+                                                <form asp-action="Moderate" method="post" class="d-inline">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="ReviewId" value="@review.ReviewId" />
+                                                    <input type="hidden" name="IsHidden" value="false" />
+                                                    <button type="submit" class="btn btn-outline-success ms-1" title="Show review publicly" onclick="return confirm('Bạn có chắc muốn hiện lại đánh giá này trên trang sản phẩm?');">
+                                                        <i class="bi bi-eye me-1"></i>Show
+                                                    </button>
+                                                </form>
+                                            }
+                                            else
+                                            {
+                                                <form asp-action="Moderate" method="post" class="d-inline">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="ReviewId" value="@review.ReviewId" />
+                                                    <input type="hidden" name="IsHidden" value="true" />
+                                                    <button type="submit" class="btn btn-outline-danger ms-1" title="Hide review from store" onclick="return confirm('Bạn có chắc muốn ẩn đánh giá này khỏi trang sản phẩm?');">
+                                                        <i class="bi bi-eye-slash me-1"></i>Hide
+                                                    </button>
+                                                </form>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip" title="Chỉ Admin mới có quyền ẩn/hiện đánh giá">
+                                                <button class="btn btn-outline-secondary ms-1 disabled" type="button" disabled>
+                                                    <i class="bi bi-lock-fill"></i> Moderate
+                                                </button>
+                                            </span>
+                                        }
+                                    </div>
+
+                                    <!-- Flag Modal for this review -->
+                                    <div class="modal fade" id="flagModal-@review.ReviewId" tabindex="-1" aria-labelledby="flagModalLabel-@review.ReviewId" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered text-start">
+                                            <div class="modal-content border-0 shadow">
+                                                <form asp-action="Flag" method="post">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="ReviewId" value="@review.ReviewId" />
+                                                    <div class="modal-header bg-warning-subtle">
+                                                        <h5 class="modal-title fw-bold" id="flagModalLabel-@review.ReviewId">
+                                                            <i class="bi bi-flag-fill text-warning me-2"></i>Flag Review #@review.ReviewId
+                                                        </h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <div class="mb-3">
+                                                            <label class="form-label text-muted small">Product & Customer</label>
+                                                            <p class="mb-0 fw-bold">@review.ProductName</p>
+                                                            <p class="text-muted small">Reviewed by @review.CustomerName (@review.Rating ★)</p>
+                                                        </div>
+                                                        <div class="mb-3">
+                                                            <label class="form-label fw-semibold">Reason for Flagging <span class="text-danger">*</span></label>
+                                                            <textarea name="Reason" class="form-control" rows="3" required placeholder="Describe why this review is considered spam, inappropriate, or deceptive..."></textarea>
+                                                            <div class="form-text">Flagging will highlight this review for administrative moderation.</div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer bg-light">
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                        <button type="submit" class="btn btn-warning"><i class="bi bi-flag-fill me-1"></i>Confirm Flag</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>
