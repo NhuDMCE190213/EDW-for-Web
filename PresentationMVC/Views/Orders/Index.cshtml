@@ -264,8 +264,16 @@ else
                                         <td class="text-muted">@item.ProductVariantDetails</td>
                                         <td class="text-end">@item.Quantity</td>
                                         <td class="text-end">@item.PriceAtPurchase.ToString("N0") ₫</td>
-                                        <td class="text-end pe-0 fw-semibold" style="color:var(--color-primary);">
-                                            @item.Subtotal.ToString("N0") ₫
+                                        <td class="text-end pe-0">
+                                            <div class="fw-semibold" style="color:var(--color-primary);">
+                                                @item.Subtotal.ToString("N0") ₫
+                                            </div>
+                                            @if (order.Status.Equals("Completed", StringComparison.OrdinalIgnoreCase))
+                                            {
+                                                <a asp-controller="Reviews" asp-action="Create" asp-route-productId="@item.OrderItemId" asp-route-productName="@item.ProductName" asp-route-orderId="@order.OrderId" asp-route-orderItemId="@item.OrderItemId" class="btn btn-sm btn-outline-danger py-0 px-2 mt-1 rounded-pill" style="font-size: 0.75rem;" title="Write a review for this purchased product">
+                                                    <i class="bi bi-star-fill text-warning me-1"></i>Write Review
+                                                </a>
+                                            }
                                         </td>
                                     </tr>
                                 }
