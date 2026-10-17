@@ -6,13 +6,11 @@ using System.Security.Claims;
 
 namespace PresentationMVC.Controllers
 {
-    // Removing [Authorize] for now, or you can keep it if PresentationMVC implements Auth later.
-    // Assuming user gets CustomerId via claims. Since we may not have Auth configured in PresentationMVC yet,
-    // we'll leave [Authorize] but provide a fallback if the claims are missing.
     [Authorize]
     public class OrdersController : Controller
     {
         private readonly CustomerOrderApiClient _orderApiClient;
+        private readonly ICartService _cartService;
 
         private int CustomerId 
         {
@@ -20,26 +18,25 @@ namespace PresentationMVC.Controllers
             {
                 var val = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                 if (int.TryParse(val, out int id)) return id;
-                return 0; // Or handle unauthorized access
+                return 0;
             }
         }
 
-        public OrdersController(CustomerOrderApiClient orderApiClient)
+        public OrdersController(CustomerOrderApiClient orderApiClient, ICartService cartService)
         {
             _orderApiClient = orderApiClient;
+            _cartService = cartService;
         }
 
         public async Task<IActionResult> Index()
         {
-            // For now, since PresentationMVC doesn't have login, let's allow it to fallback or redirect to Login
             var customerId = CustomerId;
             if (customerId <= 0)
             {
-                // In case it's not authenticated yet
-                return RedirectToAction("Login", "Auth");
+                return RedirectToAction("CustomerLogin", "Auth");
             }
 
-            var email = User.FindFirst(ClaimTypes.Email)?.Value ?? "Unknown Email";
+            var email = User.FindFirst(ClaimTypes.Email)?.Value ?? "Customer";
             var fullName = User.FindFirst(ClaimTypes.Name)?.Value ?? email;
 
             var orders = await _orderApiClient.GetMyOrdersAsync(customerId);
@@ -87,8 +84,15 @@ namespace PresentationMVC.Controllers
 
             try
             {
-                var result = await _orderApiClient.TransferToCartAsync(orderId, CustomerId);
+                // Transfer items to cart service
+                var result = await _cartService.TransferOrderToCartAsync(CustomerId, orderId);
                 
+                if (result == null || !result.Success)
+                {
+                    // Fallback to API if cart service did not find order
+                    result = await _orderApiClient.TransferToCartAsync(orderId, CustomerId);
+                }
+
                 if (result == null || !result.Success)
                     return Json(new { success = false, message = "Failed to transfer items to cart." });
 
