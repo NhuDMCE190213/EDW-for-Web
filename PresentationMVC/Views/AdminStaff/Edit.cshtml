@@ -1,0 +1,184 @@
+@model PresentationMVC.Models.StaffUpdateModel
+@{
+    ViewData["Title"] = "Edit Staff Member";
+}
+
+<div class="admin-page">
+    <div class="mb-3">
+        <a asp-action="Index" class="btn btn-sm btn-outline-secondary">
+            <i class="bi bi-arrow-left me-1"></i> Back to Staff List
+        </a>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-7 col-md-9">
+            <div class="card shadow-sm border-0 rounded-3">
+                <div class="card-header bg-white border-bottom py-3">
+                    <div class="d-flex align-items-center">
+                        <div class="rounded-circle bg-primary-subtle text-primary p-2 me-3">
+                            <i class="bi bi-pencil-square fs-5"></i>
+                        </div>
+                        <div>
+                            <h4 class="mb-0 fw-bold">Edit Staff Member</h4>
+                            <p class="text-muted small mb-0">Update staff details and active status.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body p-4">
+                    <form asp-action="Edit" asp-route-id="@Model.StaffId" method="post" id="staffEditForm" novalidate>
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" asp-for="StaffId" />
+
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-4" role="alert"></div>
+
+                        <!-- Full Name -->
+                        <div class="form-field-group mb-3">
+                            <label asp-for="FullName" class="form-label fw-semibold">
+                                Full Name <span class="text-danger">*</span>
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light"><i class="bi bi-person"></i></span>
+                                <input asp-for="FullName" class="form-control" id="fullNameInput" placeholder="e.g. John Doe" autofocus autocomplete="name" />
+                            </div>
+                            <span class="dynamic-feedback" id="fullNameFeedback"></span>
+                            <span asp-validation-for="FullName" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Email -->
+                        <div class="form-field-group mb-3">
+                            <label asp-for="Email" class="form-label fw-semibold">
+                                Email Address <span class="text-danger">*</span>
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light"><i class="bi bi-envelope"></i></span>
+                                <input asp-for="Email" type="email" class="form-control" id="emailInput" placeholder="e.g. john.doe@example.com" autocomplete="email" />
+                            </div>
+                            <span class="dynamic-feedback" id="emailFeedback"></span>
+                            <span asp-validation-for="Email" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Active Switch -->
+                        <div class="card bg-light border-0 p-3 mb-4 rounded-3">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div>
+                                    <label class="form-label fw-semibold mb-1 d-block">Account Status</label>
+                                    <span class="text-muted small">Active staff can sign in and perform staff operations</span>
+                                </div>
+                                <div class="d-flex align-items-center gap-3">
+                                    <label class="custom-status-switch">
+                                        <input asp-for="IsActive" type="checkbox" id="isActiveSwitch" />
+                                        <span class="custom-status-slider"></span>
+                                    </label>
+                                    <span class="fw-semibold small" id="switchStatusLabel">@(Model.IsActive ? "Active" : "Inactive")</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-2 justify-content-end pt-2 border-top">
+                            <a asp-action="Index" class="btn btn-light px-4">Cancel</a>
+                            <button type="submit" class="btn btn-primary px-4" id="submitBtn">
+                                <i class="bi bi-check2-circle me-1"></i> Save Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const form = document.getElementById("staffEditForm");
+        const fullNameInput = document.getElementById("fullNameInput");
+        const emailInput = document.getElementById("emailInput");
+        const isActiveSwitch = document.getElementById("isActiveSwitch");
+        const switchStatusLabel = document.getElementById("switchStatusLabel");
+
+        // Toggle Switch Label Sync
+        function updateSwitchLabel() {
+            if (isActiveSwitch.checked) {
+                switchStatusLabel.textContent = "Active";
+                switchStatusLabel.className = "fw-semibold text-danger small";
+            } else {
+                switchStatusLabel.textContent = "Inactive";
+                switchStatusLabel.className = "fw-semibold text-muted small";
+            }
+        }
+        isActiveSwitch.addEventListener("change", updateSwitchLabel);
+        updateSwitchLabel();
+
+        // Dynamic Real-time Validators
+        function validateFullName() {
+            const val = fullNameInput.value.trim();
+            const feedback = document.getElementById("fullNameFeedback");
+            if (val.length === 0) {
+                setInvalid(fullNameInput, feedback, "Full Name is required.");
+                return false;
+            } else if (val.length < 2) {
+                setInvalid(fullNameInput, feedback, "Full Name must be at least 2 characters.");
+                return false;
+            } else if (val.length > 100) {
+                setInvalid(fullNameInput, feedback, "Full Name cannot exceed 100 characters.");
+                return false;
+            } else {
+                setValid(fullNameInput, feedback, "Looks good!");
+                return true;
+            }
+        }
+
+        function validateEmail() {
+            const val = emailInput.value.trim();
+            const feedback = document.getElementById("emailFeedback");
+            const emailRegex = /^[^\s@@]+@@[^\s@@]+\.[^\s@@]+$/;
+            if (val.length === 0) {
+                setInvalid(emailInput, feedback, "Email address is required.");
+                return false;
+            } else if (!emailRegex.test(val)) {
+                setInvalid(emailInput, feedback, "Please enter a valid email address.");
+                return false;
+            } else {
+                setValid(emailInput, feedback, "Valid email format.");
+                return true;
+            }
+        }
+
+        function setValid(input, feedback, message) {
+            input.classList.remove("is-dynamic-invalid");
+            input.classList.add("is-dynamic-valid");
+            feedback.className = "dynamic-feedback valid";
+            feedback.innerHTML = `<i class="bi bi-check-circle me-1"></i>${message}`;
+        }
+
+        function setInvalid(input, feedback, message) {
+            input.classList.remove("is-dynamic-valid");
+            input.classList.add("is-dynamic-invalid");
+            feedback.className = "dynamic-feedback invalid";
+            feedback.innerHTML = `<i class="bi bi-exclamation-circle me-1"></i>${message}`;
+        }
+
+        fullNameInput.addEventListener("input", validateFullName);
+        fullNameInput.addEventListener("blur", validateFullName);
+
+        emailInput.addEventListener("input", validateEmail);
+        emailInput.addEventListener("blur", validateEmail);
+
+        // Pre-validate current state
+        validateFullName();
+        validateEmail();
+
+        form.addEventListener("submit", function (e) {
+            const validName = validateFullName();
+            const validEmail = validateEmail();
+
+            if (!validName || !validEmail) {
+                e.preventDefault();
+                if (!validName) fullNameInput.focus();
+                else if (!validEmail) emailInput.focus();
+            }
+        });
+    });
+</script>
+}

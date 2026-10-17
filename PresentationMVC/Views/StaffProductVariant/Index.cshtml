@@ -122,9 +122,41 @@
                 <tr>
                     <td><span class="badge badge-attribute">@variant.Color</span> <span class="badge badge-attribute">@variant.Storage</span><br /><small class="variant-sku">@variant.Sku</small></td>
                     <td><small>@if (!string.IsNullOrWhiteSpace(variant.Ram)) { <span class="d-block"><b>RAM:</b> @variant.Ram</span> } @if (!string.IsNullOrWhiteSpace(variant.Cpu)) { <span class="d-block"><b>CPU:</b> @variant.Cpu</span> } @if (!string.IsNullOrWhiteSpace(variant.ScreenSize)) { <span class="d-block"><b>Screen:</b> @variant.ScreenSize</span> }</small></td>
-                    <td class="text-end">@variant.Price.ToString("N0") VND</td>
+                    <td class="text-end">
+                        @if (variant.HasActiveDiscount)
+                        {
+                            <div class="d-inline-flex align-items-baseline justify-content-end gap-1">
+                                <span class="fw-bold text-danger">@variant.EffectiveDiscountedPrice.ToString("N0") VND</span>
+                                <span class="text-muted text-decoration-line-through small ms-1" style="font-size: 0.8em;">@variant.Price.ToString("N0") VND</span>
+                            </div>
+                        }
+                        else
+                        {
+                            <span class="fw-medium">@variant.Price.ToString("N0") VND</span>
+                        }
+                    </td>
                     <td class="text-center">@if (variant.StockQuantity > 0) { <span class="badge-stock badge-stock-ok">@variant.StockQuantity</span> } else { <span class="badge-stock badge-stock-out">Out of stock</span> }</td>
-                    <td>@variant.Promotion?.Name</td>
+                    <td>
+                        @if (variant.Promotion != null)
+                        {
+                            var isPromoActive = variant.Promotion.IsActive();
+                            <div class="d-flex flex-column align-items-start">
+                                <span class="fw-semibold text-dark"><i class="bi bi-tag-fill text-danger me-1"></i>@variant.Promotion.Name</span>
+                                @if (isPromoActive)
+                                {
+                                    <span class="badge bg-success" style="font-size: 0.7rem;">Active</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary" style="font-size: 0.7rem;">Inactive</span>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <span class="text-muted small">None</span>
+                        }
+                    </td>
                     <td class="text-center text-nowrap">
                         <button type="button" class="btn btn-ds-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#stockModal-@variant.ProductVariantId"><i class="bi bi-box-seam me-1"></i>Stock in</button>
                         <a asp-action="Update" asp-route-id="@variant.ProductVariantId" asp-route-productId="@productId" class="btn btn-ds-secondary btn-sm"><i class="bi bi-pencil-square me-1"></i>Update</a>

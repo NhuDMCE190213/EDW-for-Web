@@ -1,22 +1,405 @@
 @model PresentationMVC.Models.ProductVariantUpdateModel
-@{ ViewData["Title"] = "Update Product Variant"; }
-<div class="d-flex align-items-center mb-4 gap-3"><a asp-action="Index" asp-route-productId="@Model.ProductId" class="btn btn-light">&larr; Back</a><h2>Update Product Variant</h2></div>
-<div class="card shadow-sm"><div class="card-body">
-    <form asp-action="Edit" method="post">
-        @Html.AntiForgeryToken()
-        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
-        <input asp-for="ProductVariantId" type="hidden" /><input asp-for="ProductId" type="hidden" />
-        <div class="row">
-            <div class="col-md-3 mb-3"><label asp-for="Color"></label><input asp-for="Color" class="form-control" /><span asp-validation-for="Color" class="text-danger"></span></div>
-            <div class="col-md-3 mb-3"><label asp-for="Storage"></label><input asp-for="Storage" class="form-control" /></div>
-            <div class="col-md-3 mb-3"><label asp-for="Ram"></label><input asp-for="Ram" class="form-control" /></div>
-            <div class="col-md-3 mb-3"><label asp-for="ScreenSize"></label><input asp-for="ScreenSize" class="form-control" /></div>
-            <div class="col-md-12 mb-3"><label asp-for="Cpu"></label><input asp-for="Cpu" class="form-control" /></div>
-            <div class="col-md-4 mb-3"><label asp-for="Price"></label><input asp-for="Price" type="number" min="0" class="form-control" /></div>
-            <div class="col-md-4 mb-3"><label asp-for="StockQuantity"></label><input asp-for="StockQuantity" type="number" min="0" class="form-control" /></div>
-            <div class="col-md-4 mb-3"><label asp-for="ImageUrl"></label><input asp-for="ImageUrl" class="form-control" /></div>
-        </div>
-        <button class="btn btn-danger">Save Changes</button>
-    </form>
-</div></div>
-@section Scripts { <partial name="_ValidationScriptsPartial" /> }
+@using PresentationMVC.Models.Promotion
+@{ 
+    ViewData["Title"] = "Update Product Variant"; 
+    var promotions = ViewBag.Promotions as List<PromotionDto> ?? new List<PromotionDto>();
+    var selectedPromo = promotions.FirstOrDefault(p => p.PromotionId == Model.PromotionId);
+    var now = DateTime.UtcNow;
+}
+
+<style>
+    .custom-promo-dropdown .dropdown-toggle::after {
+        float: right;
+        margin-top: 10px;
+    }
+    .custom-promo-menu {
+        max-height: 420px;
+        min-width: 100%;
+        width: 100%;
+        border-radius: 10px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+        padding: 0;
+        overflow: hidden;
+    }
+    .custom-promo-search-box {
+        padding: 10px 12px;
+        background: #f8f9fa;
+        border-bottom: 1px solid #e9ecef;
+    }
+    .custom-promo-list {
+        max-height: 280px;
+        overflow-y: auto;
+        padding: 6px;
+    }
+    .promo-option-item {
+        border-radius: 8px;
+        padding: 8px 12px;
+        margin-bottom: 4px;
+        cursor: pointer;
+        transition: all 0.15s ease-in-out;
+        border: 1px solid transparent;
+    }
+    .promo-option-item:hover {
+        background-color: #f1f5f9;
+        border-color: #cbd5e1;
+    }
+    .promo-option-item.selected {
+        background-color: #eff6ff;
+        border-color: #93c5fd;
+    }
+</style>
+
+<div class="d-flex align-items-center mb-4 gap-3">
+    <a asp-action="Index" asp-route-productId="@Model.ProductId" class="btn btn-light">&larr; Back</a>
+    <h2 class="mb-0">Update Product Variant</h2>
+</div>
+
+<div class="card shadow-sm border-0 rounded-3">
+    <div class="card-body p-4">
+        <form asp-action="Edit" method="post" id="updateVariantForm">
+            @Html.AntiForgeryToken()
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+            <input asp-for="ProductVariantId" type="hidden" />
+            <input asp-for="ProductId" type="hidden" />
+            
+            <div class="row">
+                <div class="col-md-3 mb-3">
+                    <label asp-for="Color" class="form-label fw-semibold"></label>
+                    <input asp-for="Color" class="form-control" />
+                    <span asp-validation-for="Color" class="text-danger"></span>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label asp-for="Storage" class="form-label fw-semibold"></label>
+                    <input asp-for="Storage" class="form-control" />
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label asp-for="Ram" class="form-label fw-semibold"></label>
+                    <input asp-for="Ram" class="form-control" />
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label asp-for="ScreenSize" class="form-label fw-semibold"></label>
+                    <input asp-for="ScreenSize" class="form-control" />
+                </div>
+                
+                <div class="col-md-12 mb-3">
+                    <label asp-for="Cpu" class="form-label fw-semibold"></label>
+                    <input asp-for="Cpu" class="form-control" />
+                </div>
+                
+                <div class="col-md-4 mb-3">
+                    <label asp-for="Price" class="form-label fw-semibold">Price (Real Price - VND)</label>
+                    <input asp-for="Price" type="number" min="0" step="1000" class="form-control" id="variantPriceInput" />
+                    <div class="form-text text-muted">Actual base price saved to database (not reduced by promotion).</div>
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <label asp-for="StockQuantity" class="form-label fw-semibold"></label>
+                    <input asp-for="StockQuantity" type="number" min="0" class="form-control" />
+                </div>
+                
+                <div class="col-md-4 mb-3">
+                    <label asp-for="ImageUrl" class="form-label fw-semibold"></label>
+                    <input asp-for="ImageUrl" class="form-control" />
+                </div>
+
+                <!-- PROMOTION SELECTION FIELD -->
+                <div class="col-md-12 mb-4">
+                    <label class="form-label fw-semibold d-flex justify-content-between align-items-center">
+                        <span><i class="bi bi-tag-fill text-danger me-1"></i> Promotion</span>
+                        <small class="text-muted">Select a promotion to apply to this variant</small>
+                    </label>
+
+                    <!-- Hidden input to bind PromotionId -->
+                    <input type="hidden" asp-for="PromotionId" id="selectedPromotionId" />
+
+                    <!-- Custom Dropdown Trigger -->
+                    <div class="dropdown custom-promo-dropdown position-relative" id="promotionDropdownContainer">
+                        <button class="btn btn-outline-secondary w-100 text-start d-flex justify-content-between align-items-center py-2 px-3 bg-white border" 
+                                type="button" 
+                                id="promotionDropdownBtn" 
+                                data-bs-toggle="dropdown" 
+                                aria-expanded="false">
+                            <span id="selectedPromotionDisplay" class="d-flex align-items-center gap-2 text-truncate">
+                                @if (selectedPromo != null)
+                                {
+                                    <i class="bi bi-tag-fill text-danger"></i>
+                                    <span class="fw-semibold text-dark">@selectedPromo.Name</span>
+                                    @if (selectedPromo.PromotionType == PromotionType.Percentage)
+                                    {
+                                        <span class="badge bg-danger rounded-pill">-@selectedPromo.Percentage%</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-danger rounded-pill">-@((selectedPromo.SalePrice ?? 0).ToString("N0")) VND</span>
+                                    }
+                                }
+                                else
+                                {
+                                    <span class="text-secondary"><i class="bi bi-slash-circle me-1"></i>-- None (No Promotion) --</span>
+                                }
+                            </span>
+                            <i class="bi bi-chevron-down text-muted"></i>
+                        </button>
+
+                        <!-- Dropdown Menu with Search and List -->
+                        <div class="dropdown-menu custom-promo-menu" aria-labelledby="promotionDropdownBtn" onclick="event.stopPropagation()">
+                            <!-- Part 1: Search Bar -->
+                            <div class="custom-promo-search-box">
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
+                                    <input type="text" 
+                                           id="promotionSearchInput" 
+                                           class="form-control border-start-0 ps-0" 
+                                           placeholder="Search promotions by name or discount..." 
+                                           autocomplete="off" />
+                                    <button class="btn btn-outline-secondary border-start-0 bg-white" type="button" id="clearPromoSearchBtn" style="display:none;">
+                                        <i class="bi bi-x"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Part 2: List of Promotions -->
+                            <div class="custom-promo-list" id="promotionOptionsList">
+                                <!-- Option None (Clear promotion) -->
+                                <div class="promo-option-item d-flex justify-content-between align-items-center @(Model.PromotionId == null ? "selected" : "")"
+                                     data-id=""
+                                     data-name="-- None (No Promotion) --"
+                                     data-type=""
+                                     data-val="0"
+                                     data-active="false">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <i class="bi bi-slash-circle text-secondary fs-5"></i>
+                                        <div>
+                                            <div class="fw-medium text-secondary">None (No Promotion)</div>
+                                            <small class="text-muted">Do not apply promotion to this variant</small>
+                                        </div>
+                                    </div>
+                                    <span class="badge bg-light text-secondary border">Clear</span>
+                                </div>
+
+                                <!-- List of promotions -->
+                                @if (promotions.Count > 0)
+                                {
+                                    @foreach (var p in promotions)
+                                    {
+                                        var isSelected = Model.PromotionId == p.PromotionId;
+                                        bool isPromoActive = !p.IsDeleted && !p.IsDisabled
+                                            && !(p.IsLimitedTime && p.EndAt.HasValue && p.EndAt.Value < now)
+                                            && !(p.IsLimitedTime && p.StartAt.HasValue && p.StartAt.Value > now)
+                                            && !(p.IsReservedStock && p.MaxReservedStock.HasValue && p.MaxReservedStock.Value <= 0);
+
+                                        string statusBadge;
+                                        if (p.IsDeleted) { statusBadge = "<span class='badge bg-dark'>Deleted</span>"; }
+                                        else if (p.IsDisabled) { statusBadge = "<span class='badge bg-secondary'>Disabled</span>"; }
+                                        else if (p.IsLimitedTime && p.EndAt.HasValue && p.EndAt.Value < now) { statusBadge = "<span class='badge bg-danger'>Expired</span>"; }
+                                        else if (p.IsLimitedTime && p.StartAt.HasValue && p.StartAt.Value > now) { statusBadge = "<span class='badge bg-info text-dark'>Upcoming</span>"; }
+                                        else if (p.IsReservedStock && p.MaxReservedStock.HasValue && p.MaxReservedStock.Value <= 0) { statusBadge = "<span class='badge bg-danger'>Out of Stock</span>"; }
+                                        else { statusBadge = "<span class='badge bg-success'>Active</span>"; }
+
+                                        var discountText = p.PromotionType == PromotionType.Percentage
+                                            ? $"-{p.Percentage}%"
+                                            : $"-{((p.SalePrice ?? 0).ToString("N0"))} VND";
+
+                                        var discountVal = p.PromotionType == PromotionType.Percentage
+                                            ? (p.Percentage ?? 0)
+                                            : (p.SalePrice ?? 0);
+
+                                        <div class="promo-option-item d-flex justify-content-between align-items-center @(isSelected ? "selected" : "")"
+                                             data-id="@p.PromotionId"
+                                             data-name="@p.Name"
+                                             data-type="@((int)p.PromotionType)"
+                                             data-val="@discountVal"
+                                             data-active="@(isPromoActive ? "true" : "false")"
+                                             data-discount-text="@discountText">
+                                            <div class="me-2 text-truncate">
+                                                <div class="d-flex align-items-center gap-2 mb-1">
+                                                    <span class="fw-semibold text-dark text-truncate">@p.Name</span>
+                                                    @Html.Raw(statusBadge)
+                                                </div>
+                                                <div class="text-muted small">
+                                                    @if (p.IsLimitedTime && p.StartAt.HasValue && p.EndAt.HasValue)
+                                                    {
+                                                        <span><i class="bi bi-clock me-1"></i>@p.StartAt.Value.ToString("dd/MM/yyyy") - @p.EndAt.Value.ToString("dd/MM/yyyy")</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span><i class="bi bi-infinity me-1"></i>Unlimited time</span>
+                                                    }
+                                                </div>
+                                            </div>
+                                            <span class="badge bg-danger rounded-pill px-2.5 py-1.5 fs-7">@discountText</span>
+                                        </div>
+                                    }
+                                }
+                                else
+                                {
+                                    <div class="text-center text-muted py-3 small">
+                                        No promotions available.
+                                    </div>
+                                }
+
+                                <div id="noPromoFound" class="text-center text-muted py-3 small d-none">
+                                    No promotions match your search.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Discount Preview Box -->
+                    <div id="promoPreviewBox" class="alert alert-info py-2 px-3 mt-2 d-none d-flex align-items-center justify-content-between">
+                        <div>
+                            <i class="bi bi-info-circle-fill me-1 text-primary"></i>
+                            <span id="promoPreviewText"></span>
+                        </div>
+                        <div class="fw-bold fs-6" id="promoPreviewPrice"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-danger px-4 py-2 fw-semibold">Save Changes</button>
+                <a asp-action="Index" asp-route-productId="@Model.ProductId" class="btn btn-outline-secondary px-4 py-2">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const dropdownBtn = document.getElementById('promotionDropdownBtn');
+            const searchInput = document.getElementById('promotionSearchInput');
+            const clearSearchBtn = document.getElementById('clearPromoSearchBtn');
+            const itemsList = document.getElementById('promotionOptionsList');
+            const hiddenInput = document.getElementById('selectedPromotionId');
+            const displaySpan = document.getElementById('selectedPromotionDisplay');
+            const priceInput = document.getElementById('variantPriceInput');
+            const previewBox = document.getElementById('promoPreviewBox');
+            const previewText = document.getElementById('promoPreviewText');
+            const previewPrice = document.getElementById('promoPreviewPrice');
+            const noFound = document.getElementById('noPromoFound');
+            const items = itemsList.querySelectorAll('.promo-option-item');
+
+            let currentSelected = {
+                id: hiddenInput.value || '',
+                name: '',
+                type: null,
+                val: 0,
+                isActive: false,
+                discountText: ''
+            };
+
+            // Init currentSelected from currently active item
+            items.forEach(item => {
+                if (item.classList.contains('selected') && item.dataset.id) {
+                    currentSelected = {
+                        id: item.dataset.id,
+                        name: item.dataset.name,
+                        type: parseInt(item.dataset.type),
+                        val: parseFloat(item.dataset.val),
+                        isActive: item.dataset.active === 'true',
+                        discountText: item.dataset.discountText || ''
+                    };
+                }
+            });
+
+            function updatePricePreview() {
+                const basePrice = parseFloat(priceInput.value) || 0;
+                if (!currentSelected.id || !currentSelected.isActive || basePrice <= 0) {
+                    previewBox.classList.add('d-none');
+                    return;
+                }
+
+                let discountedPrice = basePrice;
+                if (currentSelected.type === 0) { // Percentage
+                    discountedPrice = Math.max(0, basePrice * (1 - currentSelected.val / 100));
+                } else if (currentSelected.type === 1) { // FixedAmount
+                    discountedPrice = Math.max(0, basePrice - currentSelected.val);
+                }
+
+                previewBox.classList.remove('d-none');
+                previewText.innerHTML = `Promotion: <strong>${currentSelected.name}</strong> (${currentSelected.discountText}). Estimated discounted price:`;
+                previewPrice.innerHTML = `<span class="text-danger fw-bold">${discountedPrice.toLocaleString('vi-VN')} VND</span> <span class="text-muted text-decoration-line-through small ms-1" style="font-size:0.8em">${basePrice.toLocaleString('vi-VN')} VND</span>`;
+            }
+
+            // Real-time search filter
+            searchInput.addEventListener('input', function () {
+                const query = this.value.trim().toLowerCase();
+                clearSearchBtn.style.display = query ? 'block' : 'none';
+                let visibleCount = 0;
+
+                items.forEach(item => {
+                    const name = (item.dataset.name || '').toLowerCase();
+                    const discount = (item.dataset.discountText || '').toLowerCase();
+                    if (name.includes(query) || discount.includes(query) || item.dataset.id === '') {
+                        item.classList.remove('d-none');
+                        visibleCount++;
+                    } else {
+                        item.classList.add('d-none');
+                    }
+                });
+
+                if (visibleCount === 0) {
+                    noFound.classList.remove('d-none');
+                } else {
+                    noFound.classList.add('d-none');
+                }
+            });
+
+            clearSearchBtn.addEventListener('click', function () {
+                searchInput.value = '';
+                searchInput.dispatchEvent(new Event('input'));
+                searchInput.focus();
+            });
+
+            // Focus search input when dropdown opens
+            dropdownBtn.addEventListener('shown.bs.dropdown', function () {
+                searchInput.focus();
+            });
+
+            // Handle option selection
+            items.forEach(item => {
+                item.addEventListener('click', function () {
+                    items.forEach(i => i.classList.remove('selected'));
+                    this.classList.add('selected');
+
+                    const promoId = this.dataset.id || '';
+                    hiddenInput.value = promoId;
+
+                    if (!promoId) {
+                        displaySpan.innerHTML = '<span class="text-secondary"><i class="bi bi-slash-circle me-1"></i>-- None (No Promotion) --</span>';
+                        currentSelected = { id: '', name: '', type: null, val: 0, isActive: false, discountText: '' };
+                    } else {
+                        const name = this.dataset.name;
+                        const discount = this.dataset.discountText;
+                        displaySpan.innerHTML = `<i class="bi bi-tag-fill text-danger"></i> <span class="fw-semibold text-dark">${name}</span> <span class="badge bg-danger rounded-pill">${discount}</span>`;
+                        currentSelected = {
+                            id: promoId,
+                            name: name,
+                            type: parseInt(this.dataset.type),
+                            val: parseFloat(this.dataset.val),
+                            isActive: this.dataset.active === 'true',
+                            discountText: discount
+                        };
+                    }
+
+                    updatePricePreview();
+
+                    // Close dropdown
+                    const bsDropdown = bootstrap.Dropdown.getInstance(dropdownBtn);
+                    if (bsDropdown) {
+                        bsDropdown.hide();
+                    }
+                });
+            });
+
+            // Recalculate preview on price change
+            priceInput.addEventListener('input', updatePricePreview);
+
+            // Initial preview calculation
+            updatePricePreview();
+        });
+    </script>
+}

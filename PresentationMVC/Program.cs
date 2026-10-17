@@ -1,4 +1,4 @@
-﻿using PresentationMVC.Services;
+using PresentationMVC.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -32,6 +32,8 @@ builder.Services.AddHttpClient<CategoryApiClient>(configureApiClient);
 builder.Services.AddHttpClient<ProfileApiClient>(configureApiClient);
 builder.Services.AddHttpClient<ProductVariantApiClient>(configureApiClient);
 builder.Services.AddHttpClient<ProductApiClient>(configureApiClient);
+builder.Services.AddHttpClient<StaffApiClient>(configureApiClient);
+builder.Services.AddHttpClient<CustomerApiClient>(configureApiClient);
 
 var app = builder.Build();
 
