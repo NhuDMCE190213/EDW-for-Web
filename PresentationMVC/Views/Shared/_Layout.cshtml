@@ -51,6 +51,15 @@
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-controller="StaffOrder" asp-action="Index"><i class="bi bi-receipt me-1"></i>All Orders</a>
                             </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="AdminStaff" asp-action="Index"><i class="bi bi-person-badge me-1"></i>Staffs</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="AdminCustomer" asp-action="Index"><i class="bi bi-people me-1"></i>Customers</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="StaffReview" asp-action="Index"><i class="bi bi-chat-square-quote me-1"></i>Reviews</a>
+                            </li>
                             @* Variant management is available from each product row.
                                A global variant page is intentionally hidden until its API screen is ready. *@
                         }
@@ -63,10 +72,14 @@
                                 <a class="nav-link text-dark" asp-controller="StaffProduct" asp-action="Index"><i class="bi bi-box-seam me-1"></i>Products</a>
                             </li>
                             <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="StaffPromotion" asp-action="Index"><i class="bi bi-megaphone me-1"></i>Promotions</a>
+                            </li>
+                            <li class="nav-item">
                                 <a class="nav-link text-dark" asp-controller="StaffOrder" asp-action="Index"><i class="bi bi-receipt me-1"></i>Orders</a>
                             </li>
-                            @* Reviews and other staff screens remain hidden until their
-                               API-backed MVC controllers are implemented. *@
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="StaffReview" asp-action="Index"><i class="bi bi-chat-square-quote me-1"></i>Reviews</a>
+                            </li>
                         }
                         @* Customer-facing Home, reviews, promotions, staff, customers and orders
                            remain hidden while their API-backed MVC screens are in development. *@

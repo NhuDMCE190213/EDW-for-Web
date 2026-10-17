@@ -26,6 +26,37 @@
         </div>
     }
 
+    <!-- Dashboard Stat Cards (Above Filters) -->
+    <div class="row g-3 mb-4" id="promotionDashboardCards">
+        <div class="col-md-4">
+            <div class="admin-stat admin-stat-green">
+                <div>
+                    <small>ACTIVE PROMOTIONS</small>
+                    <strong id="statActivePromotions">@(Model.PromotionData?.ActiveCount ?? 0)</strong>
+                </div>
+                <span><i class="bi bi-check2-circle text-success"></i></span>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="admin-stat admin-stat-blue">
+                <div>
+                    <small>UPCOMING PROMOTIONS</small>
+                    <strong id="statUpcomingPromotions">@(Model.PromotionData?.Upcoming ?? 0)</strong>
+                </div>
+                <span><i class="bi bi-calendar-event text-primary"></i></span>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="admin-stat">
+                <div>
+                    <small>EXPIRED PROMOTIONS</small>
+                    <strong id="statExpiredPromotions">@(Model.PromotionData?.ExpiredOrDisabledCount ?? 0)</strong>
+                </div>
+                <span><i class="bi bi-x-circle text-danger"></i></span>
+            </div>
+        </div>
+    </div>
+
     <!-- Filters -->
     <div class="card shadow-sm border-0 rounded-4 mb-4">
         <div class="card-body p-4">
@@ -311,6 +342,16 @@
                     .then(response => response.text())
                     .then(html => {
                         document.getElementById('tableContent').innerHTML = html;
+                        // Synchronize top dashboard cards
+                        const meta = document.getElementById('promotionTableMetadata');
+                        if (meta) {
+                            const active = meta.getAttribute('data-active');
+                            const upcoming = meta.getAttribute('data-upcoming');
+                            const expired = meta.getAttribute('data-expired');
+                            if (active !== null) document.getElementById('statActivePromotions').textContent = active;
+                            if (upcoming !== null) document.getElementById('statUpcomingPromotions').textContent = upcoming;
+                            if (expired !== null) document.getElementById('statExpiredPromotions').textContent = expired;
+                        }
                     })
                     .finally(() => {
                         overlay.classList.add('d-none');

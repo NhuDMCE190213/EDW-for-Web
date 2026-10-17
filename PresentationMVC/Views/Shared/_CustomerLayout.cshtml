@@ -90,6 +90,9 @@
                                 <a class="customer-icon-link" asp-controller="Profile" asp-action="Index">
                                     <i class="bi bi-person-fill"></i><span>Account</span>
                                 </a>
+                                <a class="customer-icon-link" asp-controller="Reviews" asp-action="MyReviews">
+                                    <i class="bi bi-star-fill"></i><span>My Reviews</span>
+                                </a>
                                 <form asp-controller="Auth" asp-action="Logout" method="post" class="m-0">
                                     @Html.AntiForgeryToken()
                                     <button type="submit" class="customer-auth-link customer-link-button">Log out</button>

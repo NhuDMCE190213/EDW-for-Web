@@ -1,0 +1,316 @@
+@model PresentationMVC.Models.CustomerCreateModel
+@{
+    ViewData["Title"] = "Add New Customer";
+}
+
+<div class="admin-page">
+    <div class="mb-3">
+        <a asp-action="Index" class="btn btn-sm btn-outline-secondary">
+            <i class="bi bi-arrow-left me-1"></i> Back to Customer List
+        </a>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-7 col-md-9">
+            <div class="card shadow-sm border-0 rounded-3">
+                <div class="card-header bg-white border-bottom py-3">
+                    <div class="d-flex align-items-center">
+                        <div class="rounded-circle bg-danger-subtle text-danger p-2 me-3">
+                            <i class="bi bi-person-plus-fill fs-5"></i>
+                        </div>
+                        <div>
+                            <h4 class="mb-0 fw-bold">Create Customer Account</h4>
+                            <p class="text-muted small mb-0">Fill in the details below. Role is automatically set to Customer.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body p-4">
+                    <form asp-action="Create" method="post" id="customerCreateForm" novalidate>
+                        @Html.AntiForgeryToken()
+
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-4" role="alert"></div>
+
+                        <!-- Full Name -->
+                        <div class="form-field-group mb-3">
+                            <label asp-for="FullName" class="form-label fw-semibold">
+                                Full Name <span class="text-danger">*</span>
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light"><i class="bi bi-person"></i></span>
+                                <input asp-for="FullName" class="form-control" id="fullNameInput" placeholder="e.g. Alice Smith" autofocus autocomplete="name" />
+                            </div>
+                            <span class="dynamic-feedback" id="fullNameFeedback"></span>
+                            <span asp-validation-for="FullName" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Email -->
+                        <div class="form-field-group mb-3">
+                            <label asp-for="Email" class="form-label fw-semibold">
+                                Email Address <span class="text-danger">*</span>
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light"><i class="bi bi-envelope"></i></span>
+                                <input asp-for="Email" type="email" class="form-control" id="emailInput" placeholder="e.g. alice.smith@example.com" autocomplete="email" />
+                            </div>
+                            <span class="dynamic-feedback" id="emailFeedback"></span>
+                            <span asp-validation-for="Email" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Phone Number -->
+                        <div class="form-field-group mb-3">
+                            <label asp-for="PhoneNumber" class="form-label fw-semibold">
+                                Phone Number <span class="text-danger">*</span>
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light"><i class="bi bi-telephone"></i></span>
+                                <input asp-for="PhoneNumber" class="form-control" id="phoneInput" placeholder="e.g. 0912345678" autocomplete="tel" />
+                            </div>
+                            <div class="form-text text-muted small mt-1">10-digit Vietnamese phone number starting with 0 (e.g. 09, 08, 07, 05, 03).</div>
+                            <span class="dynamic-feedback" id="phoneFeedback"></span>
+                            <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Password -->
+                        <div class="form-field-group mb-3">
+                            <label asp-for="Password" class="form-label fw-semibold">
+                                Password <span class="text-danger">*</span>
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light"><i class="bi bi-lock"></i></span>
+                                <input asp-for="Password" type="password" class="form-control" id="passwordInput" placeholder="Minimum 8 characters" autocomplete="new-password" />
+                                <button type="button" class="btn btn-outline-secondary" id="togglePasswordBtn" tabindex="-1">
+                                    <i class="bi bi-eye" id="passwordEyeIcon"></i>
+                                </button>
+                            </div>
+                            <div class="form-text text-muted small mt-1">
+                                Must be at least 8 characters and include at least one letter, one number, and one special character.
+                            </div>
+                            <span class="dynamic-feedback" id="passwordFeedback"></span>
+                            <span asp-validation-for="Password" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Points -->
+                        <div class="form-field-group mb-3">
+                            <label asp-for="Points" class="form-label fw-semibold">
+                                Reward Points
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light"><i class="bi bi-star"></i></span>
+                                <input asp-for="Points" type="number" min="0" step="1" class="form-control" id="pointsInput" placeholder="0" />
+                            </div>
+                            <span class="dynamic-feedback" id="pointsFeedback"></span>
+                            <span asp-validation-for="Points" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Active Switch -->
+                        <div class="card bg-light border-0 p-3 mb-4 rounded-3">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div>
+                                    <label class="form-label fw-semibold mb-1 d-block">Account Status</label>
+                                    <span class="text-muted small">Enable or disable customer login and ordering access</span>
+                                </div>
+                                <div class="d-flex align-items-center gap-3">
+                                    <label class="custom-status-switch">
+                                        <input asp-for="IsActive" type="checkbox" id="isActiveSwitch" />
+                                        <span class="custom-status-slider"></span>
+                                    </label>
+                                    <span class="fw-semibold text-dark small" id="switchStatusLabel">Active</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-2 justify-content-end pt-2 border-top">
+                            <a asp-action="Index" class="btn btn-light px-4">Cancel</a>
+                            <button type="submit" class="btn btn-danger px-4" id="submitBtn">
+                                <i class="bi bi-check2-circle me-1"></i> Create Customer
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const form = document.getElementById("customerCreateForm");
+        const fullNameInput = document.getElementById("fullNameInput");
+        const emailInput = document.getElementById("emailInput");
+        const phoneInput = document.getElementById("phoneInput");
+        const passwordInput = document.getElementById("passwordInput");
+        const pointsInput = document.getElementById("pointsInput");
+        const isActiveSwitch = document.getElementById("isActiveSwitch");
+        const switchStatusLabel = document.getElementById("switchStatusLabel");
+
+        function updateSwitchLabel() {
+            if (isActiveSwitch.checked) {
+                switchStatusLabel.textContent = "Active";
+                switchStatusLabel.className = "fw-semibold text-danger small";
+            } else {
+                switchStatusLabel.textContent = "Inactive";
+                switchStatusLabel.className = "fw-semibold text-muted small";
+            }
+        }
+        isActiveSwitch.addEventListener("change", updateSwitchLabel);
+        updateSwitchLabel();
+
+        const togglePasswordBtn = document.getElementById("togglePasswordBtn");
+        const passwordEyeIcon = document.getElementById("passwordEyeIcon");
+        togglePasswordBtn.addEventListener("click", function () {
+            if (passwordInput.type === "password") {
+                passwordInput.type = "text";
+                passwordEyeIcon.className = "bi bi-eye-slash";
+            } else {
+                passwordInput.type = "password";
+                passwordEyeIcon.className = "bi bi-eye";
+            }
+        });
+
+        // Dynamic Real-time Validators
+        function validateFullName() {
+            const val = fullNameInput.value.trim();
+            const feedback = document.getElementById("fullNameFeedback");
+            if (val.length === 0) {
+                setInvalid(fullNameInput, feedback, "Full Name is required.");
+                return false;
+            } else if (val.length < 2) {
+                setInvalid(fullNameInput, feedback, "Full Name must be at least 2 characters.");
+                return false;
+            } else if (val.length > 100) {
+                setInvalid(fullNameInput, feedback, "Full Name cannot exceed 100 characters.");
+                return false;
+            } else {
+                setValid(fullNameInput, feedback, "Looks good!");
+                return true;
+            }
+        }
+
+        function validateEmail() {
+            const val = emailInput.value.trim();
+            const feedback = document.getElementById("emailFeedback");
+            const emailRegex = /^[^\s@@]+@@[^\s@@]+\.[^\s@@]+$/;
+            if (val.length === 0) {
+                setInvalid(emailInput, feedback, "Email address is required.");
+                return false;
+            } else if (!emailRegex.test(val)) {
+                setInvalid(emailInput, feedback, "Please enter a valid email address.");
+                return false;
+            } else {
+                setValid(emailInput, feedback, "Valid email format.");
+                return true;
+            }
+        }
+
+        function validatePhone() {
+            const val = phoneInput.value.trim();
+            const feedback = document.getElementById("phoneFeedback");
+            const phoneRegex = /^(0[3|5|7|8|9])[0-9]{8}$/;
+            if (val.length === 0) {
+                setInvalid(phoneInput, feedback, "Phone number is required.");
+                return false;
+            } else if (!phoneRegex.test(val)) {
+                setInvalid(phoneInput, feedback, "Must be a valid 10-digit number starting with 0 (e.g. 0912345678).");
+                return false;
+            } else {
+                setValid(phoneInput, feedback, "Valid phone number format.");
+                return true;
+            }
+        }
+
+        function validatePassword() {
+            const val = passwordInput.value;
+            const feedback = document.getElementById("passwordFeedback");
+            const hasLetter = /[a-zA-Z]/.test(val);
+            const hasDigit = /\d/.test(val);
+            const hasSpecial = /[!@@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(val);
+
+            if (val.length === 0) {
+                setInvalid(passwordInput, feedback, "Password is required.");
+                return false;
+            } else if (val.length < 8) {
+                setInvalid(passwordInput, feedback, `Too short (${val.length}/8 characters).`);
+                return false;
+            } else if (!hasLetter || !hasDigit || !hasSpecial) {
+                const missing = [];
+                if (!hasLetter) missing.push("letter");
+                if (!hasDigit) missing.push("number");
+                if (!hasSpecial) missing.push("special character");
+                setInvalid(passwordInput, feedback, `Must include at least one ${missing.join(", ")}.`);
+                return false;
+            } else {
+                setValid(passwordInput, feedback, "Strong password!");
+                return true;
+            }
+        }
+
+        function validatePoints() {
+            const val = pointsInput.value;
+            const feedback = document.getElementById("pointsFeedback");
+            if (val === "" || isNaN(val)) {
+                setInvalid(pointsInput, feedback, "Points must be a valid number.");
+                return false;
+            }
+            const num = parseInt(val, 10);
+            if (num < 0) {
+                setInvalid(pointsInput, feedback, "Points cannot be negative.");
+                return false;
+            } else if (num > 1000000) {
+                setInvalid(pointsInput, feedback, "Points cannot exceed 1,000,000.");
+                return false;
+            } else {
+                setValid(pointsInput, feedback, `${num.toLocaleString()} reward points.`);
+                return true;
+            }
+        }
+
+        function setValid(input, feedback, message) {
+            input.classList.remove("is-dynamic-invalid");
+            input.classList.add("is-dynamic-valid");
+            feedback.className = "dynamic-feedback valid";
+            feedback.innerHTML = `<i class="bi bi-check-circle me-1"></i>${message}`;
+        }
+
+        function setInvalid(input, feedback, message) {
+            input.classList.remove("is-dynamic-valid");
+            input.classList.add("is-dynamic-invalid");
+            feedback.className = "dynamic-feedback invalid";
+            feedback.innerHTML = `<i class="bi bi-exclamation-circle me-1"></i>${message}`;
+        }
+
+        fullNameInput.addEventListener("input", validateFullName);
+        fullNameInput.addEventListener("blur", validateFullName);
+
+        emailInput.addEventListener("input", validateEmail);
+        emailInput.addEventListener("blur", validateEmail);
+
+        phoneInput.addEventListener("input", validatePhone);
+        phoneInput.addEventListener("blur", validatePhone);
+
+        passwordInput.addEventListener("input", validatePassword);
+        passwordInput.addEventListener("blur", validatePassword);
+
+        pointsInput.addEventListener("input", validatePoints);
+        pointsInput.addEventListener("blur", validatePoints);
+
+        form.addEventListener("submit", function (e) {
+            const validName = validateFullName();
+            const validEmail = validateEmail();
+            const validPhone = validatePhone();
+            const validPass = validatePassword();
+            const validPoints = validatePoints();
+
+            if (!validName || !validEmail || !validPhone || !validPass || !validPoints) {
+                e.preventDefault();
+                if (!validName) fullNameInput.focus();
+                else if (!validEmail) emailInput.focus();
+                else if (!validPhone) phoneInput.focus();
+                else if (!validPass) passwordInput.focus();
+                else if (!validPoints) pointsInput.focus();
+            }
+        });
+    });
+</script>
+}
