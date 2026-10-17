@@ -17,14 +17,30 @@ namespace PresentationMVC.Services
 
         public async Task<List<ProductStaffModel>> GetAllAsync(CancellationToken cancellationToken = default)
         {
-            using var response = await _httpClient.GetAsync(ResourceStaff, cancellationToken);
-            return await ReadAsync<List<ProductStaffModel>>(response, cancellationToken) ?? new();
+            try
+            {
+                using var response = await _httpClient.GetAsync(ResourceStaff, cancellationToken);
+                return await ReadAsync<List<ProductStaffModel>>(response, cancellationToken) ?? new();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Product API GetAllAsync failed");
+                return new List<ProductStaffModel>();
+            }
         }
 
         public async Task<ProductStaffModel?> GetByIdAsync(int productId, CancellationToken cancellationToken = default)
         {
-            using var response = await _httpClient.GetAsync($"{ResourceAdmin}/{productId}", cancellationToken);
-            return await ReadAsync<ProductStaffModel>(response, cancellationToken);
+            try
+            {
+                using var response = await _httpClient.GetAsync($"{ResourceAdmin}/{productId}", cancellationToken);
+                return await ReadAsync<ProductStaffModel>(response, cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Product API GetByIdAsync failed");
+                return null;
+            }
         }
 
         public async Task CreateAsync(ProductStaffCreateModel model, CancellationToken cancellationToken = default)
