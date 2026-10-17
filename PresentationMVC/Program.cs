@@ -5,6 +5,15 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromHours(2);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+    options.Cookie.Name = ".EDW.Session";
+});
+
 builder.Services.AddAuthentication(Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
@@ -16,11 +25,7 @@ builder.Services.AddAuthentication(Microsoft.AspNetCore.Authentication.Cookies.C
 
 Action<HttpClient> configureApiClient = client =>
 {
-    var baseUrl = builder.Configuration["ApiSettings:BaseUrl"];
-    if (string.IsNullOrWhiteSpace(baseUrl))
-    {
-        throw new InvalidOperationException("ApiSettings:BaseUrl must be configured.");
-    }
+    var baseUrl = builder.Configuration["ApiSettings:BaseUrl"] ?? "https://localhost:7278";
     client.BaseAddress = new Uri(baseUrl, UriKind.Absolute);
 };
 
@@ -36,13 +41,14 @@ builder.Services.AddHttpClient<StaffApiClient>(configureApiClient);
 builder.Services.AddHttpClient<CustomerApiClient>(configureApiClient);
 builder.Services.AddHttpClient<ReviewApiClient>(configureApiClient);
 
+builder.Services.AddScoped<ICartService, CartService>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
@@ -51,9 +57,10 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseSession();
+
 app.UseAuthentication();
 app.UseAuthorization();
-
 
 app.MapControllerRoute(
     name: "default",

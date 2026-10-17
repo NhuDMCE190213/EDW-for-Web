@@ -1,40 +1,340 @@
+@using System.Globalization
 @model PresentationMVC.Models.CustomerStoreViewModel
 @{
     ViewData["Title"] = "Electronic Store";
 }
 
 <section class="customer-hero">
-    <span class="badge bg-warning text-dark mb-2">ELECTRONICS STORE</span>
-    <h1 class="display-6 fw-bold">Technology for every day.</h1>
-    <p class="mb-0">Discover phones, laptops and accessories selected for your needs.</p>
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+        <div>
+            <span class="badge bg-warning text-dark px-3 py-1 mb-2 fw-bold" style="font-size:0.78rem; letter-spacing:0.04em;">ELECTRONICS STORE</span>
+            <h1 class="display-6 fw-bold mb-2">Technology for Every Day.</h1>
+            <p class="mb-0 text-white-50" style="font-size:1.05rem;">Discover cutting-edge laptops, phones, tablets and accessories engineered for performance.</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a asp-controller="Cart" asp-action="Index" class="btn btn-light fw-bold px-4 py-2 rounded-pill shadow-sm text-danger">
+                <i class="bi bi-cart3 me-1"></i> View Cart
+            </a>
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+                <a asp-controller="Orders" asp-action="Index" class="btn btn-outline-light fw-semibold px-3 py-2 rounded-pill">
+                    <i class="bi bi-bag-check me-1"></i> My Orders
+                </a>
+            }
+        </div>
+    </div>
 </section>
 
-<div class="d-flex justify-content-between align-items-end mb-3">
+<!-- Filter & Search Bar -->
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
     <div>
-        <h2 class="h4 mb-1">@(string.IsNullOrWhiteSpace(Model.Search) ? "Featured products" : $"Search results for \"{Model.Search}\"")</h2>
-        <p class="text-muted mb-0">@Model.Products.Count product(s) available</p>
+        <h2 class="h4 fw-bold mb-1 text-dark">
+            @(string.IsNullOrWhiteSpace(Model.Search)
+                ? (string.IsNullOrWhiteSpace(Model.Category) ? "Featured Products" : $"{Model.Category}")
+                : $"Search results for \"{Model.Search}\"")
+        </h2>
+        <p class="text-muted small mb-0">Showing <strong>@Model.Products.Count</strong> product(s) in catalog</p>
     </div>
     @if (!string.IsNullOrWhiteSpace(Model.Search) || !string.IsNullOrWhiteSpace(Model.Category))
     {
-        <a asp-action="Customer" class="btn btn-outline-secondary btn-sm">Clear filters</a>
+        <a asp-action="Customer" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+            <i class="bi bi-x-circle me-1"></i> Clear filters
+        </a>
     }
 </div>
 
+<!-- Category Pills -->
+<div class="d-flex flex-wrap gap-2 mb-4">
+    <a asp-action="Customer" class="btn btn-sm rounded-pill px-3 fw-semibold @(string.IsNullOrEmpty(Model.Category) ? "btn-danger text-white" : "btn-outline-secondary")">
+        All Categories
+    </a>
+    @foreach (var cat in Model.Categories)
+    {
+        bool isActive = string.Equals(Model.Category, cat.Name, StringComparison.OrdinalIgnoreCase);
+        <a asp-action="Customer" asp-route-category="@cat.Name" class="btn btn-sm rounded-pill px-3 fw-semibold @(isActive ? "btn-danger text-white" : "btn-outline-secondary")">
+            @cat.Name
+        </a>
+    }
+</div>
+
+<!-- Product Grid -->
 <div class="row g-4">
     @foreach (var product in Model.Products)
     {
+        decimal displayPrice = product.MinPrice > 0 ? product.MinPrice : 0m;
+        string formattedPrice = displayPrice > 0 ? $"{displayPrice.ToString("N0", new CultureInfo("vi-VN"))} ₫" : "Contact for price";
+        bool inStock = product.InStock;
+        string imageUrl = !string.IsNullOrEmpty(product.ImageUrl)
+            ? product.ImageUrl
+            : "https://images.unsplash.com/photo-1511707171634-5f897ff02560?w=400&auto=format&fit=crop&q=80";
+
         <div class="col-sm-6 col-lg-4 col-xl-3">
-            <article class="customer-product-card">
-                <div class="product-icon"><i class="bi bi-cpu"></i></div>
-                <span class="badge bg-danger-subtle text-danger mb-2">@product.CategoryName</span>
-                <h3 class="h5">@product.ProductName</h3>
-                <p class="text-muted small mb-1">@product.Brand</p>
-                <small class="text-secondary">Product #@product.ProductId</small>
+            <article class="customer-product-card d-flex flex-column h-100 position-relative">
+                <div class="product-thumb-container text-center mb-3 position-relative overflow-hidden" style="height: 190px; background:#f8fafc; border-radius:12px;">
+                    <img src="@imageUrl" alt="@product.ProductName" class="img-fluid h-100 object-fit-contain p-3" />
+                    @if (inStock)
+                    {
+                        <span class="position-absolute top-0 start-0 m-2 badge bg-success-subtle text-success border border-success-subtle px-2 py-1 small rounded-pill">
+                            In Stock
+                        </span>
+                    }
+                    else
+                    {
+                        <span class="position-absolute top-0 start-0 m-2 badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1 small rounded-pill">
+                            Out of Stock
+                        </span>
+                    }
+                </div>
+
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                    <span class="badge bg-danger-subtle text-danger fw-semibold px-2 py-1">@product.CategoryName</span>
+                    <small class="text-muted fw-bold text-uppercase" style="font-size:0.72rem;">@product.Brand</small>
+                </div>
+
+                <h3 class="h6 fw-bold text-dark mb-1" title="@product.ProductName" style="display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; min-height:40px;">
+                    <a asp-controller="Product" asp-action="Index" asp-route-id="@product.ProductId" class="text-dark text-decoration-none">
+                        @product.ProductName
+                    </a>
+                </h3>
+
+                <div class="mt-auto pt-2">
+                    <div class="d-flex align-items-baseline gap-1 mb-3">
+                        @if (product.Variants.Count > 1 && product.MinPrice < product.MaxPrice)
+                        {
+                            <small class="text-muted" style="font-size:0.75rem;">From</small>
+                        }
+                        <span class="fw-bold fs-5 text-danger">@formattedPrice</span>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-danger w-100 py-2 rounded-3 fw-semibold d-flex align-items-center justify-content-center gap-1 shadow-sm"
+                                style="background-color: var(--customer-primary); font-size:0.88rem;"
+                                onclick="openVariantModal('@product.ProductId')">
+                            <i class="bi bi-cart-plus fs-6"></i> Add to Cart
+                        </button>
+                        <a asp-controller="Product" asp-action="Index" asp-route-id="@product.ProductId" class="btn btn-outline-secondary rounded-3 px-3 py-2" title="View details">
+                            <i class="bi bi-eye"></i>
+                        </a>
+                    </div>
+                </div>
             </article>
         </div>
     }
+
     @if (Model.Products.Count == 0)
     {
-        <div class="col-12"><div class="alert alert-light border text-center py-5">No products match your search.</div></div>
+        <div class="col-12">
+            <div class="alert alert-light border rounded-4 text-center py-5 shadow-sm">
+                <i class="bi bi-search text-muted mb-3" style="font-size: 3rem; display: block;"></i>
+                <h5 class="fw-bold text-dark">No Products Found</h5>
+                <p class="text-muted mb-3">No products match your search or category filter.</p>
+                <a asp-action="Customer" class="btn btn-outline-danger rounded-pill px-4">View All Products</a>
+            </div>
+        </div>
     }
 </div>
+
+@* ─── Quick Variant Selector Modal ─────────────────────────────────────────── *@
+<div class="modal fade" id="quickVariantModal" tabindex="-1" aria-labelledby="quickVariantModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 shadow-lg" style="border-radius:20px; overflow:hidden;">
+            <div class="modal-header border-0 pb-0 pt-4 px-4">
+                <h5 class="modal-title fw-bold text-dark" id="quickVariantModalTitle">Choose Options</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="row g-4">
+                    <!-- Left: Product Image & Info -->
+                    <div class="col-md-5 text-center">
+                        <div class="p-3 bg-light rounded-4 mb-3" style="height:220px; display:flex; align-items:center; justify-content:center;">
+                            <img id="modalProductImg" src="" alt="Product" class="img-fluid h-100 object-fit-contain" />
+                        </div>
+                        <span class="badge bg-danger-subtle text-danger text-uppercase fw-bold mb-1" id="modalBrand">BRAND</span>
+                        <h5 class="fw-bold text-dark" id="modalProductName">Product Name</h5>
+                        <div class="mt-2">
+                            <span class="fs-4 fw-bold text-danger" id="modalPrice">0 ₫</span>
+                        </div>
+                        <div id="modalStockStatus" class="small mt-1 fw-semibold text-success">In Stock</div>
+                    </div>
+
+                    <!-- Right: Variants list & Quantity -->
+                    <div class="col-md-7">
+                        <label class="form-label fw-bold text-dark mb-2">Available Editions / Configurations</label>
+                        <div id="variantsContainer" class="d-flex flex-column gap-2 mb-4" style="max-height:220px; overflow-y:auto;">
+                            <!-- Injected dynamically via JS -->
+                        </div>
+
+                        <!-- Quantity Selector -->
+                        <div class="d-flex align-items-center justify-content-between mb-4 pt-2 border-top">
+                            <span class="fw-bold text-dark">Quantity</span>
+                            <div class="qty-control">
+                                <button type="button" class="qty-btn" onclick="adjustModalQty(-1)">-</button>
+                                <input type="number" id="modalQtyInput" class="qty-input" value="1" min="1" max="99" />
+                                <button type="button" class="qty-btn" onclick="adjustModalQty(1)">+</button>
+                            </div>
+                        </div>
+
+                        <!-- Add to Cart Submit Button -->
+                        <button type="button" id="btnModalAddToCart" class="btn btn-danger w-100 py-3 rounded-3 fw-bold shadow-sm"
+                                style="background-color:var(--customer-primary);" onclick="submitModalAddToCart()">
+                            <i class="bi bi-cart-plus me-2 fs-5"></i> Add to Cart Now
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let _modalVariants = [];
+        let _selectedVariantId = null;
+        let _selectedStock = 1;
+
+        function openVariantModal(productId) {
+            const modal = new bootstrap.Modal(document.getElementById('quickVariantModal'));
+            document.getElementById('variantsContainer').innerHTML = '<div class="text-center py-4 text-muted"><span class="spinner-border spinner-border-sm me-2"></span>Loading options...</div>';
+            document.getElementById('modalQtyInput').value = 1;
+            modal.show();
+
+            $.ajax({
+                url: '@Url.Action("GetProductVariants", "Cart")',
+                type: 'GET',
+                data: { productId: productId },
+                success: function (res) {
+                    if (!res.success || !res.variants || res.variants.length === 0) {
+                        document.getElementById('variantsContainer').innerHTML = '<div class="alert alert-warning">No options available for this product.</div>';
+                        return;
+                    }
+
+                    _modalVariants = res.variants;
+                    document.getElementById('modalProductName').innerText = res.productName;
+                    document.getElementById('modalBrand').innerText = res.brand;
+                    document.getElementById('modalProductImg').src = res.imageUrl || res.variants[0].imageUrl;
+
+                    let html = '';
+                    res.variants.forEach((v, idx) => {
+                        const isChecked = idx === 0 ? 'checked' : '';
+                        const formattedPrice = new Intl.NumberFormat('vi-VN').format(v.price) + ' ₫';
+                        const specs = [v.color, v.cpu, v.ram ? v.ram + ' RAM' : null, v.storage, v.screenSize].filter(Boolean).join(' • ');
+
+                        html += `
+                            <label class="d-flex align-items-center justify-content-between p-3 border rounded-3 variant-option-item ${idx === 0 ? 'border-danger bg-danger-subtle' : ''}" style="cursor:pointer;" onclick="selectVariant('${v.productVariantId}', this)">
+                                <div class="d-flex align-items-center gap-2">
+                                    <input type="radio" name="modalVariantRadio" value="${v.productVariantId}" class="form-check-input" ${isChecked} />
+                                    <div>
+                                        <div class="fw-bold text-dark" style="font-size:0.9rem;">${v.color}</div>
+                                        <div class="text-muted small">${specs || 'Standard'}</div>
+                                    </div>
+                                </div>
+                                <div class="text-end">
+                                    <div class="fw-bold text-danger">${formattedPrice}</div>
+                                    <small class="text-muted" style="font-size:0.75rem;">Stock: ${v.stockQuantity}</small>
+                                </div>
+                            </label>
+                        `;
+                    });
+
+                    document.getElementById('variantsContainer').innerHTML = html;
+                    selectVariant(res.variants[0].productVariantId, null);
+                },
+                error: function () {
+                    document.getElementById('variantsContainer').innerHTML = '<div class="alert alert-danger">Failed to load product options.</div>';
+                }
+            });
+        }
+
+        function selectVariant(variantId, el) {
+            _selectedVariantId = variantId;
+            const v = _modalVariants.find(item => item.productVariantId === variantId);
+            if (!v) return;
+
+            _selectedStock = v.stockQuantity;
+            const priceFormatted = new Intl.NumberFormat('vi-VN').format(v.price) + ' ₫';
+            document.getElementById('modalPrice').innerText = priceFormatted;
+
+            if (v.imageUrl) {
+                document.getElementById('modalProductImg').src = v.imageUrl;
+            }
+
+            const stockEl = document.getElementById('modalStockStatus');
+            const btnSubmit = document.getElementById('btnModalAddToCart');
+
+            if (v.stockQuantity > 0) {
+                stockEl.innerText = `In Stock (${v.stockQuantity} units available)`;
+                stockEl.className = 'small mt-1 fw-semibold text-success';
+                btnSubmit.disabled = false;
+                btnSubmit.innerHTML = '<i class="bi bi-cart-plus me-2 fs-5"></i> Add to Cart Now';
+            } else {
+                stockEl.innerText = 'Out of Stock';
+                stockEl.className = 'small mt-1 fw-semibold text-danger';
+                btnSubmit.disabled = true;
+                btnSubmit.innerHTML = '<i class="bi bi-x-circle me-2"></i> Out of Stock';
+            }
+
+            // Update UI selected radio
+            document.querySelectorAll('.variant-option-item').forEach(item => {
+                item.classList.remove('border-danger', 'bg-danger-subtle');
+            });
+            if (el) {
+                el.classList.add('border-danger', 'bg-danger-subtle');
+                const radio = el.querySelector('input[type="radio"]');
+                if (radio) radio.checked = true;
+            }
+        }
+
+        function adjustModalQty(change) {
+            const input = document.getElementById('modalQtyInput');
+            let current = parseInt(input.value) || 1;
+            let target = current + change;
+            if (target < 1) target = 1;
+            if (target > _selectedStock && _selectedStock > 0) {
+                showToast("Only " + _selectedStock + " units available.", "info", "Stock Limit");
+                target = _selectedStock;
+            }
+            input.value = target;
+        }
+
+        function submitModalAddToCart() {
+            if (!_selectedVariantId) {
+                showToast("Please choose an option.", "info");
+                return;
+            }
+
+            const qty = parseInt(document.getElementById('modalQtyInput').value) || 1;
+            const btn = document.getElementById('btnModalAddToCart');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Adding...';
+
+            $.ajax({
+                url: '@Url.Action("AddToCart", "Cart")',
+                type: 'POST',
+                data: { variantId: _selectedVariantId, quantity: qty },
+                success: function (res) {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="bi bi-cart-plus me-2 fs-5"></i> Add to Cart Now';
+
+                    if (res.success) {
+                        refreshCartBadge();
+                        showToast(res.message, "success", "Cart Updated");
+                        const modalEl = document.getElementById('quickVariantModal');
+                        const modal = bootstrap.Modal.getInstance(modalEl);
+                        if (modal) modal.hide();
+                    } else {
+                        showToast(res.message || "Failed to add to cart.", "error", "Add Failed");
+                    }
+                },
+                error: function (xhr) {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="bi bi-cart-plus me-2 fs-5"></i> Add to Cart Now';
+                    if (xhr.status === 401 || xhr.status === 403) {
+                        window.location.href = '@Url.Action("CustomerLogin", "Auth")?returnUrl=' + encodeURIComponent(window.location.pathname);
+                    } else {
+                        showToast("Could not communicate with cart service.", "error", "Error");
+                    }
+                }
+            });
+        }
+    </script>
+}

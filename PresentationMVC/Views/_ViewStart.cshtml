@@ -1,3 +1,13 @@
-﻿@{
-    Layout = User.IsInRole("Customer") ? "_CustomerLayout" : "_Layout";
+@{
+    var routeData = ViewContext.RouteData.Values;
+    var controller = routeData["controller"]?.ToString() ?? "";
+    var action = routeData["action"]?.ToString() ?? "";
+
+    bool isCustomerView = User.IsInRole("Customer") || 
+                          controller.Equals("Cart", StringComparison.OrdinalIgnoreCase) ||
+                          controller.Equals("Orders", StringComparison.OrdinalIgnoreCase) ||
+                          controller.Equals("Product", StringComparison.OrdinalIgnoreCase) ||
+                          (controller.Equals("Home", StringComparison.OrdinalIgnoreCase) && action.Equals("Customer", StringComparison.OrdinalIgnoreCase));
+
+    Layout = isCustomerView ? "_CustomerLayout" : "_Layout";
 }

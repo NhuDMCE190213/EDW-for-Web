@@ -18,19 +18,35 @@ public sealed class ProductVariantApiClient
 
     public async Task<List<ProductVariantModel>> GetByProductAsync(int productId, CancellationToken cancellationToken = default)
     {
-        using var response = await _httpClient.GetAsync($"{Resource}/by-product/{productId}", cancellationToken);
-        return await ReadAsync<List<ProductVariantModel>>(response, cancellationToken) ?? new();
+        try
+        {
+            using var response = await _httpClient.GetAsync($"{Resource}/by-product/{productId}", cancellationToken);
+            return await ReadAsync<List<ProductVariantModel>>(response, cancellationToken) ?? new();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "ProductVariant API GetByProductAsync failed for {ProductId}", productId);
+            return new List<ProductVariantModel>();
+        }
     }
 
     public async Task<ProductVariantModel?> GetAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        using var response = await _httpClient.GetAsync($"{Resource}/{id}", cancellationToken);
-        if (response.StatusCode == HttpStatusCode.NotFound)
+        try
         {
+            using var response = await _httpClient.GetAsync($"{Resource}/{id}", cancellationToken);
+            if (response.StatusCode == HttpStatusCode.NotFound)
+            {
+                return null;
+            }
+
+            return await ReadAsync<ProductVariantModel>(response, cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "ProductVariant API GetAsync failed for {Id}", id);
             return null;
         }
-
-        return await ReadAsync<ProductVariantModel>(response, cancellationToken);
     }
 
     public async Task CreateAsync(ProductVariantCreateModel model, CancellationToken cancellationToken = default)
