@@ -32,6 +32,8 @@ builder.Services.AddHttpClient<CategoryApiClient>(configureApiClient);
 builder.Services.AddHttpClient<ProfileApiClient>(configureApiClient);
 builder.Services.AddHttpClient<ProductVariantApiClient>(configureApiClient);
 builder.Services.AddHttpClient<ProductApiClient>(configureApiClient);
+builder.Services.AddHttpClient<StaffApiClient>(configureApiClient);
+builder.Services.AddHttpClient<CustomerApiClient>(configureApiClient);
 builder.Services.AddHttpClient<ReviewApiClient>(configureApiClient);
 
 var app = builder.Build();
