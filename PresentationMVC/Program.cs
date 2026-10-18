@@ -25,6 +25,7 @@ Action<HttpClient> configureApiClient = client =>
 };
 
 builder.Services.AddHttpClient<CustomerOrderApiClient>(configureApiClient);
+builder.Services.AddHttpClient<CustomerCartApiClient>(configureApiClient);
 builder.Services.AddHttpClient<OrderApiClient>(configureApiClient);
 builder.Services.AddHttpClient<PromotionApiClient>(configureApiClient);
 builder.Services.AddHttpClient<AuthApiClient>(configureApiClient);
