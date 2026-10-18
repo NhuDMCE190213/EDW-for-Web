@@ -63,6 +63,7 @@
             <div class="product-gallery-box">
                 <img id="detailMainImg" src="@initialImg" alt="@Model.ProductName" class="img-fluid h-100 object-fit-contain" />
             </div>
+
         </div>
 
         <!-- Product Details & Variant Picker -->
@@ -157,6 +158,53 @@
             </div>
         </div>
     </div>
+    <section class="mt-5">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+            <h2 class="h4 fw-bold mb-0">
+                <i class="bi bi-star-fill text-warning me-2"></i>Customer Reviews
+            </h2>
+            <span class="text-muted small">@Model.Reviews.Count review(s)</span>
+        </div>
+
+        @if (Model.Reviews.Count == 0)
+        {
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-body text-center text-muted py-5">
+                    <i class="bi bi-chat-square-text fs-1 d-block mb-2"></i>
+                    <p class="mb-0">This product has no published reviews yet.</p>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="d-flex flex-column gap-3">
+                @foreach (var review in Model.Reviews)
+                {
+                    <article class="card border-0 shadow-sm rounded-4">
+                        <div class="card-body p-4">
+                            <div class="d-flex justify-content-between align-items-start gap-3 mb-2">
+                                <div>
+                                    <div class="fw-semibold">
+                                        @(string.IsNullOrWhiteSpace(review.CustomerName) ? "Customer" : review.CustomerName)
+                                    </div>
+                                    <div class="text-warning small" aria-label="@review.Rating out of 5 stars">
+                                        @for (var star = 1; star <= 5; star++)
+                                        {
+                                            <i class="bi @(star <= review.Rating ? "bi-star-fill" : "bi-star")"></i>
+                                        }
+                                    </div>
+                                </div>
+                                <time class="text-muted small" datetime="@review.CreatedAt.ToString("O")">
+                                    @review.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy")
+                                </time>
+                            </div>
+                            <p class="mb-0 text-secondary" style="white-space: pre-line;">@review.Content</p>
+                        </div>
+                    </article>
+                }
+            </div>
+        }
+    </section>
 </div>
 
 @section Scripts {

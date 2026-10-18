@@ -92,10 +92,10 @@
                         }
                         else
                         {
-                            <text>$@Model.SalePrice?.ToString("#,##0.##")</text>
+                            <text>@Model.SalePrice?.ToString("#,##0", new System.Globalization.CultureInfo("vi-VN")) ₫</text>
                             @if (Model.ThresholdPrice > 0)
                             {
-                                <span class="text-sm font-normal text-slate-500 block mt-1">Min Purchase: $@Model.ThresholdPrice?.ToString("#,##0.##")</span>
+                                <span class="text-sm font-normal text-slate-500 block mt-1">Min Purchase: @Model.ThresholdPrice?.ToString("#,##0", new System.Globalization.CultureInfo("vi-VN")) ₫</span>
                             }
                         }
                     </p>

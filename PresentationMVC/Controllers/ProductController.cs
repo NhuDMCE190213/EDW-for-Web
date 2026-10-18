@@ -6,10 +6,12 @@ namespace PresentationMVC.Controllers
     public class ProductController : Controller
     {
         private readonly ICartService _cartService;
+        private readonly ReviewApiClient _reviewApiClient;
 
-        public ProductController(ICartService cartService)
+        public ProductController(ICartService cartService, ReviewApiClient reviewApiClient)
         {
             _cartService = cartService;
+            _reviewApiClient = reviewApiClient;
         }
 
         // GET: /Product/Index/1 or /Product/Details/1
@@ -20,6 +22,13 @@ namespace PresentationMVC.Controllers
             {
                 return NotFound();
             }
+
+            var token = User.FindFirst("JWTToken")?.Value;
+            product.Reviews = (await _reviewApiClient.GetProductReviewsAsync(id, token))
+                .Where(review => string.Equals(review.Status, "Published", StringComparison.OrdinalIgnoreCase))
+                .OrderByDescending(review => review.CreatedAt)
+                .ToList();
+
             return View(product);
         }
 

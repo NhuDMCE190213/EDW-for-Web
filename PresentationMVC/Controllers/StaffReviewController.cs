@@ -108,6 +108,17 @@ namespace PresentationMVC.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Unflag(int reviewId)
+        {
+            var token = GetJwtToken();
+            var (success, message) = await _reviewApiClient.UnflagReviewAsync(reviewId, token);
+
+            TempData[success ? "SuccessMessage" : "ErrorMessage"] = message;
+            return RedirectToAction(nameof(Index));
+        }
+
         // ═══════════════════════════════════════════════════════════════════════
         // UC-06.3 — MODERATE PRODUCT REVIEWS (Admin Only)
         // ═══════════════════════════════════════════════════════════════════════

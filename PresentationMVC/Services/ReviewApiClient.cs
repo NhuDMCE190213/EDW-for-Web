@@ -109,6 +109,29 @@ namespace PresentationMVC.Services
             }
         }
 
+        public async Task<(bool Success, string Message)> UnflagReviewAsync(int reviewId, string? jwtToken = null, CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                var request = new HttpRequestMessage(HttpMethod.Post, $"{StaffResource}/{reviewId}/unflag");
+                AttachBearerToken(request, jwtToken);
+
+                using var response = await _httpClient.SendAsync(request, cancellationToken);
+                if (response.IsSuccessStatusCode)
+                {
+                    return (true, "Đã gỡ cờ đánh giá.");
+                }
+
+                var errorMsg = await response.Content.ReadAsStringAsync(cancellationToken);
+                return (false, string.IsNullOrWhiteSpace(errorMsg) ? "Không thể gỡ cờ đánh giá." : errorMsg);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error unflagging review {ReviewId}", reviewId);
+                return (false, "Lỗi kết nối máy chủ khi gỡ cờ đánh giá.");
+            }
+        }
+
         // ═══════════════════════════════════════════════════════════════════════
         // UC-06.3 — MODERATE PRODUCT REVIEWS (Admin Only)
         // ═══════════════════════════════════════════════════════════════════════
@@ -167,6 +190,41 @@ namespace PresentationMVC.Services
             {
                 _logger.LogError(ex, "Failed to retrieve customer reviews for CustomerId {CustomerId}", customerId);
                 throw new HttpRequestException("Unable to load your reviews. Please try again later.", ex);
+            }
+        }
+
+        public async Task<List<CustomerReviewDto>> GetProductReviewsAsync(int productId, string? jwtToken = null, CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                var request = new HttpRequestMessage(HttpMethod.Get, $"{StaffResource}?productId={productId}");
+                AttachBearerToken(request, jwtToken);
+
+                using var response = await _httpClient.SendAsync(request, cancellationToken);
+                if (response.IsSuccessStatusCode)
+                {
+                    var reviews = await response.Content.ReadFromJsonAsync<List<ReviewStaffDto>>(_jsonOptions, cancellationToken) ?? new();
+                    return reviews.Select(review => new CustomerReviewDto
+                    {
+                        ReviewId = review.ReviewId,
+                        ProductId = review.ProductId,
+                        ProductName = review.ProductName,
+                        CustomerName = review.CustomerName,
+                        Rating = review.Rating,
+                        Content = review.Content,
+                        Status = review.Status,
+                        CreatedAt = review.CreatedAt,
+                        UpdatedAt = review.UpdatedAt
+                    }).ToList();
+                }
+
+                _logger.LogWarning("GetProductReviewsAsync returned status code {StatusCode} for ProductId {ProductId}", response.StatusCode, productId);
+                return new List<CustomerReviewDto>();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to retrieve reviews for ProductId {ProductId}", productId);
+                return new List<CustomerReviewDto>();
             }
         }
 

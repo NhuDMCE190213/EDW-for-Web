@@ -53,14 +53,13 @@
                                         }
                                         else
                                         {
-                                            formattedDiscount = "-$" + (item.SalePrice ?? 0).ToString("#,##0.##", new System.Globalization.CultureInfo("en-US"));
+                                            formattedDiscount = "-" + (item.SalePrice ?? 0).ToString("#,##0", new System.Globalization.CultureInfo("vi-VN")) + " ₫";
                                         }
-                                        var parts = formattedDiscount.Split('.');
                                     }
-                                    <span class="fw-bold" style="color: #008060;">@parts[0]</span>@if(parts.Length > 1){<span class="text-warning fw-bold">.@parts[1]</span>}
+                                    <span class="fw-bold" style="color: #008060;">@formattedDiscount</span>
                                     @if (item.ThresholdPrice > 0)
                                     {
-                                        <div class="small text-muted mt-1">Min: $@((item.ThresholdPrice ?? 0).ToString("#,##0.##", new System.Globalization.CultureInfo("en-US")))</div>
+                                        <div class="small text-muted mt-1">Min: @((item.ThresholdPrice ?? 0).ToString("#,##0", new System.Globalization.CultureInfo("vi-VN"))) ₫</div>
                                     }
                                 </td>
                                 <td>

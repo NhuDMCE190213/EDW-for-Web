@@ -102,7 +102,7 @@
                                     </div>
                                     <div class="form-check mb-0 d-flex align-items-center gap-1">
                                         <input class="form-check-input discount-type" type="radio" name="DiscountType" value="1" id="typeFixed" @(Model.DiscountType == PresentationMVC.Models.Promotion.PromotionType.FixedAmount ? "checked" : "")>
-                                        <label class="form-check-label" for="typeFixed">$ Cost</label>
+                                        <label class="form-check-label" for="typeFixed">VND Cost</label>
                                         <button type="button" id="btnClearDiscountType" class="btn btn-sm btn-outline-danger p-0 ms-1 d-flex justify-content-center align-items-center" style="width: 18px; height: 18px; font-size: 0.7rem; border-radius: 50%;" title="Clear Type"><i class="bi bi-x"></i></button>
                                     </div>
                                 </div>
@@ -240,7 +240,7 @@
                 }
                 
                 let isPercent = document.getElementById('typePercent').checked;
-                let unit = isPercent ? '%' : '$';
+                let unit = isPercent ? '%' : ' ₫';
                 rangeDisplay.innerText = `${minSlider.value}${unit} - ${maxSlider.value}${unit}`;
             }
 

@@ -62,7 +62,7 @@
     @foreach (var product in Model.Products)
     {
         decimal displayPrice = product.MinPrice > 0 ? product.MinPrice : 0m;
-        string formattedPrice = displayPrice > 0 ? $"{displayPrice.ToString("N0", new CultureInfo("vi-VN"))} ₫" : "Contact for price";
+        @* string formattedPrice = displayPrice > 0 ? $"{displayPrice.ToString("N0", new CultureInfo("vi-VN"))} ₫" : "Contact for price"; *@
         bool inStock = product.InStock;
         string imageUrl = !string.IsNullOrEmpty(product.ImageUrl)
             ? product.ImageUrl
@@ -72,7 +72,7 @@
             <article class="customer-product-card d-flex flex-column h-100 position-relative">
                 <div class="product-thumb-container text-center mb-3 position-relative overflow-hidden" style="height: 190px; background:#f8fafc; border-radius:12px;">
                     <img src="@imageUrl" alt="@product.ProductName" class="img-fluid h-100 object-fit-contain p-3" />
-                    @if (inStock)
+                    @* @if (inStock)
                     {
                         <span class="position-absolute top-0 start-0 m-2 badge bg-success-subtle text-success border border-success-subtle px-2 py-1 small rounded-pill">
                             In Stock
@@ -83,7 +83,7 @@
                         <span class="position-absolute top-0 start-0 m-2 badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1 small rounded-pill">
                             Out of Stock
                         </span>
-                    }
+                    } *@
                 </div>
 
                 <div class="d-flex align-items-center justify-content-between mb-2">
@@ -103,7 +103,7 @@
                         {
                             <small class="text-muted" style="font-size:0.75rem;">From</small>
                         }
-                        <span class="fw-bold fs-5 text-danger">@formattedPrice</span>
+                        @* <span class="fw-bold fs-5 text-danger">@formattedPrice</span> *@
                     </div>
 
                     <div class="d-flex gap-2">
