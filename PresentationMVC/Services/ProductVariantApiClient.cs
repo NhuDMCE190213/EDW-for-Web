@@ -22,6 +22,12 @@ public sealed class ProductVariantApiClient
         return await ReadAsync<List<ProductVariantModel>>(response, cancellationToken) ?? new();
     }
 
+    public async Task<List<ProductVariantModel>> GetCustomerByProductAsync(int productId, CancellationToken cancellationToken = default)
+    {
+        using var response = await _httpClient.GetAsync($"api/customer/products/{productId}/variants", cancellationToken);
+        return await ReadAsync<List<ProductVariantModel>>(response, cancellationToken) ?? new();
+    }
+
     public async Task<ProductVariantModel?> GetAsync(Guid id, CancellationToken cancellationToken = default)
     {
         using var response = await _httpClient.GetAsync($"{Resource}/{id}", cancellationToken);

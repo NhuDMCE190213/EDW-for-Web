@@ -21,10 +21,22 @@ namespace PresentationMVC.Services
             return await ReadAsync<List<ProductStaffModel>>(response, cancellationToken) ?? new();
         }
 
+        public async Task<List<ProductStaffModel>> GetCustomerAllAsync(CancellationToken cancellationToken = default)
+        {
+            using var response = await _httpClient.GetAsync("api/customer/products", cancellationToken);
+            return await ReadAsync<List<ProductStaffModel>>(response, cancellationToken) ?? new();
+        }
+
         public async Task<ProductStaffModel?> GetByIdAsync(int productId, CancellationToken cancellationToken = default)
         {
             using var response = await _httpClient.GetAsync($"{ResourceAdmin}/{productId}", cancellationToken);
             return await ReadAsync<ProductStaffModel>(response, cancellationToken);
+        }
+
+        public async Task<ProductCustomerModel?> GetCustomerByIdAsync(int productId, CancellationToken cancellationToken = default)
+        {
+            using var response = await _httpClient.GetAsync($"api/customer/products/{productId}", cancellationToken);
+            return await ReadAsync<ProductCustomerModel>(response, cancellationToken);
         }
 
         public async Task CreateAsync(ProductStaffCreateModel model, CancellationToken cancellationToken = default)
