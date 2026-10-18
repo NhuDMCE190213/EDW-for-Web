@@ -17,20 +17,36 @@ namespace PresentationMVC.Services
 
         public async Task<List<ProductStaffModel>> GetAllAsync(CancellationToken cancellationToken = default)
         {
-            using var response = await _httpClient.GetAsync(ResourceStaff, cancellationToken);
-            return await ReadAsync<List<ProductStaffModel>>(response, cancellationToken) ?? new();
+            try
+            {
+                using var response = await _httpClient.GetAsync(ResourceStaff, cancellationToken);
+                return await ReadAsync<List<ProductStaffModel>>(response, cancellationToken) ?? new();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Product API GetAllAsync failed");
+                return new List<ProductStaffModel>();
+            }
         }
 
-        public async Task<List<ProductStaffModel>> GetCustomerAllAsync(CancellationToken cancellationToken = default)
+        public async Task<List<ProductCustomerModel>> GetCustomerAllAsync(CancellationToken cancellationToken = default)
         {
             using var response = await _httpClient.GetAsync("api/customer/products", cancellationToken);
-            return await ReadAsync<List<ProductStaffModel>>(response, cancellationToken) ?? new();
+            return await ReadAsync<List<ProductCustomerModel>>(response, cancellationToken) ?? new();
         }
 
         public async Task<ProductStaffModel?> GetByIdAsync(int productId, CancellationToken cancellationToken = default)
         {
-            using var response = await _httpClient.GetAsync($"{ResourceAdmin}/{productId}", cancellationToken);
-            return await ReadAsync<ProductStaffModel>(response, cancellationToken);
+            try
+            {
+                using var response = await _httpClient.GetAsync($"{ResourceAdmin}/{productId}", cancellationToken);
+                return await ReadAsync<ProductStaffModel>(response, cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Product API GetByIdAsync failed");
+                return null;
+            }
         }
 
         public async Task<ProductCustomerModel?> GetCustomerByIdAsync(int productId, CancellationToken cancellationToken = default)

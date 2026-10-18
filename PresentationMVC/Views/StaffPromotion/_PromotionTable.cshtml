@@ -1,47 +1,11 @@
 @model PresentationMVC.Models.Promotion.StaffPromotionIndexViewModel
 
-<!-- Summary Cards -->
-<div class="row g-4 mb-4">
-    <div class="col-md-4">
-        <div class="card border-0 shadow-sm rounded-4 bg-success text-white h-100">
-            <div class="card-body p-4 d-flex align-items-center">
-                <div class="bg-white bg-opacity-25 rounded-circle p-3 me-4">
-                    <i class="bi bi-check2-circle fs-3"></i>
-                </div>
-                <div>
-                    <h6 class="text-white-50 mb-1">Active Promotions</h6>
-                    <h3 class="mb-0 fw-bold">@(Model.PromotionData?.ActiveCount ?? 0)</h3>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-4">
-        <div class="card border-0 shadow-sm rounded-4 bg-info text-white h-100">
-            <div class="card-body p-4 d-flex align-items-center">
-                <div class="bg-white bg-opacity-25 rounded-circle p-3 me-4">
-                    <i class="bi bi-calendar-event fs-3"></i>
-                </div>
-                <div>
-                    <h6 class="text-white-50 mb-1">Upcoming Promotions</h6>
-                    <h3 class="mb-0 fw-bold">@(Model.PromotionData?.Upcoming ?? 0)</h3>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-4">
-        <div class="card border-0 shadow-sm rounded-4 bg-danger text-white h-100">
-            <div class="card-body p-4 d-flex align-items-center">
-                <div class="bg-white bg-opacity-25 rounded-circle p-3 me-4">
-                    <i class="bi bi-x-circle fs-3"></i>
-                </div>
-                <div>
-                    <h6 class="text-white-50 mb-1">Expired</h6>
-                    <h3 class="mb-0 fw-bold">@(Model.PromotionData?.ExpiredOrDisabledCount ?? 0)</h3>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+<!-- Summary Data for Top Dashboard Synchronization -->
+<div id="promotionTableMetadata" 
+     data-active="@(Model.PromotionData?.ActiveCount ?? 0)" 
+     data-upcoming="@(Model.PromotionData?.Upcoming ?? 0)" 
+     data-expired="@(Model.PromotionData?.ExpiredOrDisabledCount ?? 0)"
+     class="d-none"></div>
 
 <div class="card shadow-sm border-0 rounded-4">
     <div class="card-body p-0">

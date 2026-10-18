@@ -9,11 +9,16 @@ namespace PresentationMVC.Controllers;
 public sealed class StaffProductVariantController : Controller
 {
     private readonly ProductVariantApiClient _api;
+    private readonly PromotionApiClient _promotionApi;
     private readonly ILogger<StaffProductVariantController> _logger;
 
-    public StaffProductVariantController(ProductVariantApiClient api, ILogger<StaffProductVariantController> logger)
+    public StaffProductVariantController(
+        ProductVariantApiClient api, 
+        PromotionApiClient promotionApi, 
+        ILogger<StaffProductVariantController> logger)
     {
         _api = api;
+        _promotionApi = promotionApi;
         _logger = logger;
     }
 
@@ -70,6 +75,9 @@ public sealed class StaffProductVariantController : Controller
             return NotFound();
         }
 
+        await LoadPromotionsForViewAsync(variant.PromotionId, cancellationToken);
+        ViewBag.ProductId = productId;
+
         return View(new ProductVariantUpdateModel
         {
             ProductVariantId = variant.ProductVariantId,
@@ -90,9 +98,16 @@ public sealed class StaffProductVariantController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(ProductVariantUpdateModel model, CancellationToken cancellationToken)
     {
+        if (model.PromotionId == Guid.Empty)
+        {
+            model.PromotionId = null;
+        }
+
         if (!ModelState.IsValid)
         {
-            return View(model);
+            await LoadPromotionsForViewAsync(model.PromotionId, cancellationToken);
+            ViewBag.ProductId = model.ProductId;
+            return View("Update", model);
         }
 
         try
@@ -105,7 +120,31 @@ public sealed class StaffProductVariantController : Controller
         {
             _logger.LogError(ex, "Could not update variant {VariantId}", model.ProductVariantId);
             ModelState.AddModelError(string.Empty, "The API could not update this variant.");
-            return View(model);
+            await LoadPromotionsForViewAsync(model.PromotionId, cancellationToken);
+            ViewBag.ProductId = model.ProductId;
+            return View("Update", model);
+        }
+    }
+
+    private async Task LoadPromotionsForViewAsync(Guid? currentPromotionId, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var promotions = await _promotionApi.GetActiveAndUpcomingPromotionsAsync(cancellationToken);
+            if (currentPromotionId.HasValue && !promotions.Any(p => p.PromotionId == currentPromotionId.Value))
+            {
+                var currentPromo = await _promotionApi.GetPromotionByIdAsync(currentPromotionId.Value, cancellationToken);
+                if (currentPromo != null)
+                {
+                    promotions.Insert(0, currentPromo);
+                }
+            }
+            ViewBag.Promotions = promotions;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Could not load promotions list.");
+            ViewBag.Promotions = new List<PresentationMVC.Models.Promotion.PromotionDto>();
         }
     }
 

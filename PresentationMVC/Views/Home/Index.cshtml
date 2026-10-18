@@ -63,10 +63,11 @@
             <div class="admin-panel">
                 <h2>Quick Actions</h2>
                 <div class="d-grid gap-2">
+                    <a asp-controller="StaffOrder" asp-action="Dashboard" class="btn btn-primary text-start"><i class="bi bi-graph-up-arrow me-2"></i>Order Dashboard</a>
+                    <a asp-controller="StaffOrder" asp-action="Index" class="btn btn-outline-primary text-start"><i class="bi bi-receipt me-2"></i>Manage Orders</a>
                     <a asp-controller="AdminProduct" asp-action="Index" class="btn btn-danger text-start"><i class="bi bi-box-seam me-2"></i>Manage products</a>
                     <a asp-controller="AdminCategory" asp-action="Index" class="btn btn-outline-danger text-start"><i class="bi bi-tags me-2"></i>Manage categories</a>
-                    @* Reviews, promotions, staff, customers and orders are intentionally hidden
-                       until their API-backed MVC screens are ready. *@
+                    <a asp-controller="StaffPromotion" asp-action="Index" class="btn btn-outline-secondary text-start"><i class="bi bi-megaphone me-2"></i>Manage promotions</a>
                 </div>
             </div>
             <div class="admin-panel mt-4">

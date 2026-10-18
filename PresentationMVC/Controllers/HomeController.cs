@@ -14,19 +14,22 @@ namespace PresentationMVC.Controllers
         private readonly ProductVariantApiClient _productVariantApi;
         private readonly CategoryApiClient _categoryApi;
         private readonly OrderApiClient _orderApi;
+        private readonly ICartService _cartService;
 
         public HomeController(
             ILogger<HomeController> logger,
             ProductApiClient productApi,
             ProductVariantApiClient productVariantApi,
             CategoryApiClient categoryApi,
-            OrderApiClient orderApi)
+            OrderApiClient orderApi,
+            ICartService cartService)
         {
             _logger = logger;
             _productApi = productApi;
             _productVariantApi = productVariantApi;
             _categoryApi = categoryApi;
             _orderApi = orderApi;
+            _cartService = cartService;
         }
 
         [Authorize(Roles = "Admin,Staff")]
@@ -50,7 +53,7 @@ namespace PresentationMVC.Controllers
                     Categories = categoriesTask.Result.Where(c => !c.IsDeleted).OrderBy(c => c.Name).ToList()
                 });
             }
-            catch (HttpRequestException ex)
+            catch (Exception ex)
             {
                 _logger.LogError(ex, "Could not load admin dashboard data");
                 TempData["ErrorMessage"] = "Unable to load dashboard data from the API.";
@@ -58,7 +61,7 @@ namespace PresentationMVC.Controllers
             }
         }
 
-        [Authorize(Roles = "Customer")]
+        [AllowAnonymous]
         public async Task<IActionResult> Customer(string? q, string? category, CancellationToken cancellationToken)
         {
             var productsTask = _productApi.GetCustomerAllAsync(cancellationToken);
@@ -66,21 +69,34 @@ namespace PresentationMVC.Controllers
             await Task.WhenAll(productsTask, categoriesTask);
 
             var products = productsTask.Result.Where(p => !p.IsDeleted);
+            var categories = categoriesTask.Result.Where(c => !c.IsDeleted).OrderBy(c => c.Name).ToList();
             if (!string.IsNullOrWhiteSpace(q))
             {
                 products = products.Where(p =>
                     p.ProductName.Contains(q, StringComparison.OrdinalIgnoreCase) ||
                     p.Brand.Contains(q, StringComparison.OrdinalIgnoreCase));
             }
+
             if (!string.IsNullOrWhiteSpace(category))
             {
                 products = products.Where(p => p.CategoryName.Contains(category, StringComparison.OrdinalIgnoreCase));
             }
 
+            if (categories.Count == 0)
+            {
+                categories = new List<CategoryModel>
+                {
+                    new() { Id = 1, Name = "Laptops" },
+                    new() { Id = 2, Name = "Phones" },
+                    new() { Id = 3, Name = "Tablets" },
+                    new() { Id = 4, Name = "Accessories" }
+                };
+            }
+
             return View(new CustomerStoreViewModel
             {
                 Products = products.OrderBy(p => p.ProductId).ToList(),
-                Categories = categoriesTask.Result.Where(c => !c.IsDeleted).OrderBy(c => c.Name).ToList(),
+                Categories = categories,
                 Search = q ?? string.Empty,
                 Category = category ?? string.Empty
             });
