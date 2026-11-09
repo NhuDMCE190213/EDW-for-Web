@@ -135,7 +135,7 @@ namespace PresentationMVC.Controllers
         }
 
         // ═══════════════════════════════════════════════════════════════════════
-        // UC-04 – FORGOT PASSWORD (STEP 1: VERIFY EMAIL)
+        // UC-04 – FORGOT PASSWORD (STEP 1: SEND OTP TO EMAIL)
         // ═══════════════════════════════════════════════════════════════════════
         [HttpGet]
         public IActionResult ForgotPassword(string userType = "Customer")
@@ -153,23 +153,85 @@ namespace PresentationMVC.Controllers
                 return View(model);
             }
 
-            var (success, errorMessage) = await _authApiClient.VerifyEmailAsync(model.Email, model.UserType);
+            var (success, errorMessage) = await _authApiClient.SendForgotPasswordOtpAsync(model.Email, model.UserType);
             if (!success)
             {
-                ModelState.AddModelError(string.Empty, errorMessage ?? "Email không tồn tại trong hệ thống.");
+                ModelState.AddModelError(string.Empty, errorMessage ?? "Không thể gửi mã xác thực tới email này.");
                 return View(model);
             }
 
-            return RedirectToAction(nameof(ResetPassword), new { email = model.Email, userType = model.UserType });
+            TempData["InfoMessage"] = "Mã xác thực OTP 6 số đã được gửi đến email của bạn. Vui lòng kiểm tra hộp thư.";
+            return RedirectToAction(nameof(VerifyOtp), new { email = model.Email, userType = model.UserType });
         }
 
         // ═══════════════════════════════════════════════════════════════════════
-        // UC-04 – RESET PASSWORD (STEP 2: SET NEW PASSWORD)
+        // UC-04 – FORGOT PASSWORD (STEP 2: VERIFY OTP)
         // ═══════════════════════════════════════════════════════════════════════
         [HttpGet]
-        public IActionResult ResetPassword(string email, string userType = "Customer")
+        public IActionResult VerifyOtp(string email, string userType = "Customer")
         {
             if (string.IsNullOrWhiteSpace(email))
+            {
+                return RedirectToAction(nameof(ForgotPassword));
+            }
+
+            var model = new VerifyOtpViewModel
+            {
+                Email = email,
+                UserType = userType
+            };
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> VerifyOtp(VerifyOtpViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            var (success, resetToken, errorMessage) = await _authApiClient.VerifyOtpAsync(model.Email, model.Otp, model.UserType);
+            if (!success || string.IsNullOrWhiteSpace(resetToken))
+            {
+                ModelState.AddModelError(string.Empty, errorMessage ?? "Mã OTP không hợp lệ hoặc đã hết hạn.");
+                return View(model);
+            }
+
+            TempData["SuccessMessage"] = "Xác thực mã OTP thành công! Vui lòng nhập mật khẩu mới.";
+            return RedirectToAction(nameof(ResetPassword), new { email = model.Email, resetToken = resetToken, userType = model.UserType });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ResendOtp(string email, string userType)
+        {
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                return RedirectToAction(nameof(ForgotPassword));
+            }
+
+            var (success, errorMessage) = await _authApiClient.SendForgotPasswordOtpAsync(email, userType);
+            if (success)
+            {
+                TempData["InfoMessage"] = "Đã gửi lại mã OTP mới đến email của bạn.";
+            }
+            else
+            {
+                TempData["ErrorMessage"] = errorMessage ?? "Không thể gửi lại mã OTP.";
+            }
+
+            return RedirectToAction(nameof(VerifyOtp), new { email = email, userType = userType });
+        }
+
+        // ═══════════════════════════════════════════════════════════════════════
+        // UC-04 – RESET PASSWORD (STEP 3: SET NEW PASSWORD WITH RESET TOKEN)
+        // ═══════════════════════════════════════════════════════════════════════
+        [HttpGet]
+        public IActionResult ResetPassword(string email, string resetToken, string userType = "Customer")
+        {
+            if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(resetToken))
             {
                 return RedirectToAction(nameof(ForgotPassword));
             }
@@ -177,6 +239,7 @@ namespace PresentationMVC.Controllers
             var model = new ResetPasswordViewModel
             {
                 Email = email,
+                ResetToken = resetToken,
                 UserType = userType
             };
             return View(model);
@@ -191,12 +254,12 @@ namespace PresentationMVC.Controllers
                 return View(model);
             }
 
-            var (success, errorMessage) = await _authApiClient.ResetPasswordAsync(
-                model.Email, model.Password, model.ConfirmPassword, model.UserType);
+            var (success, errorMessage) = await _authApiClient.ResetPasswordWithOtpAsync(
+                model.Email, model.ResetToken, model.Password, model.UserType);
 
             if (!success)
             {
-                ModelState.AddModelError(string.Empty, errorMessage ?? "Đặt lại mật khẩu thất bại.");
+                ModelState.AddModelError(string.Empty, errorMessage ?? "Đặt lại mật khẩu thất bại. Mã xác nhận có thể đã hết hạn.");
                 return View(model);
             }
 

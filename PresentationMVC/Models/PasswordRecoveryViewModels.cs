@@ -13,6 +13,20 @@ namespace PresentationMVC.Models
         public string UserType { get; set; } = "Customer"; // "Customer" or "Staff"
     }
 
+    public class VerifyOtpViewModel
+    {
+        [Required(ErrorMessage = "Email không được để trống")]
+        [EmailAddress]
+        public string Email { get; set; } = string.Empty;
+
+        public string UserType { get; set; } = "Customer";
+
+        [Required(ErrorMessage = "Vui lòng nhập mã OTP 6 số")]
+        [StringLength(6, MinimumLength = 6, ErrorMessage = "Mã OTP phải có đúng 6 chữ số")]
+        [Display(Name = "Mã xác thực OTP")]
+        public string Otp { get; set; } = string.Empty;
+    }
+
     public class ResetPasswordViewModel
     {
         [Required(ErrorMessage = "Email không được để trống")]
@@ -20,6 +34,9 @@ namespace PresentationMVC.Models
         public string Email { get; set; } = string.Empty;
 
         public string UserType { get; set; } = "Customer";
+
+        [Required(ErrorMessage = "Mã xác nhận ResetToken không được để trống")]
+        public string ResetToken { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Vui lòng nhập mật khẩu mới")]
         [StringLength(100, MinimumLength = 8, ErrorMessage = "Mật khẩu phải có ít nhất 8 ký tự")]

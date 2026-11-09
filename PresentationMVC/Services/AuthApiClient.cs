@@ -91,6 +91,111 @@ namespace PresentationMVC.Services
             }
         }
 
+        public async Task<(bool Success, string? ErrorMessage)> SendForgotPasswordOtpAsync(string email, string userType)
+        {
+            try
+            {
+                var endpoint = userType.Equals("Staff", StringComparison.OrdinalIgnoreCase)
+                    ? "api/auth/staff/forgot-password"
+                    : "api/auth/customer/forgot-password";
+
+                var response = await _httpClient.PostAsJsonAsync(endpoint, new { Email = email });
+                if (response.IsSuccessStatusCode)
+                {
+                    return (true, null);
+                }
+
+                try
+                {
+                    var error = await response.Content.ReadFromJsonAsync<ApiErrorResponse>(_jsonOptions);
+                    return (false, error?.Message ?? "Không thể gửi mã OTP tới email này.");
+                }
+                catch
+                {
+                    return (false, "Email không hợp lệ hoặc máy chủ không phản hồi.");
+                }
+            }
+            catch (HttpRequestException)
+            {
+                return (false, "Không thể kết nối đến máy chủ Backend API.");
+            }
+            catch (Exception ex)
+            {
+                return (false, $"Lỗi hệ thống: {ex.Message}");
+            }
+        }
+
+        public async Task<(bool Success, string? ResetToken, string? ErrorMessage)> VerifyOtpAsync(string email, string otp, string userType)
+        {
+            try
+            {
+                var endpoint = userType.Equals("Staff", StringComparison.OrdinalIgnoreCase)
+                    ? "api/auth/staff/verify-otp"
+                    : "api/auth/customer/verify-otp";
+
+                var response = await _httpClient.PostAsJsonAsync(endpoint, new { Email = email, Otp = otp });
+                if (response.IsSuccessStatusCode)
+                {
+                    var result = await response.Content.ReadFromJsonAsync<VerifyOtpResultDto>(_jsonOptions);
+                    return (true, result?.ResetToken, null);
+                }
+
+                try
+                {
+                    var error = await response.Content.ReadFromJsonAsync<ApiErrorResponse>(_jsonOptions);
+                    return (false, null, error?.Message ?? "Mã OTP không hợp lệ.");
+                }
+                catch
+                {
+                    return (false, null, "Lỗi phản hồi từ máy chủ khi kiểm tra mã OTP.");
+                }
+            }
+            catch (HttpRequestException)
+            {
+                return (false, null, "Không thể kết nối đến máy chủ Backend API.");
+            }
+            catch (Exception ex)
+            {
+                return (false, null, $"Lỗi hệ thống: {ex.Message}");
+            }
+        }
+
+        public async Task<(bool Success, string? ErrorMessage)> ResetPasswordWithOtpAsync(string email, string resetToken, string newPassword, string userType)
+        {
+            try
+            {
+                var endpoint = userType.Equals("Staff", StringComparison.OrdinalIgnoreCase)
+                    ? "api/auth/staff/reset-password-otp"
+                    : "api/auth/customer/reset-password-otp";
+
+                var request = new { Email = email, ResetToken = resetToken, NewPassword = newPassword };
+                var response = await _httpClient.PostAsJsonAsync(endpoint, request);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    return (true, null);
+                }
+
+                try
+                {
+                    var error = await response.Content.ReadFromJsonAsync<ApiErrorResponse>(_jsonOptions);
+                    return (false, error?.Message ?? "Cập nhật mật khẩu không thành công.");
+                }
+                catch
+                {
+                    return (false, "Lỗi kết nối máy chủ khi đổi mật khẩu.");
+                }
+            }
+            catch (HttpRequestException)
+            {
+                return (false, "Không thể kết nối đến máy chủ Backend API.");
+            }
+            catch (Exception ex)
+            {
+                return (false, $"Lỗi hệ thống: {ex.Message}");
+            }
+        }
+
         public async Task<(bool Success, string? ErrorMessage)> VerifyEmailAsync(string email, string userType)
         {
             try
@@ -165,6 +270,13 @@ namespace PresentationMVC.Services
     public class ApiErrorResponse
     {
         public string? Message { get; set; }
+    }
+
+    public class VerifyOtpResultDto
+    {
+        public bool Success { get; set; }
+        public string Message { get; set; } = string.Empty;
+        public string ResetToken { get; set; } = string.Empty;
     }
 
     public class LoginResponse
