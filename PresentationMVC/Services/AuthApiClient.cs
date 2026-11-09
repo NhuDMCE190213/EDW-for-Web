@@ -83,7 +83,7 @@ namespace PresentationMVC.Services
             }
             catch (HttpRequestException)
             {
-                return (false, "Không thể kết nối đến máy chủ Backend API (localhost:7001). Vui lòng kiểm tra và đảm bảo Backend API đang chạy.");
+                return (false, "Không thể kết nối đến máy chủ Backend API được cấu hình.");
             }
             catch (Exception ex)
             {
@@ -117,7 +117,7 @@ namespace PresentationMVC.Services
             }
             catch (HttpRequestException)
             {
-                return (false, "Không thể kết nối đến máy chủ Backend API (localhost:7001).");
+                return (false, "Không thể kết nối đến máy chủ Backend API được cấu hình.");
             }
             catch (Exception ex)
             {
@@ -153,7 +153,7 @@ namespace PresentationMVC.Services
             }
             catch (HttpRequestException)
             {
-                return (false, "Không thể kết nối đến máy chủ Backend API (localhost:7001).");
+                return (false, "Không thể kết nối đến máy chủ Backend API được cấu hình.");
             }
             catch (Exception ex)
             {

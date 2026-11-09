@@ -1,4 +1,5 @@
 @model PresentationMVC.Models.Promotion.StaffPromotionIndexViewModel
+@inject IConfiguration Configuration
 @{
     ViewData["Title"] = "Manage Promotions";
 }
@@ -360,7 +361,7 @@
 
             // --- SIGNALR REALTIME LOGIC ---
             const connection = new signalR.HubConnectionBuilder()
-                .withUrl("https://localhost:7278/promotionHub") 
+                .withUrl("@(Configuration["ApiSettings:BaseUrl"]?.TrimEnd('/') ?? "https://localhost:7278")/promotionHub")
                 .withAutomaticReconnect()
                 .build();
 

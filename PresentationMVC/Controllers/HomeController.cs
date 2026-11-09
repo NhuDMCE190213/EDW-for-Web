@@ -64,35 +64,12 @@ namespace PresentationMVC.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Customer(string? q, string? category, CancellationToken cancellationToken)
         {
-            var productsTask = _productApi.GetCustomerAllAsync(cancellationToken);
+            var productsTask = _cartService.GetCustomerProductsAsync(q, category, cancellationToken);
             var categoriesTask = _categoryApi.GetAllAsync(cancellationToken);
             await Task.WhenAll(productsTask, categoriesTask);
 
             var products = productsTask.Result.Where(p => !p.IsDeleted);
             var categories = categoriesTask.Result.Where(c => !c.IsDeleted).OrderBy(c => c.Name).ToList();
-            if (!string.IsNullOrWhiteSpace(q))
-            {
-                products = products.Where(p =>
-                    p.ProductName.Contains(q, StringComparison.OrdinalIgnoreCase) ||
-                    p.Brand.Contains(q, StringComparison.OrdinalIgnoreCase));
-            }
-
-            if (!string.IsNullOrWhiteSpace(category))
-            {
-                products = products.Where(p => p.CategoryName.Contains(category, StringComparison.OrdinalIgnoreCase));
-            }
-
-            if (categories.Count == 0)
-            {
-                categories = new List<CategoryModel>
-                {
-                    new() { Id = 1, Name = "Laptops" },
-                    new() { Id = 2, Name = "Phones" },
-                    new() { Id = 3, Name = "Tablets" },
-                    new() { Id = 4, Name = "Accessories" }
-                };
-            }
-
             return View(new CustomerStoreViewModel
             {
                 Products = products.OrderBy(p => p.ProductId).ToList(),

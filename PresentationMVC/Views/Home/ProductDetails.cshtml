@@ -48,7 +48,7 @@
                                 {
                                     <text> - @variant.Ram</text>
                                 }
-                                — @variant.Price.ToString("N0") VND
+                                — @variant.DisplayPrice.ToString("N0") VND
                                 @(variant.StockQuantity > 0 ? $" ({variant.StockQuantity} available)" : " (Out of stock)")
                             </option>
                         }

@@ -6,7 +6,7 @@ using System.Security.Claims;
 
 namespace PresentationMVC.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "Customer")]
     public class OrdersController : Controller
     {
         private readonly CustomerOrderApiClient _orderApiClient;

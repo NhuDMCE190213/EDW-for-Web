@@ -3,10 +3,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PresentationMVC.Models;
 using PresentationMVC.Services;
-using System.Security.Claims;
 
 namespace PresentationMVC.Controllers
 {
+    [Authorize(Roles = "Customer")]
     public class CartController : Controller
     {
         private readonly ICartService _cartService;
@@ -18,7 +18,7 @@ namespace PresentationMVC.Controllers
             {
                 var val = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                 if (int.TryParse(val, out int id)) return id;
-                return 1; // Fallback customer ID if testing without auth
+                return 0;
             }
         }
 
@@ -82,8 +82,8 @@ namespace PresentationMVC.Controllers
                     storage = v.Storage,
                     screenSize = v.ScreenSize,
                     price = v.Price,
-                    finalPrice = v.Price,
-                    isOnSale = false,
+                    finalPrice = v.DisplayPrice,
+                    isOnSale = v.HasActiveDiscount,
                     stockQuantity = v.StockQuantity,
                     imageUrl = v.ImageUrl ?? product.ImageUrl
                 })
@@ -107,7 +107,7 @@ namespace PresentationMVC.Controllers
                 return Json(new
                 {
                     success = true,
-                    message = $"Added {quantity} × \"{addedItem.ProductVariant?.ProductName ?? "Item"}\" to your cart!",
+                    message = $"Added {quantity} ï¿½ \"{addedItem.ProductVariant?.ProductName ?? "Item"}\" to your cart!",
                     totalCount
                 });
             }

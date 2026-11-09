@@ -77,7 +77,7 @@
 
             <div class="mb-3">
                 <span class="display-6 fw-bold text-danger" id="detailPrice">
-                    @(defaultVariant != null ? $"{defaultVariant.Price.ToString("N0", new CultureInfo("vi-VN"))} ₫" : "Contact")
+                    @(defaultVariant != null ? $"{defaultVariant.DisplayPrice.ToString("N0", new CultureInfo("vi-VN"))} ₫" : "Contact")
                 </span>
             </div>
 
@@ -113,13 +113,13 @@
 
                             <button type="button"
                                     class="variant-pill-btn d-flex align-items-center justify-content-between @(i == 0 ? "active" : "")"
-                                    onclick="switchDetailVariant('@v.ProductVariantId', '@v.Price', '@v.StockQuantity', '@v.ImageUrl', this)">
+                                    onclick="switchDetailVariant('@v.ProductVariantId', '@v.DisplayPrice', '@v.StockQuantity', '@v.ImageUrl', this)">
                                 <div>
                                     <div class="fw-bold">@v.Color</div>
                                     <small class="text-muted">@specsStr</small>
                                 </div>
                                 <div class="text-end">
-                                    <div class="fw-bold text-danger">@v.Price.ToString("N0", new CultureInfo("vi-VN")) ₫</div>
+                                    <div class="fw-bold text-danger">@v.DisplayPrice.ToString("N0", new CultureInfo("vi-VN")) ₫</div>
                                     <small class="text-muted">Stock: @v.StockQuantity</small>
                                 </div>
                             </button>

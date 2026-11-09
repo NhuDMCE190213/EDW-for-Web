@@ -4,6 +4,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddTransient<ApiAuthorizationHandler>();
 
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
@@ -29,18 +31,18 @@ Action<HttpClient> configureApiClient = client =>
     client.BaseAddress = new Uri(baseUrl, UriKind.Absolute);
 };
 
-builder.Services.AddHttpClient<CustomerOrderApiClient>(configureApiClient);
-builder.Services.AddHttpClient<CustomerCartApiClient>(configureApiClient);
-builder.Services.AddHttpClient<OrderApiClient>(configureApiClient);
-builder.Services.AddHttpClient<PromotionApiClient>(configureApiClient);
-builder.Services.AddHttpClient<AuthApiClient>(configureApiClient);
-builder.Services.AddHttpClient<CategoryApiClient>(configureApiClient);
-builder.Services.AddHttpClient<ProfileApiClient>(configureApiClient);
-builder.Services.AddHttpClient<ProductVariantApiClient>(configureApiClient);
-builder.Services.AddHttpClient<ProductApiClient>(configureApiClient);
-builder.Services.AddHttpClient<StaffApiClient>(configureApiClient);
-builder.Services.AddHttpClient<CustomerApiClient>(configureApiClient);
-builder.Services.AddHttpClient<ReviewApiClient>(configureApiClient);
+builder.Services.AddHttpClient<CustomerOrderApiClient>(configureApiClient).AddHttpMessageHandler<ApiAuthorizationHandler>();
+builder.Services.AddHttpClient<CustomerCartApiClient>(configureApiClient).AddHttpMessageHandler<ApiAuthorizationHandler>();
+builder.Services.AddHttpClient<OrderApiClient>(configureApiClient).AddHttpMessageHandler<ApiAuthorizationHandler>();
+builder.Services.AddHttpClient<PromotionApiClient>(configureApiClient).AddHttpMessageHandler<ApiAuthorizationHandler>();
+builder.Services.AddHttpClient<AuthApiClient>(configureApiClient).AddHttpMessageHandler<ApiAuthorizationHandler>();
+builder.Services.AddHttpClient<CategoryApiClient>(configureApiClient).AddHttpMessageHandler<ApiAuthorizationHandler>();
+builder.Services.AddHttpClient<ProfileApiClient>(configureApiClient).AddHttpMessageHandler<ApiAuthorizationHandler>();
+builder.Services.AddHttpClient<ProductVariantApiClient>(configureApiClient).AddHttpMessageHandler<ApiAuthorizationHandler>();
+builder.Services.AddHttpClient<ProductApiClient>(configureApiClient).AddHttpMessageHandler<ApiAuthorizationHandler>();
+builder.Services.AddHttpClient<StaffApiClient>(configureApiClient).AddHttpMessageHandler<ApiAuthorizationHandler>();
+builder.Services.AddHttpClient<CustomerApiClient>(configureApiClient).AddHttpMessageHandler<ApiAuthorizationHandler>();
+builder.Services.AddHttpClient<ReviewApiClient>(configureApiClient).AddHttpMessageHandler<ApiAuthorizationHandler>();
 
 builder.Services.AddScoped<ICartService, CartService>();
 
