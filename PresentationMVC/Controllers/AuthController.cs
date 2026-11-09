@@ -156,11 +156,11 @@ namespace PresentationMVC.Controllers
             var (success, errorMessage) = await _authApiClient.SendForgotPasswordOtpAsync(model.Email, model.UserType);
             if (!success)
             {
-                ModelState.AddModelError(string.Empty, errorMessage ?? "Không thể gửi mã xác thực tới email này.");
+                ModelState.AddModelError(string.Empty, errorMessage ?? "Unable to send verification code to this email address.");
                 return View(model);
             }
 
-            TempData["InfoMessage"] = "Mã xác thực OTP 6 số đã được gửi đến email của bạn. Vui lòng kiểm tra hộp thư.";
+            TempData["InfoMessage"] = "A 6-digit OTP verification code has been sent to your email. Please check your inbox.";
             return RedirectToAction(nameof(VerifyOtp), new { email = model.Email, userType = model.UserType });
         }
 
@@ -195,11 +195,11 @@ namespace PresentationMVC.Controllers
             var (success, resetToken, errorMessage) = await _authApiClient.VerifyOtpAsync(model.Email, model.Otp, model.UserType);
             if (!success || string.IsNullOrWhiteSpace(resetToken))
             {
-                ModelState.AddModelError(string.Empty, errorMessage ?? "Mã OTP không hợp lệ hoặc đã hết hạn.");
+                ModelState.AddModelError(string.Empty, errorMessage ?? "OTP code is invalid or has expired.");
                 return View(model);
             }
 
-            TempData["SuccessMessage"] = "Xác thực mã OTP thành công! Vui lòng nhập mật khẩu mới.";
+            TempData["SuccessMessage"] = "OTP verified successfully! Please enter your new password.";
             return RedirectToAction(nameof(ResetPassword), new { email = model.Email, resetToken = resetToken, userType = model.UserType });
         }
 
@@ -215,11 +215,11 @@ namespace PresentationMVC.Controllers
             var (success, errorMessage) = await _authApiClient.SendForgotPasswordOtpAsync(email, userType);
             if (success)
             {
-                TempData["InfoMessage"] = "Đã gửi lại mã OTP mới đến email của bạn.";
+                TempData["InfoMessage"] = "A new OTP code has been sent to your email address.";
             }
             else
             {
-                TempData["ErrorMessage"] = errorMessage ?? "Không thể gửi lại mã OTP.";
+                TempData["ErrorMessage"] = errorMessage ?? "Unable to resend OTP code.";
             }
 
             return RedirectToAction(nameof(VerifyOtp), new { email = email, userType = userType });
@@ -259,11 +259,11 @@ namespace PresentationMVC.Controllers
 
             if (!success)
             {
-                ModelState.AddModelError(string.Empty, errorMessage ?? "Đặt lại mật khẩu thất bại. Mã xác nhận có thể đã hết hạn.");
+                ModelState.AddModelError(string.Empty, errorMessage ?? "Failed to reset password. The reset token may have expired.");
                 return View(model);
             }
 
-            TempData["SuccessMessage"] = "Mật khẩu đã được cập nhật thành công! Vui lòng đăng nhập với mật khẩu mới.";
+            TempData["SuccessMessage"] = "Password updated successfully! Please log in with your new password.";
             if (model.UserType.Equals("Staff", StringComparison.OrdinalIgnoreCase))
             {
                 return RedirectToAction(nameof(StaffLogin));

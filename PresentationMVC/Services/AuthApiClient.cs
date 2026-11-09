@@ -108,20 +108,20 @@ namespace PresentationMVC.Services
                 try
                 {
                     var error = await response.Content.ReadFromJsonAsync<ApiErrorResponse>(_jsonOptions);
-                    return (false, error?.Message ?? "Không thể gửi mã OTP tới email này.");
+                    return (false, error?.Message ?? "Unable to send OTP code to this email address.");
                 }
                 catch
                 {
-                    return (false, "Email không hợp lệ hoặc máy chủ không phản hồi.");
+                    return (false, "Invalid email address or server did not respond.");
                 }
             }
             catch (HttpRequestException)
             {
-                return (false, "Không thể kết nối đến máy chủ Backend API.");
+                return (false, "Unable to connect to Backend API server.");
             }
             catch (Exception ex)
             {
-                return (false, $"Lỗi hệ thống: {ex.Message}");
+                return (false, $"System error: {ex.Message}");
             }
         }
 
@@ -143,20 +143,20 @@ namespace PresentationMVC.Services
                 try
                 {
                     var error = await response.Content.ReadFromJsonAsync<ApiErrorResponse>(_jsonOptions);
-                    return (false, null, error?.Message ?? "Mã OTP không hợp lệ.");
+                    return (false, null, error?.Message ?? "Invalid OTP verification code.");
                 }
                 catch
                 {
-                    return (false, null, "Lỗi phản hồi từ máy chủ khi kiểm tra mã OTP.");
+                    return (false, null, "Server error while verifying OTP code.");
                 }
             }
             catch (HttpRequestException)
             {
-                return (false, null, "Không thể kết nối đến máy chủ Backend API.");
+                return (false, null, "Unable to connect to Backend API server.");
             }
             catch (Exception ex)
             {
-                return (false, null, $"Lỗi hệ thống: {ex.Message}");
+                return (false, null, $"System error: {ex.Message}");
             }
         }
 
@@ -179,20 +179,20 @@ namespace PresentationMVC.Services
                 try
                 {
                     var error = await response.Content.ReadFromJsonAsync<ApiErrorResponse>(_jsonOptions);
-                    return (false, error?.Message ?? "Cập nhật mật khẩu không thành công.");
+                    return (false, error?.Message ?? "Failed to update password.");
                 }
                 catch
                 {
-                    return (false, "Lỗi kết nối máy chủ khi đổi mật khẩu.");
+                    return (false, "Server connection error while updating password.");
                 }
             }
             catch (HttpRequestException)
             {
-                return (false, "Không thể kết nối đến máy chủ Backend API.");
+                return (false, "Unable to connect to Backend API server.");
             }
             catch (Exception ex)
             {
-                return (false, $"Lỗi hệ thống: {ex.Message}");
+                return (false, $"System error: {ex.Message}");
             }
         }
 
