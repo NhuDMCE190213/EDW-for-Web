@@ -91,6 +91,111 @@ namespace PresentationMVC.Services
             }
         }
 
+        public async Task<(bool Success, string? ErrorMessage)> SendForgotPasswordOtpAsync(string email, string userType)
+        {
+            try
+            {
+                var endpoint = userType.Equals("Staff", StringComparison.OrdinalIgnoreCase)
+                    ? "api/auth/staff/forgot-password"
+                    : "api/auth/customer/forgot-password";
+
+                var response = await _httpClient.PostAsJsonAsync(endpoint, new { Email = email });
+                if (response.IsSuccessStatusCode)
+                {
+                    return (true, null);
+                }
+
+                try
+                {
+                    var error = await response.Content.ReadFromJsonAsync<ApiErrorResponse>(_jsonOptions);
+                    return (false, error?.Message ?? "Unable to send OTP code to this email address.");
+                }
+                catch
+                {
+                    return (false, "Invalid email address or server did not respond.");
+                }
+            }
+            catch (HttpRequestException)
+            {
+                return (false, "Unable to connect to Backend API server.");
+            }
+            catch (Exception ex)
+            {
+                return (false, $"System error: {ex.Message}");
+            }
+        }
+
+        public async Task<(bool Success, string? ResetToken, string? ErrorMessage)> VerifyOtpAsync(string email, string otp, string userType)
+        {
+            try
+            {
+                var endpoint = userType.Equals("Staff", StringComparison.OrdinalIgnoreCase)
+                    ? "api/auth/staff/verify-otp"
+                    : "api/auth/customer/verify-otp";
+
+                var response = await _httpClient.PostAsJsonAsync(endpoint, new { Email = email, Otp = otp });
+                if (response.IsSuccessStatusCode)
+                {
+                    var result = await response.Content.ReadFromJsonAsync<VerifyOtpResultDto>(_jsonOptions);
+                    return (true, result?.ResetToken, null);
+                }
+
+                try
+                {
+                    var error = await response.Content.ReadFromJsonAsync<ApiErrorResponse>(_jsonOptions);
+                    return (false, null, error?.Message ?? "Invalid OTP verification code.");
+                }
+                catch
+                {
+                    return (false, null, "Server error while verifying OTP code.");
+                }
+            }
+            catch (HttpRequestException)
+            {
+                return (false, null, "Unable to connect to Backend API server.");
+            }
+            catch (Exception ex)
+            {
+                return (false, null, $"System error: {ex.Message}");
+            }
+        }
+
+        public async Task<(bool Success, string? ErrorMessage)> ResetPasswordWithOtpAsync(string email, string resetToken, string newPassword, string userType)
+        {
+            try
+            {
+                var endpoint = userType.Equals("Staff", StringComparison.OrdinalIgnoreCase)
+                    ? "api/auth/staff/reset-password-otp"
+                    : "api/auth/customer/reset-password-otp";
+
+                var request = new { Email = email, ResetToken = resetToken, NewPassword = newPassword };
+                var response = await _httpClient.PostAsJsonAsync(endpoint, request);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    return (true, null);
+                }
+
+                try
+                {
+                    var error = await response.Content.ReadFromJsonAsync<ApiErrorResponse>(_jsonOptions);
+                    return (false, error?.Message ?? "Failed to update password.");
+                }
+                catch
+                {
+                    return (false, "Server connection error while updating password.");
+                }
+            }
+            catch (HttpRequestException)
+            {
+                return (false, "Unable to connect to Backend API server.");
+            }
+            catch (Exception ex)
+            {
+                return (false, $"System error: {ex.Message}");
+            }
+        }
+
         public async Task<(bool Success, string? ErrorMessage)> VerifyEmailAsync(string email, string userType)
         {
             try
@@ -165,6 +270,13 @@ namespace PresentationMVC.Services
     public class ApiErrorResponse
     {
         public string? Message { get; set; }
+    }
+
+    public class VerifyOtpResultDto
+    {
+        public bool Success { get; set; }
+        public string Message { get; set; } = string.Empty;
+        public string ResetToken { get; set; } = string.Empty;
     }
 
     public class LoginResponse
