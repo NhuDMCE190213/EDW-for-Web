@@ -14,8 +14,8 @@ namespace PresentationMVC.Models
 
         public List<ProductVariantModel> Variants { get; set; } = new();
         public List<Review.CustomerReviewDto> Reviews { get; set; } = new();
-        public decimal MinPrice => Variants.Count > 0 ? Variants.Min(v => v.Price) : 0m;
-        public decimal MaxPrice => Variants.Count > 0 ? Variants.Max(v => v.Price) : 0m;
+        public decimal MinPrice => Variants.Count > 0 ? Variants.Min(v => v.DisplayPrice) : 0m;
+        public decimal MaxPrice => Variants.Count > 0 ? Variants.Max(v => v.DisplayPrice) : 0m;
         public int TotalStock => Variants.Sum(v => v.StockQuantity);
         public bool InStock => Variants.Any(v => v.StockQuantity > 0);
     }

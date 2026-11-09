@@ -32,9 +32,14 @@ namespace PresentationMVC.Controllers
             _cartService = cartService;
         }
 
-        [Authorize(Roles = "Admin,Staff")]
+        [Authorize]
         public async Task<IActionResult> Index(CancellationToken cancellationToken)
         {
+            if (User.IsInRole("Customer"))
+            {
+                return RedirectToAction(nameof(Customer));
+            }
+
             if (User.IsInRole("Staff"))
             {
                 var orderDashboard = await _orderApi.GetDashboardAsync(cancellationToken);

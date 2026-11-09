@@ -17,16 +17,8 @@ namespace PresentationMVC.Services
 
         public async Task<List<ProductStaffModel>> GetAllAsync(CancellationToken cancellationToken = default)
         {
-            try
-            {
-                using var response = await _httpClient.GetAsync(ResourceStaff, cancellationToken);
-                return await ReadAsync<List<ProductStaffModel>>(response, cancellationToken) ?? new();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogWarning(ex, "Product API GetAllAsync failed");
-                return new List<ProductStaffModel>();
-            }
+            using var response = await _httpClient.GetAsync(ResourceStaff, cancellationToken);
+            return await ReadAsync<List<ProductStaffModel>>(response, cancellationToken) ?? new();
         }
 
         public async Task<List<ProductCustomerModel>> GetCustomerAllAsync(CancellationToken cancellationToken = default)
@@ -37,16 +29,8 @@ namespace PresentationMVC.Services
 
         public async Task<ProductStaffModel?> GetByIdAsync(int productId, CancellationToken cancellationToken = default)
         {
-            try
-            {
-                using var response = await _httpClient.GetAsync($"{ResourceAdmin}/{productId}", cancellationToken);
-                return await ReadAsync<ProductStaffModel>(response, cancellationToken);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogWarning(ex, "Product API GetByIdAsync failed");
-                return null;
-            }
+            using var response = await _httpClient.GetAsync($"{ResourceAdmin}/{productId}", cancellationToken);
+            return await ReadAsync<ProductStaffModel>(response, cancellationToken);
         }
 
         public async Task<ProductCustomerModel?> GetCustomerByIdAsync(int productId, CancellationToken cancellationToken = default)

@@ -146,8 +146,8 @@ namespace PresentationMVC.Controllers
                 var cart = await _cartService.GetCartItemsAsync(CustomerId);
                 var updatedItem = cart.FirstOrDefault(i => i.CartItemId == cartItemId);
                 var totalCount = cart.Sum(i => i.Quantity);
-                var cartTotal = cart.Sum(i => i.Quantity * (i.ProductVariant?.Price ?? 0));
-                var totalPrice = (updatedItem?.Quantity ?? 0) * (updatedItem?.ProductVariant?.Price ?? 0);
+                var cartTotal = cart.Sum(i => i.Quantity * (i.ProductVariant?.GetPrice() ?? 0));
+                var totalPrice = (updatedItem?.Quantity ?? 0) * (updatedItem?.ProductVariant?.GetPrice() ?? 0);
 
                 return Json(new
                 {
@@ -182,7 +182,7 @@ namespace PresentationMVC.Controllers
                 var removed = await _cartService.RemoveItemAsync(CustomerId, cartItemId);
                 var cart = await _cartService.GetCartItemsAsync(CustomerId);
                 var totalCount = cart.Sum(i => i.Quantity);
-                var cartTotal = cart.Sum(i => i.Quantity * (i.ProductVariant?.Price ?? 0));
+                var cartTotal = cart.Sum(i => i.Quantity * (i.ProductVariant?.GetPrice() ?? 0));
 
                 return Json(new
                 {

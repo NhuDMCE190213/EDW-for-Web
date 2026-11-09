@@ -90,7 +90,7 @@
                                            value="@item.CartItemId"
                                            class="cart-item-checkbox item-select-check"
                                            checked
-                                           data-price="@v.Price"
+                                           data-price="@v.GetPrice()"
                                            data-qty="@item.Quantity"
                                            onchange="calculateSummary()" />
                                 </div>
@@ -108,10 +108,10 @@
 
                                 <div class="text-end px-3" style="min-width: 140px;">
                                     <div class="fw-bold text-danger fs-5" id="price-@item.CartItemId">
-                                        @((v.Price * item.Quantity).ToString("N0", new CultureInfo("vi-VN"))) ₫
+                                        @((v.GetPrice() * item.Quantity).ToString("N0", new CultureInfo("vi-VN"))) ₫
                                     </div>
                                     <div class="text-muted small">
-                                        @v.Price.ToString("N0", new CultureInfo("vi-VN")) ₫ / unit
+                                        @v.GetPrice().ToString("N0", new CultureInfo("vi-VN")) ₫ / unit
                                     </div>
                                 </div>
 

@@ -35,8 +35,10 @@ namespace PresentationMVC.Services
 
             using var response = await _httpClient.PostAsJsonAsync(
                 $"{Resource}/checkout", request, cancellationToken);
-            return await ReadAsync<OrderCheckoutResultDto>(response, cancellationToken)
+            var envelope = await ReadAsync<ApiResponse<OrderCheckoutResultDto>>(response, cancellationToken)
                 ?? throw new HttpRequestException("Customer checkout API returned an empty response.");
+            return envelope.Data
+                ?? throw new HttpRequestException("Customer checkout API returned no checkout data.");
         }
 
         public async Task<bool> CancelOrderAsync(Guid orderId, CancellationToken cancellationToken = default)
@@ -71,6 +73,13 @@ namespace PresentationMVC.Services
             throw new HttpRequestException($"Customer Order API request failed ({(int)response.StatusCode} {response.ReasonPhrase}).");
         }
 
+    }
+
+    internal sealed class ApiResponse<T>
+    {
+        public bool Success { get; set; }
+        public string? Message { get; set; }
+        public T? Data { get; set; }
     }
 
     public class TransferResult

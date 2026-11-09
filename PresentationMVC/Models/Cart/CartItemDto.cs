@@ -1,4 +1,4 @@
-using System.Globalization;
+using PresentationMVC.Models;
 
 namespace PresentationMVC.Models.Cart
 {
@@ -30,9 +30,28 @@ namespace PresentationMVC.Models.Cart
         public string ProductName { get; set; } = string.Empty;
         public string Brand { get; set; } = string.Empty;
         public Guid? PromotionId { get; set; }
-        public bool IsOnSale => OriginalPrice.HasValue && OriginalPrice.Value > Price;
+        public PromotionModel? Promotion { get; set; }
+        public bool IsOnSale => GetPrice() < Price;
 
-        public decimal GetPrice() => Price;
+        public decimal GetPrice()
+        {
+            if (Promotion is null || !Promotion.IsActive())
+            {
+                return Price;
+            }
+
+            if (Promotion.PromotionType == 0 && Promotion.Percentage.HasValue)
+            {
+                return Math.Max(0, Price * (1 - Promotion.Percentage.Value / 100m));
+            }
+
+            if (Promotion.PromotionType == 1 && Promotion.SalePrice.HasValue)
+            {
+                return Math.Max(0, Price - Promotion.SalePrice.Value);
+            }
+
+            return Price;
+        }
 
         public string GetFormattedSpecs()
         {
