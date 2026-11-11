@@ -1,0 +1,156 @@
+@model PresentationMVC.Models.Review.CreateReviewViewModel
+@{
+    ViewData["Title"] = "Write Review";
+    Layout = "~/Views/Shared/_CustomerLayout.cshtml";
+}
+
+<div class="container py-4" style="max-width: 760px;">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Customer">Shop</a></li>
+            <li class="breadcrumb-item"><a asp-controller="Orders" asp-action="Index">My Orders</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Write Review</li>
+        </ol>
+    </nav>
+
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+        <div class="card-header bg-danger text-white py-3 px-4">
+            <h4 class="fw-bold mb-0"><i class="bi bi-star-half me-2"></i>Write a Product Review</h4>
+            <p class="mb-0 small text-white-50">Share your genuine experience to help other shoppers make better decisions.</p>
+        </div>
+
+        <div class="card-body p-4">
+            <!-- Product Information Banner -->
+            <div class="d-flex align-items-center p-3 bg-light rounded-3 mb-4">
+                <div class="p-3 bg-white rounded-3 shadow-sm me-3 text-danger">
+                    <i class="bi bi-laptop fs-2"></i>
+                </div>
+                <div>
+                    <span class="badge bg-danger-subtle text-danger mb-1">Purchased Product</span>
+                    <h5 class="fw-bold mb-0 text-dark">@Model.ProductName</h5>
+                    @if (Model.OrderId.HasValue)
+                    {
+                        <small class="text-muted">Order ID: @Model.OrderId.Value.ToString().Substring(0, 8)...</small>
+                    }
+                </div>
+            </div>
+
+            @if (!ViewData.ModelState.IsValid && ViewData.ModelState[string.Empty]?.Errors.Count > 0)
+            {
+                <div class="alert alert-danger border-0 rounded-3 shadow-sm mb-4">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    @Html.ValidationSummary(true)
+                </div>
+            }
+
+            <form asp-action="Create" method="post" id="reviewForm">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="ProductId" />
+                <input type="hidden" asp-for="ProductName" />
+                <input type="hidden" asp-for="OrderId" />
+                <input type="hidden" asp-for="OrderItemId" />
+
+                <!-- 1. Star Rating Selection (BR-REVIEW-05) -->
+                <div class="mb-4 text-center p-3 border rounded-3 bg-white">
+                    <label class="form-label fw-bold d-block mb-2">Overall Rating <span class="text-danger">*</span></label>
+                    <div class="star-rating d-inline-flex flex-row-reverse justify-content-center gap-2 fs-2 cursor-pointer" id="starContainer">
+                        <input type="radio" id="star5" name="Rating" value="5" class="d-none" @(Model.Rating == 5 ? "checked" : "") />
+                        <label for="star5" class="star-label bi bi-star-fill text-muted" title="5 stars - Excellent"></label>
+
+                        <input type="radio" id="star4" name="Rating" value="4" class="d-none" @(Model.Rating == 4 ? "checked" : "") />
+                        <label for="star4" class="star-label bi bi-star-fill text-muted" title="4 stars - Good"></label>
+
+                        <input type="radio" id="star3" name="Rating" value="3" class="d-none" @(Model.Rating == 3 ? "checked" : "") />
+                        <label for="star3" class="star-label bi bi-star-fill text-muted" title="3 stars - Average"></label>
+
+                        <input type="radio" id="star2" name="Rating" value="2" class="d-none" @(Model.Rating == 2 ? "checked" : "") />
+                        <label for="star2" class="star-label bi bi-star-fill text-muted" title="2 stars - Poor"></label>
+
+                        <input type="radio" id="star1" name="Rating" value="1" class="d-none" @(Model.Rating == 1 ? "checked" : "") />
+                        <label for="star1" class="star-label bi bi-star-fill text-muted" title="1 star - Terrible"></label>
+                    </div>
+                    <div id="ratingText" class="text-warning fw-bold mt-1">Excellent (5/5)</div>
+                    <span asp-validation-for="Rating" class="text-danger small d-block mt-1"></span>
+                </div>
+
+                <!-- 2. Review Content (BR-REVIEW-06, BR-REVIEW-07: max 1000 chars) -->
+                <div class="mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <label asp-for="Content" class="form-label fw-bold mb-0">Your Review <span class="text-danger">*</span></label>
+                        <span id="charCount" class="text-muted small">0 / 1000 characters</span>
+                    </div>
+                    <textarea asp-for="Content" id="reviewContent" class="form-control" rows="5" maxlength="1000" placeholder="What did you like or dislike about this product? How was its performance and quality?"></textarea>
+                    <span asp-validation-for="Content" class="text-danger small d-block mt-1"></span>
+                    <div class="form-text">Minimum 5 characters, maximum 1000 characters. Please avoid profanity or spam content.</div>
+                </div>
+
+                <!-- 3. Actions -->
+                <div class="d-flex justify-content-between align-items-center pt-3 border-top">
+                    <a asp-action="MyReviews" class="btn btn-outline-secondary px-4 rounded-pill">
+                        <i class="bi bi-arrow-left me-1"></i>Cancel
+                    </a>
+                    <button type="submit" class="btn btn-danger px-4 rounded-pill fw-semibold shadow-sm">
+                        <i class="bi bi-send-fill me-1"></i>Submit Review
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+<style>
+    .star-rating .star-label {
+        cursor: pointer;
+        transition: color 0.15s ease, transform 0.15s ease;
+    }
+    .star-rating .star-label:hover {
+        transform: scale(1.15);
+    }
+    .star-rating input:checked ~ label,
+    .star-rating label:hover,
+    .star-rating label:hover ~ label {
+        color: #ffc107 !important;
+    }
+</style>
+}
+
+@section Scripts {
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const textarea = document.getElementById("reviewContent");
+        const charCount = document.getElementById("charCount");
+        const ratingText = document.getElementById("ratingText");
+        const starLabels = {
+            "5": "Excellent (5/5) ★★★★★",
+            "4": "Good (4/5) ★★★★☆",
+            "3": "Average (3/5) ★★★☆☆",
+            "2": "Poor (2/5) ★★☆☆☆",
+            "1": "Terrible (1/5) ★☆☆☆☆"
+        };
+
+        function updateCount() {
+            const len = textarea.value.length;
+            charCount.textContent = len + " / 1000 characters";
+            if (len > 950) {
+                charCount.classList.add("text-danger");
+            } else {
+                charCount.classList.remove("text-danger");
+            }
+        }
+
+        textarea.addEventListener("input", updateCount);
+        updateCount();
+
+        const radios = document.querySelectorAll('input[name="Rating"]');
+        radios.forEach(radio => {
+            radio.addEventListener("change", function () {
+                if (this.checked && starLabels[this.value]) {
+                    ratingText.textContent = starLabels[this.value];
+                }
+            });
+        });
+    });
+</script>
+}
