@@ -11,24 +11,35 @@ namespace PresentationMVC.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly ProductApiClient _productApi;
+        private readonly ProductVariantApiClient _productVariantApi;
         private readonly CategoryApiClient _categoryApi;
         private readonly OrderApiClient _orderApi;
+        private readonly ICartService _cartService;
 
         public HomeController(
             ILogger<HomeController> logger,
             ProductApiClient productApi,
+            ProductVariantApiClient productVariantApi,
             CategoryApiClient categoryApi,
-            OrderApiClient orderApi)
+            OrderApiClient orderApi,
+            ICartService cartService)
         {
             _logger = logger;
             _productApi = productApi;
+            _productVariantApi = productVariantApi;
             _categoryApi = categoryApi;
             _orderApi = orderApi;
+            _cartService = cartService;
         }
 
-        [Authorize(Roles = "Admin,Staff")]
+        [Authorize]
         public async Task<IActionResult> Index(CancellationToken cancellationToken)
         {
+            if (User.IsInRole("Customer"))
+            {
+                return RedirectToAction(nameof(Customer));
+            }
+
             if (User.IsInRole("Staff"))
             {
                 var orderDashboard = await _orderApi.GetDashboardAsync(cancellationToken);
@@ -47,7 +58,7 @@ namespace PresentationMVC.Controllers
                     Categories = categoriesTask.Result.Where(c => !c.IsDeleted).OrderBy(c => c.Name).ToList()
                 });
             }
-            catch (HttpRequestException ex)
+            catch (Exception ex)
             {
                 _logger.LogError(ex, "Could not load admin dashboard data");
                 TempData["ErrorMessage"] = "Unable to load dashboard data from the API.";
@@ -55,32 +66,57 @@ namespace PresentationMVC.Controllers
             }
         }
 
-        [Authorize(Roles = "Customer")]
+        [AllowAnonymous]
         public async Task<IActionResult> Customer(string? q, string? category, CancellationToken cancellationToken)
         {
-            var productsTask = _productApi.GetAllAsync(cancellationToken);
+            var productsTask = _cartService.GetCustomerProductsAsync(q, category, cancellationToken);
             var categoriesTask = _categoryApi.GetAllAsync(cancellationToken);
             await Task.WhenAll(productsTask, categoriesTask);
 
             var products = productsTask.Result.Where(p => !p.IsDeleted);
-            if (!string.IsNullOrWhiteSpace(q))
-            {
-                products = products.Where(p =>
-                    p.ProductName.Contains(q, StringComparison.OrdinalIgnoreCase) ||
-                    p.Brand.Contains(q, StringComparison.OrdinalIgnoreCase));
-            }
-            if (!string.IsNullOrWhiteSpace(category))
-            {
-                products = products.Where(p => p.CategoryName.Contains(category, StringComparison.OrdinalIgnoreCase));
-            }
-
+            var categories = categoriesTask.Result.Where(c => !c.IsDeleted).OrderBy(c => c.Name).ToList();
             return View(new CustomerStoreViewModel
             {
                 Products = products.OrderBy(p => p.ProductId).ToList(),
-                Categories = categoriesTask.Result.Where(c => !c.IsDeleted).OrderBy(c => c.Name).ToList(),
+                Categories = categories,
                 Search = q ?? string.Empty,
                 Category = category ?? string.Empty
             });
+        }
+
+        [Authorize(Roles = "Customer")]
+        [HttpGet]
+        public async Task<IActionResult> ProductDetails(int id, CancellationToken cancellationToken)
+        {
+            if (id <= 0)
+            {
+                return NotFound();
+            }
+
+            try
+            {
+                var productTask = _productApi.GetCustomerByIdAsync(id, cancellationToken);
+                var variantsTask = _productVariantApi.GetCustomerByProductAsync(id, cancellationToken);
+                await Task.WhenAll(productTask, variantsTask);
+
+                var product = productTask.Result;
+                if (product is null || product.IsDeleted)
+                {
+                    return NotFound();
+                }
+
+                return View(new ProductDetailViewModel
+                {
+                    Product = product,
+                    Variants = variantsTask.Result
+                });
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "Could not load product details for product {ProductId}", id);
+                TempData["ErrorMessage"] = "Unable to load product details from the API.";
+                return RedirectToAction(nameof(Customer));
+            }
         }
 
         public IActionResult Privacy()

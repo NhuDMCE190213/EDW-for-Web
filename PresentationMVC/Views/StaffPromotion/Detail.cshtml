@@ -1,4 +1,5 @@
 @model PresentationMVC.Models.Promotion.PromotionDto
+@inject IConfiguration Configuration
 @{
     Layout = null;
 }
@@ -92,10 +93,10 @@
                         }
                         else
                         {
-                            <text>$@Model.SalePrice?.ToString("#,##0.##")</text>
+                            <text>@Model.SalePrice?.ToString("#,##0", new System.Globalization.CultureInfo("vi-VN")) ₫</text>
                             @if (Model.ThresholdPrice > 0)
                             {
-                                <span class="text-sm font-normal text-slate-500 block mt-1">Min Purchase: $@Model.ThresholdPrice?.ToString("#,##0.##")</span>
+                                <span class="text-sm font-normal text-slate-500 block mt-1">Min Purchase: @Model.ThresholdPrice?.ToString("#,##0", new System.Globalization.CultureInfo("vi-VN")) ₫</span>
                             }
                         }
                     </p>
@@ -160,7 +161,7 @@
             const returnUrl = '@Html.Raw(ViewBag.ReturnUrl)';
 
             const connection = new signalR.HubConnectionBuilder()
-                .withUrl("https://localhost:7278/promotionHub") 
+                .withUrl("@(Configuration["ApiSettings:BaseUrl"]?.TrimEnd('/') ?? "https://localhost:7278")/promotionHub")
                 .withAutomaticReconnect()
                 .build();
 

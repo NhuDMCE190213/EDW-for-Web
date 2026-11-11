@@ -25,7 +25,8 @@ namespace PresentationMVC.Services
         public async Task<OrderDashboardModel> GetDashboardAsync(CancellationToken cancellationToken = default)
         {
             using var response = await _httpClient.GetAsync($"{Resource}/dashboard", cancellationToken);
-            return await ReadAsync<OrderDashboardModel>(response, cancellationToken) ?? new OrderDashboardModel();
+            return await ReadAsync<OrderDashboardModel>(response, cancellationToken)
+                ?? throw new HttpRequestException("Order dashboard API returned an empty response.");
         }
 
         public async Task<OrderStaffModel?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
@@ -39,7 +40,8 @@ namespace PresentationMVC.Services
         {
             var content = new StringContent(JsonSerializer.Serialize(status), Encoding.UTF8, "application/json");
             using var response = await _httpClient.PutAsync($"{Resource}/{id}/status", content, cancellationToken);
-            return response.IsSuccessStatusCode;
+            await EnsureSuccessAsync(response, cancellationToken);
+            return true;
         }
 
         private async Task<T?> ReadAsync<T>(HttpResponseMessage response, CancellationToken cancellationToken)
@@ -59,5 +61,6 @@ namespace PresentationMVC.Services
             _logger.LogWarning("Order API returned {StatusCode}: {Body}", response.StatusCode, body);
             throw new HttpRequestException($"Order API request failed ({(int)response.StatusCode} {response.ReasonPhrase}).");
         }
+
     }
 }

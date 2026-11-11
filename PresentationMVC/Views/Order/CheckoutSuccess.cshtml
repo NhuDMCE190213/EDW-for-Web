@@ -1,0 +1,282 @@
+@using System.Globalization
+@model PresentationMVC.Models.Order.Customer.OrderCheckoutResultDto
+@{
+    ViewData["Title"] = "Order Confirmed";
+}
+
+@section Styles {
+    <style>
+        .checkout-success-container {
+            max-width: 960px;
+            margin: 20px auto 50px;
+            padding: 0 16px;
+        }
+
+        .success-hero {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border-radius: 20px;
+            padding: 40px 24px;
+            text-align: center;
+            color: #fff;
+            margin-bottom: 28px;
+            box-shadow: 0 10px 30px rgba(16, 185, 129, 0.25);
+        }
+
+        .success-icon {
+            width: 72px;
+            height: 72px;
+            background: rgba(255, 255, 255, 0.22);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.4rem;
+            margin: 0 auto 18px;
+        }
+
+        .stat-card-checkout {
+            background: #fff;
+            border-radius: 14px;
+            border: 1px solid #e2e8f0;
+            padding: 18px 20px;
+            text-align: center;
+            height: 100%;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.03);
+        }
+
+        .stat-card-checkout .label {
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: #64748b;
+            letter-spacing: 0.04em;
+        }
+
+        .stat-card-checkout .value {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: #1e293b;
+            margin-top: 6px;
+        }
+
+        .stat-card-checkout .value.highlight {
+            color: var(--customer-primary);
+            font-size: 1.45rem;
+        }
+
+        .order-id-banner {
+            background: #f0fdf4;
+            border: 1.5px solid #bbf7d0;
+            border-radius: 12px;
+            padding: 14px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 28px;
+        }
+
+        .order-id-code {
+            font-family: monospace;
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #166534;
+        }
+
+        .order-items-card {
+            background: #fff;
+            border-radius: 16px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.04);
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+
+        .order-items-header {
+            padding: 18px 24px;
+            border-bottom: 1px solid #e2e8f0;
+            font-weight: 700;
+            font-size: 1.05rem;
+            color: #1e293b;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .checkout-actions-row {
+            display: flex;
+            gap: 14px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .btn-view-orders-main {
+            background: var(--customer-primary);
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            padding: 13px 28px;
+            font-weight: 700;
+            font-size: 0.98rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            transition: all 0.2s;
+            box-shadow: 0 4px 14px rgba(226, 75, 74, 0.3);
+        }
+
+        .btn-view-orders-main:hover {
+            background: var(--customer-primary-dark);
+            color: #fff;
+            transform: translateY(-1px);
+        }
+
+        .btn-back-home {
+            background: #fff;
+            color: #475569;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 12px;
+            padding: 13px 24px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .btn-back-home:hover {
+            border-color: #94a3b8;
+            color: #1e293b;
+        }
+    </style>
+}
+
+<div class="checkout-success-container">
+    @* ── Success Hero ───────────────────────────────────────────────────────── *@
+    <div class="success-hero">
+        <div class="success-icon"><i class="bi bi-check-lg"></i></div>
+        <h2 class="fw-bold mb-2">Order Transferred & Placed Successfully!</h2>
+        <p class="mb-3" style="font-size: 1.05rem; opacity: 0.95;">
+            Your selected products have been converted into an order and registered in the system.
+        </p>
+        <span class="badge bg-white text-success px-3 py-2 rounded-pill fw-bold" style="font-size: 0.85rem;">
+            <i class="bi bi-clock-history me-1"></i> Status: @Model.Order.Status
+        </span>
+    </div>
+
+    @* ── Order ID Copy Row ────────────────────────────────────────────────── *@
+    <div class="order-id-banner">
+        <div>
+            <div class="text-muted small fw-semibold">ORDER TRACKING ID</div>
+            <div class="order-id-code">#@Model.Order.OrderId</div>
+        </div>
+        <button type="button" class="btn btn-sm btn-outline-success rounded-pill px-3 fw-semibold" onclick="copyOrderId('@Model.Order.OrderId')">
+            <i class="bi bi-clipboard me-1"></i> Copy ID
+        </button>
+    </div>
+
+    @* ── Summary Stat Cards ───────────────────────────────────────────────── *@
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3">
+            <div class="stat-card-checkout">
+                <div class="label">Subtotal</div>
+                <div class="value">@Model.Subtotal.ToString("N0", new CultureInfo("vi-VN")) ₫</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="stat-card-checkout">
+                <div class="label">Discount</div>
+                <div class="value text-success">
+                    @(Model.Discount > 0 ? $"-{Model.Discount.ToString("N0", new CultureInfo("vi-VN"))} ₫" : "0 ₫")
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="stat-card-checkout">
+                <div class="label">Shipping</div>
+                <div class="value text-success">FREE</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="stat-card-checkout">
+                <div class="label">Total Amount</div>
+                <div class="value highlight">@Model.Total.ToString("N0", new CultureInfo("vi-VN")) ₫</div>
+            </div>
+        </div>
+    </div>
+
+    @* ── Items Breakdown Table ────────────────────────────────────────────── *@
+    <div class="order-items-card">
+        <div class="order-items-header">
+            <i class="bi bi-box-seam text-danger"></i>
+            <span>Order Items (@Model.Order.OrderItems.Count)</span>
+        </div>
+        <div class="table-responsive">
+            <table class="table align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th class="ps-4">Product Name</th>
+                        <th>Variant Details</th>
+                        <th class="text-end">Qty</th>
+                        <th class="text-end">Unit Price</th>
+                        <th class="text-end pe-4">Line Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Order.OrderItems)
+                    {
+                        <tr>
+                            <td class="ps-4">
+                                <div class="fw-bold text-dark">@item.ProductName</div>
+                                <div class="text-muted small">Item Ref #@item.OrderItemId</div>
+                            </td>
+                            <td>
+                                <span class="badge bg-light text-secondary border px-2 py-1">
+                                    @item.ProductVariantDetails
+                                </span>
+                            </td>
+                            <td class="text-end fw-semibold">@item.Quantity</td>
+                            <td class="text-end">@item.PriceAtPurchase.ToString("N0", new CultureInfo("vi-VN")) ₫</td>
+                            <td class="text-end pe-4 fw-bold text-danger">
+                                @((item.PriceAtPurchase * item.Quantity).ToString("N0", new CultureInfo("vi-VN"))) ₫
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+                <tfoot class="border-top table-light">
+                    <tr>
+                        <td colspan="4" class="text-end fw-bold ps-4">Total Paid:</td>
+                        <td class="text-end pe-4 fw-bold text-danger fs-5">
+                            @Model.Total.ToString("N0", new CultureInfo("vi-VN")) ₫
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+
+    @* ── Navigation Action Buttons ────────────────────────────────────────── *@
+    <div class="checkout-actions-row">
+        <a asp-controller="Orders" asp-action="Index" class="btn-view-orders-main">
+            <i class="bi bi-bag-check-fill"></i> View My Orders
+        </a>
+        <a asp-controller="Home" asp-action="Customer" class="btn-back-home">
+            <i class="bi bi-grid-fill"></i> Continue Shopping
+        </a>
+        <a asp-controller="Cart" asp-action="Index" class="btn-back-home ms-auto">
+            <i class="bi bi-cart3"></i> Back to Cart
+        </a>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function copyOrderId(id) {
+            navigator.clipboard.writeText(id).then(function() {
+                showToast("Order ID copied to clipboard!", "success", "Copied");
+            });
+        }
+    </script>
+}

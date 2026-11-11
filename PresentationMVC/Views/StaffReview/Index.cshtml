@@ -235,9 +235,14 @@
                                         }
                                         else
                                         {
-                                            <button type="button" class="btn btn-warning disabled" title="Already flagged">
-                                                <i class="bi bi-flag-fill me-1"></i>Flagged
-                                            </button>
+                                            <form asp-action="Unflag" method="post" class="d-inline">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="reviewId" value="@review.ReviewId" />
+                                                <button type="submit" class="btn btn-outline-warning" title="Remove flag"
+                                                        onclick="return confirm('Bạn có chắc muốn gỡ cờ đánh giá này?');">
+                                                    <i class="bi bi-flag-fill me-1"></i>Unflag
+                                                </button>
+                                            </form>
                                         }
 
                                         <!-- UC-06.3: Moderate Product Reviews (Admin Only - FR-01) -->

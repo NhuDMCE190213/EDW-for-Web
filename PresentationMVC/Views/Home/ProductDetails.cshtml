@@ -1,0 +1,72 @@
+@model PresentationMVC.Models.ProductDetailViewModel
+@{
+    ViewData["Title"] = Model.Product.ProductName;
+}
+
+<div class="row g-4">
+    <div class="col-md-5">
+        <div class="product-detail-image">
+            @if (!string.IsNullOrWhiteSpace(Model.Product.ImageUrl))
+            {
+                <img src="@Model.Product.ImageUrl" alt="@Model.Product.ProductName" />
+            }
+            else
+            {
+                <i class="bi bi-cpu"></i>
+            }
+        </div>
+    </div>
+    <div class="col-md-7">
+        <span class="badge bg-danger-subtle text-danger mb-2">@Model.Product.CategoryName</span>
+        <h1 class="display-6 fw-bold">@Model.Product.ProductName</h1>
+        <p class="text-muted fs-5">@Model.Product.Brand</p>
+        <hr />
+
+        @if (Model.Variants.Count == 0)
+        {
+            <div class="alert alert-warning">This product is currently unavailable.</div>
+        }
+        else
+        {
+            <form asp-controller="Cart" asp-action="AddToCart" method="post" class="product-cart-form">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="productId" value="@Model.Product.ProductId" />
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold" for="ProductVariantId">Choose a variant</label>
+                    <select class="form-select" id="ProductVariantId" name="ProductVariantId" required>
+                        <option value="">Select a variant</option>
+                        @foreach (var variant in Model.Variants)
+                        {
+                            <option value="@variant.ProductVariantId" disabled="@(variant.StockQuantity <= 0 ? "disabled" : null)">
+                                @variant.Color
+                                @if (!string.IsNullOrWhiteSpace(variant.Storage))
+                                {
+                                    <text> - @variant.Storage</text>
+                                }
+                                @if (!string.IsNullOrWhiteSpace(variant.Ram))
+                                {
+                                    <text> - @variant.Ram</text>
+                                }
+                                — @variant.DisplayPrice.ToString("N0") VND
+                                @(variant.StockQuantity > 0 ? $" ({variant.StockQuantity} available)" : " (Out of stock)")
+                            </option>
+                        }
+                    </select>
+                </div>
+                <div class="row g-3 align-items-end">
+                    <div class="col-sm-4">
+                        <label class="form-label fw-semibold" for="Quantity">Quantity</label>
+                        <input class="form-control" id="Quantity" name="Quantity" type="number" min="1" value="1" required />
+                    </div>
+                    <div class="col-sm-8">
+                        <button type="submit" class="btn btn-danger w-100">
+                            <i class="bi bi-cart-plus me-2"></i>Add to cart
+                        </button>
+                    </div>
+                </div>
+            </form>
+        }
+        <a asp-action="Customer" class="btn btn-link px-0 mt-4">Back to products</a>
+    </div>
+</div>
