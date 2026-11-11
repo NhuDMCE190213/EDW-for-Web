@@ -1,9 +1,11 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PresentationMVC.Models.Promotion;
 using PresentationMVC.Services;
 
 namespace PresentationMVC.Controllers
 {
+    [Authorize(Roles = "Admin,Staff")]
     public class StaffPromotionController : Controller
     {
         private readonly PromotionApiClient _promotionApiClient;
@@ -16,11 +18,6 @@ namespace PresentationMVC.Controllers
         [HttpGet]
         public async Task<IActionResult> Index([FromQuery] StaffPromotionIndexViewModel model)
         {
-            // if (!User.IsInRole("Admin"))
-            // {
-            //     TempData["AccessDeniedMessage"] = "Yêu cầu quyền Quản trị viên (Admin) để quản lý Promotion!";
-            //     return RedirectToAction("Index", "Home");
-            // }
 
             var request = new PromotionListRequest
             {
@@ -80,11 +77,6 @@ namespace PresentationMVC.Controllers
         [HttpGet]
         public IActionResult Create()
         {
-            // if (!User.IsInRole("Admin"))
-            // {
-            //     TempData["AccessDeniedMessage"] = "Yêu cầu quyền Quản trị viên (Admin) để quản lý Promotion!";
-            //     return RedirectToAction("Index", "Home");
-            // }
 
             var dto = new PromotionCreateModel
             {
@@ -97,11 +89,6 @@ namespace PresentationMVC.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(PromotionCreateModel dto)
         {
-            // if (!User.IsInRole("Admin"))
-            // {
-            //     TempData["AccessDeniedMessage"] = "Yêu cầu quyền Quản trị viên (Admin) để quản lý Promotion!";
-            //     return RedirectToAction("Index", "Home");
-            // }
 
             if (!ModelState.IsValid)
             {
@@ -111,7 +98,7 @@ namespace PresentationMVC.Controllers
             try
             {
                 await _promotionApiClient.CreatePromotionAsync(dto);
-                TempData["SuccessMessage"] = "Tạo Promotion thành công.";
+                TempData["SuccessMessage"] = "Promotion created successfully.";
                 return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
@@ -124,6 +111,7 @@ namespace PresentationMVC.Controllers
         [HttpGet]
         public async Task<IActionResult> Detail(Guid id, string returnUrl)
         {
+
             var p = await _promotionApiClient.GetPromotionByIdAsync(id);
 
             if (p == null) return NotFound();
@@ -135,11 +123,6 @@ namespace PresentationMVC.Controllers
         [HttpGet]
         public async Task<IActionResult> Edit(Guid id)
         {
-            // if (!User.IsInRole("Admin"))
-            // {
-            //     TempData["AccessDeniedMessage"] = "Yêu cầu quyền Quản trị viên (Admin) để quản lý Promotion!";
-            //     return RedirectToAction("Index", "Home");
-            // }
 
             var p = await _promotionApiClient.GetPromotionByIdAsync(id);
 
@@ -167,11 +150,6 @@ namespace PresentationMVC.Controllers
         [HttpPost]
         public async Task<IActionResult> Edit(Guid id, PromotionUpdateModel dto)
         {
-            // if (!User.IsInRole("Admin"))
-            // {
-            //     TempData["AccessDeniedMessage"] = "Yêu cầu quyền Quản trị viên (Admin) để quản lý Promotion!";
-            //     return RedirectToAction("Index", "Home");
-            // }
 
             if (!ModelState.IsValid)
             {
@@ -182,7 +160,7 @@ namespace PresentationMVC.Controllers
             try
             {
                 await _promotionApiClient.UpdatePromotionAsync(id, dto);
-                TempData["SuccessMessage"] = "Cập nhật Promotion thành công.";
+                TempData["SuccessMessage"] = "Promotion updated successfully.";
                 return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
@@ -196,16 +174,11 @@ namespace PresentationMVC.Controllers
         [HttpPost]
         public async Task<IActionResult> Delete(Guid id)
         {
-            // if (!User.IsInRole("Admin"))
-            // {
-            //     TempData["AccessDeniedMessage"] = "Yêu cầu quyền Quản trị viên (Admin) để quản lý Promotion!";
-            //     return RedirectToAction("Index", "Home");
-            // }
 
             try
             {
                 await _promotionApiClient.DeletePromotionAsync(id);
-                TempData["SuccessMessage"] = "Xoá/Disable Promotion thành công.";
+                TempData["SuccessMessage"] = "Promotion deleted/disabled successfully.";
             }
             catch (Exception ex)
             {

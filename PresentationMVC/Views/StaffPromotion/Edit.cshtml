@@ -3,7 +3,7 @@
     Layout = null;
 }
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
@@ -78,11 +78,11 @@
             Promotion Name <span class="text-red-600">*</span>
 </label>
 <div class="relative">
-<input class="w-full px-3.5 py-2.5 text-sm rounded-lg border border-slate-300 bg-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition-colors" id="Name" name="Name" placeholder="e.g., Siêu Sale Cuối Tuần 50%" type="text" value="@Model?.Name"/>
+<input class="w-full px-3.5 py-2.5 text-sm rounded-lg border border-slate-300 bg-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition-colors" id="Name" name="Name" placeholder="e.g., Weekend Mega Sale 50%" type="text" value="@Model?.Name"/>
 </div>
 <p class="hidden text-xs text-red-600 font-medium flex items-center gap-1 mt-1" id="err-promotionName">
 <svg class="w-3.5 h-3.5 inline shrink-0" fill="currentColor" viewbox="0 0 20 20"><path clip-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" fill-rule="evenodd"></path></svg>
-            Tên chương trình khuyến mãi không được để trống
+            Promotion name cannot be empty.
           </p>
 </div>
 <div class="md:col-span-5 space-y-1.5" data-purpose="field-promotion-type">
@@ -115,7 +115,7 @@
 </div>
 <p class="hidden text-xs text-red-600 font-medium flex items-center gap-1 mt-1" id="err-percentageValue">
 <svg class="w-3.5 h-3.5 inline shrink-0" fill="currentColor" viewbox="0 0 20 20"><path clip-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" fill-rule="evenodd"></path></svg>
-              Tỷ lệ phần trăm hợp lệ từ 0 đến 100 (tối đa 2 chữ số thập phân)
+              Percentage must be a valid number between 0 and 100 (up to 2 decimal places).
             </p>
 </div>
 </div>
@@ -146,7 +146,7 @@
 </div>
 <p class="hidden text-xs text-red-600 font-medium flex items-center gap-1.5 pt-1" id="err-fixedPrices">
 <svg class="w-3.5 h-3.5 inline shrink-0" fill="currentColor" viewbox="0 0 20 20"><path clip-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" fill-rule="evenodd"></path></svg>
-            Threshold Price phải lớn hơn Sale Price và cả hai phải lớn hơn 0
+            Threshold Price must be greater than Sale Price, and both must be greater than 0.
           </p>
 </div>
 </section>
@@ -205,7 +205,7 @@
 </div>
 <p class="hidden text-xs text-red-600 font-medium flex items-center gap-1 pt-1" id="err-dates">
 <svg class="w-3.5 h-3.5 inline shrink-0" fill="currentColor" viewbox="0 0 20 20"><path clip-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" fill-rule="evenodd"></path></svg>
-<span id="err-dates-text">Start Date và End Date không được bỏ trống, và End Date phải sau Start Date.</span>
+<span id="err-dates-text">Start Date and End Date are required, and End Date must be after Start Date.</span>
 </p>
 </div>
 </div>
@@ -220,7 +220,7 @@
 </div>
 <p class="hidden text-xs text-red-600 font-medium flex items-center gap-1 mt-1" id="err-maxReservedStock">
 <svg class="w-3.5 h-3.5 inline shrink-0" fill="currentColor" viewbox="0 0 20 20"><path clip-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" fill-rule="evenodd"></path></svg>
-            Số lượng tồn kho phải là số nguyên lớn hơn hoặc bằng 0
+            Max reserved stock must be an integer greater than or equal to 0.
           </p>
 </div>
 </div>
@@ -231,8 +231,8 @@
 <path clip-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" fill-rule="evenodd"></path>
 </svg>
 <div>
-<p class="font-bold text-sm text-emerald-900">Khuyến mãi hợp lệ, đang lưu...</p>
-<p class="text-xs text-emerald-700" id="success-summary">Dữ liệu hợp lệ theo tiêu chuẩn khuyến mãi.</p>
+<p class="font-bold text-sm text-emerald-900">Promotion is valid, saving...</p>
+<p class="text-xs text-emerald-700" id="success-summary">Promotion data meets all validation requirements.</p>
 </div>
 </div>
 </div>
@@ -465,7 +465,7 @@
           const eVal = endDateInput.value;
 
           if (!sVal || !eVal) {
-            errDatesText.textContent = 'Vui lòng chọn cả Start Date và End Date.';
+            errDatesText.textContent = 'Please select both Start Date and End Date.';
             errDates.classList.remove('hidden');
             setFieldStatus(startDateInput, !sVal);
             setFieldStatus(endDateInput, !eVal);
@@ -475,7 +475,7 @@
             const endTimestamp = new Date(eVal).getTime();
 
             if (endTimestamp <= startTimestamp) {
-              errDatesText.textContent = 'End Date phải sau Start Date.';
+              errDatesText.textContent = 'End Date must be after Start Date.';
               errDates.classList.remove('hidden');
               setFieldStatus(endDateInput, true);
               isValid = false;
@@ -531,8 +531,8 @@
             btnSave.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Updating...';
             
             const summaryText = selectedType === 'Percentage'
-                ? `Chương trình "${nameVal}" loại Giảm ${percentageInput.value}% đang được xử lý.`
-                : `Chương trình "${nameVal}" với giá bán $${Number(salePriceInput.value).toLocaleString('en-US')} đang được xử lý.`;
+                ? `Promotion "${nameVal}" (${percentageInput.value}% discount) is being processed.`
+                : `Promotion "${nameVal}" with sale price $${Number(salePriceInput.value).toLocaleString('en-US')} is being processed.`;
             
             document.getElementById('success-summary').textContent = summaryText;
             successBanner.classList.remove('hidden');
