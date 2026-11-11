@@ -12,6 +12,14 @@
         <span class="admin-page-badge"><i class="bi bi-person-badge me-1"></i> Staff workspace</span>
     </div>
 
+    @if (TempData["AccessDeniedMessage"] is string accessDenied)
+    {
+        <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+            <i class="bi bi-shield-exclamation me-2"></i>@accessDenied
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
     <div class="row g-3 mb-4">
         <div class="col-md-4">
             <div class="admin-stat order-dashboard-stat">
