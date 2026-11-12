@@ -25,7 +25,7 @@ namespace PresentationMVC.Controllers
 
             var token = User.FindFirst("JWTToken")?.Value;
             product.Reviews = (await _reviewApiClient.GetProductReviewsAsync(id, token))
-                .Where(review => string.Equals(review.Status, "Published", StringComparison.OrdinalIgnoreCase))
+                .Where(review => !string.Equals(review.Status, "Hidden", StringComparison.OrdinalIgnoreCase))
                 .OrderByDescending(review => review.CreatedAt)
                 .ToList();
 
