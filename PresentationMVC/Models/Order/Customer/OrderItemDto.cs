@@ -5,6 +5,7 @@ namespace PresentationMVC.Models.Order.Customer
         public int OrderItemId { get; set; }
         public Guid OrderId { get; set; }
         public Guid ProductVariantId { get; set; }
+        public int ProductId { get; set; }
         public string ProductName { get; set; } = string.Empty;
         public string ProductVariantDetails { get; set; } = string.Empty;
         public int Quantity { get; set; }
